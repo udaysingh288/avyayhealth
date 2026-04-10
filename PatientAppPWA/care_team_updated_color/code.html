@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Care Team - Avyay Health</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#1466ad",
+          "clinical-green": "#085041",
+          "background-light": "#f6f7f8",
+          "background-dark": "#111a21",
+        },
+        fontFamily: {
+          "display": ["Plus Jakarta Sans"],
+          "body": ["IBM Plex Sans"]
+        },
+        borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+      },
+    },
+  }
+</script>
+<style>
+  body { font-family: 'IBM Plex Sans', sans-serif; }
+  h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background-light text-[#0F172A] min-h-screen flex flex-col antialiased">
+<!-- Header Section -->
+<div class="bg-white shadow-[0_2px_4px_rgba(15,76,129,0.08)] sticky top-0 z-10">
+<div class="flex items-center justify-between px-4 py-4">
+<h1 class="text-[#0F172A] text-2xl font-bold font-display tracking-tight flex-1 text-center">Care Team</h1>
+</div>
+<!-- Segmented Control -->
+<div class="px-4 pb-4">
+<div class="flex h-10 w-full items-center justify-center rounded-md bg-[#E2E8F0] p-1">
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded px-2 has-[:checked]:bg-white has-[:checked]:shadow-sm has-[:checked]:text-[#0F172A] text-[#64748B] text-sm font-medium transition-all">
+<span class="truncate font-display">My Team</span>
+<input checked="" class="invisible w-0" name="care-team-tab" type="radio" value="My Team"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded px-2 has-[:checked]:bg-white has-[:checked]:shadow-sm has-[:checked]:text-[#0F172A] text-[#64748B] text-sm font-medium transition-all">
+<span class="truncate font-display">Hospital Directory</span>
+<input class="invisible w-0" name="care-team-tab" type="radio" value="Hospital Directory"/>
+</label>
+</div>
+</div>
+</div>
+<!-- Main Content: Contact List -->
+<main class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+<!-- Contact Card 1 -->
+<div class="flex items-center h-[88px] bg-white rounded-md border border-[#E2E8F0] shadow-[0_2px_4px_rgba(15,76,129,0.04)] p-4">
+<img alt="Dr. Sarah Jenkins profile" class="w-12 h-12 rounded-full object-cover shrink-0 border border-[#E2E8F0]" data-alt="professional headshot of a female doctor in a white coat smiling warmly against a clinical light blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFy7DbJ1NSS3us8V1Ri386PtlN2zFO2UD3C2wknRjKsR-Kg-xl9NP6rTbN2132j6ekWn-2x6fKaxcTqfAY2ZbALcCaOMbcP7m16S4Sq6wOZ43ADRp7zHU9CsgG-ETsMRbiZk8FCt2huQMSvxeE4ddMFIqKFqHzlv5a_9NDzvBsv0fm_Pf8PzzT7OUpP8I-8-WWDFySXetPE-xMdfBjsG-nlN8KVeL9SPHbemyqQFD5gcwOVXiRC4SyZSpqbpWbr2RCHGDxFo8BQmOL"/>
+<div class="ml-4 flex-1 min-w-0">
+<h2 class="text-base font-bold text-[#0F172A] font-display truncate">Dr. Sarah Jenkins</h2>
+<p class="text-sm font-medium text-[#64748B] truncate">Lead Cardiologist</p>
+</div>
+<button aria-label="Call Dr. Sarah Jenkins" class="ml-4 w-10 h-10 rounded-full bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-center text-primary hover:bg-[#E2E8F0] transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">call</span>
+</button>
+</div>
+<!-- Contact Card 2 -->
+<div class="flex items-center h-[88px] bg-white rounded-md border border-[#E2E8F0] shadow-[0_2px_4px_rgba(15,76,129,0.04)] p-4">
+<img alt="Nurse Marcus Reed profile" class="w-12 h-12 rounded-full object-cover shrink-0 border border-[#E2E8F0]" data-alt="professional headshot of a male nurse in blue scrubs looking reassuringly at the camera in a hospital setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPVNyI4EZz10kennteWsy2SoXP_Wn2DV14aTl0P5zsGof1ALEJnpkX4pKahca4AOlGU5VglIbj-0sgGWOD-OQAKsoScVGWYpwfo5Ui0I947inpYF8NxJZjdE5xQ8GX6biDjuY3hZHZUKjn95v0fgoN44mEN1RzVsKYjpPTjyOalijIPQm5TrIXtBYWUMJbdvEg3A1vgaKBZnyRet3Y4JpTy4uGbA4pRm6IqD5ir_SLkkzPG59wO6uA5_w6EIFw4uM0He8UHXXCuMY0"/>
+<div class="ml-4 flex-1 min-w-0">
+<h2 class="text-base font-bold text-[#0F172A] font-display truncate">Marcus Reed, RN</h2>
+<p class="text-sm font-medium text-[#64748B] truncate">Primary Care Nurse</p>
+</div>
+<button aria-label="Call Marcus Reed" class="ml-4 w-10 h-10 rounded-full bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-center text-primary hover:bg-[#E2E8F0] transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">call</span>
+</button>
+</div>
+<!-- Contact Card 3 -->
+<div class="flex items-center h-[88px] bg-white rounded-md border border-[#E2E8F0] shadow-[0_2px_4px_rgba(15,76,129,0.04)] p-4">
+<div class="w-12 h-12 rounded-full bg-[#F0FDF4] flex items-center justify-center shrink-0 border border-clinical-green">
+<span class="material-symbols-outlined text-clinical-green">prescriptions</span>
+</div>
+<div class="ml-4 flex-1 min-w-0">
+<h2 class="text-base font-bold text-[#0F172A] font-display truncate">Hospital Pharmacy</h2>
+<p class="text-sm font-medium text-[#64748B] truncate">Medication Refills</p>
+</div>
+<button aria-label="Call Hospital Pharmacy" class="ml-4 w-10 h-10 rounded-full bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-center text-primary hover:bg-[#E2E8F0] transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">call</span>
+</button>
+</div>
+<!-- Contact Card 4 (Emergency) -->
+<div class="flex items-center h-[88px] bg-white rounded-md border border-[#DC2626] shadow-[0_2px_4px_rgba(220,38,38,0.08)] p-4 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-[#DC2626]"></div>
+<div class="w-12 h-12 rounded-full bg-[#FEF2F2] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[#DC2626]" style="font-variation-settings: 'FILL' 1;">emergency</span>
+</div>
+<div class="ml-4 flex-1 min-w-0">
+<h2 class="text-base font-bold text-[#DC2626] font-display truncate">On-Call Physician</h2>
+<p class="text-sm font-medium text-[#DC2626] opacity-80 truncate">24/7 Urgent Line</p>
+</div>
+<button aria-label="Call On-Call Physician" class="ml-4 w-10 h-10 rounded-full bg-[#FEF2F2] border border-[#FCA5A5] flex items-center justify-center text-[#DC2626] hover:bg-[#FEE2E2] transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-[#DC2626] focus:ring-offset-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">call</span>
+</button>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Shared Component) -->
+<div class="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-[#E2E8F0] shadow-[0_-2px_10px_rgba(15,76,129,0.05)] z-20 font-display">
+<div class="flex gap-2 px-4 pb-6 pt-3 max-w-md mx-auto">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#64748B] hover:text-[#0F172A] transition-colors" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">home</span>
+</div>
+<p class="text-[11px] font-semibold leading-normal tracking-wide">Dashboard</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#64748B] hover:text-[#0F172A] transition-colors" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">check_box</span>
+</div>
+<p class="text-[11px] font-semibold leading-normal tracking-wide">Check-in</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#64748B] hover:text-[#0F172A] transition-colors" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<p class="text-[11px] font-semibold leading-normal tracking-wide">Triage</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-clinical-green" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<p class="text-[11px] font-bold leading-normal tracking-wide">Care Team</p>
+</a>
+</div>
+</div>
+</body></html>

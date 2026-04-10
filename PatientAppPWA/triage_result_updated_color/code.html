@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Avyay Health - Triage Result</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#085041",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102213",
+                        "text-slate": "#3D4035",
+                        "muted-sage": "#9CA39A",
+                        "triage-red": "#E58B88",
+                        "triage-red-light": "rgba(229, 139, 136, 0.15)",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1.5rem", "xl": "1.5rem", "full": "9999px"},
+                    boxShadow: {
+                        "soft": "0 8px 24px rgba(124, 169, 130, 0.08)"
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: theme('colors.triage-red-light');
+        }
+        
+        @keyframes springBounce {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            70% { transform: scale(0.95); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-spring {
+            animation: springBounce 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="antialiased text-text-slate min-h-screen flex flex-col items-center justify-center p-6">
+<div class="w-full max-w-md mx-auto flex flex-col items-center space-y-8">
+<!-- Header / Nav (Back to main exception) -->
+<div class="w-full flex justify-start mb-4">
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-soft text-text-slate hover:bg-gray-50 transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+</div>
+<!-- Animated Icon -->
+<div class="animate-spring w-32 h-32 rounded-full bg-white shadow-soft flex items-center justify-center text-triage-red relative">
+<div class="absolute inset-0 rounded-full border-4 border-triage-red opacity-20 scale-110"></div>
+<span class="material-symbols-outlined text-[64px]" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<!-- Headline -->
+<div class="text-center space-y-2">
+<h1 class="font-display font-bold text-[28px] leading-tight text-text-slate">Let's get that checked out.</h1>
+<p class="font-body text-muted-sage text-base px-4">Your answers suggest we should have a care team member review your symptoms.</p>
+</div>
+<!-- Instruction Card -->
+<div class="w-full bg-white rounded-lg shadow-soft p-6 space-y-4">
+<h2 class="font-display font-bold text-lg text-text-slate border-b border-gray-100 pb-3">Next Steps</h2>
+<ul class="space-y-4 font-body text-base text-text-slate">
+<li class="flex items-start gap-3">
+<div class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-triage-red-light flex items-center justify-center text-triage-red">
+<span class="text-sm font-bold">1</span>
+</div>
+<span>Rest comfortably in a seated position if possible.</span>
+</li>
+<li class="flex items-start gap-3">
+<div class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-triage-red-light flex items-center justify-center text-triage-red">
+<span class="text-sm font-bold">2</span>
+</div>
+<span>Do not take any additional pain medication until you speak with the team.</span>
+</li>
+<li class="flex items-start gap-3">
+<div class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-triage-red-light flex items-center justify-center text-triage-red">
+<span class="text-sm font-bold">3</span>
+</div>
+<span>Call the triage line using the button below.</span>
+</li>
+</ul>
+</div>
+<!-- Primary Action -->
+<div class="w-full mt-4">
+<button class="w-full h-14 bg-triage-red text-white rounded-full font-display font-bold text-lg shadow-soft flex items-center justify-center gap-2 hover:opacity-90 transition-opacity active:scale-[0.98]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">call</span>
+                Contact Care Team
+            </button>
+<p class="text-center text-sm text-muted-sage mt-4 font-body">Available 24/7 for discharged patients.</p>
+</div>
+</div>
+</body></html>

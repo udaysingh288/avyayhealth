@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Avyay Health - Triage Status</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Sans:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0F4C81",
+                        "background-light": "#F8FAFC",
+                        "background-dark": "#111a21",
+                        "surface": "#FFFFFF",
+                        "text-main": "#0F172A",
+                        "muted": "#64748B",
+                        "border-color": "#E2E8F0",
+                        "accent": "#00A9A5",
+                        "status-green": "#085041",
+                        "status-green-bg": "#E6F0EE",
+                        "status-yellow": "#D97706",
+                        "status-yellow-bg": "#FFFBEB",
+                        "status-red": "#DC2626",
+                        "status-red-bg": "#FEF2F2",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["IBM Plex Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "sm": "0.25rem",
+                        "md": "0.5rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "clinical": "0 2px 4px rgba(15, 76, 129, 0.08)"
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            min-height: max(884px, 100dvh);
+        }
+        .font-body {
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light text-text-main min-h-screen flex flex-col items-center justify-center">
+<!-- Back Navigation -->
+<div class="fixed top-0 left-0 w-full p-4 flex items-center bg-background-light z-10">
+<button aria-label="Go back" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-border-color transition-colors">
+<span class="material-symbols-outlined text-text-main text-2xl" data-icon="arrow_back">arrow_back</span>
+</button>
+</div>
+<!-- Main Content Container -->
+<main class="w-full max-w-md px-6 flex flex-col items-center justify-center flex-1 mt-16 pb-24">
+<!-- Status Icon -->
+<div class="w-[120px] h-[120px] rounded-full bg-status-red-bg flex items-center justify-center mb-8 shadow-clinical animate-pulse">
+<span class="material-symbols-outlined text-status-red text-6xl" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<!-- Headline -->
+<h1 class="text-[32px] font-bold text-center text-text-main leading-tight mb-6">
+            Medical Attention<br/>Required
+        </h1>
+<!-- Directive Card -->
+<div class="w-full bg-surface rounded-sm border border-border-color shadow-clinical p-6 mb-8 text-center">
+<p class="font-body text-base text-text-main leading-relaxed">
+                Your temperature is elevated and your reported symptoms indicate a potential issue.
+            </p>
+<p class="font-body text-base font-medium text-status-red mt-4">
+                Please contact your care team immediately.
+            </p>
+</div>
+</main>
+<!-- Fixed Bottom Action -->
+<div class="fixed bottom-0 left-0 w-full p-6 bg-background-light pb-8">
+<div class="max-w-md mx-auto">
+<button class="w-full bg-status-red text-surface font-semibold text-lg py-4 rounded-sm shadow-clinical flex items-center justify-center gap-2 hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-status-red active:bg-red-800">
+<span class="material-symbols-outlined text-surface" data-icon="call" style="font-variation-settings: 'FILL' 1;">call</span>
+                Call Care Team Now
+            </button>
+<button class="w-full mt-4 bg-transparent text-muted font-body text-sm py-2 hover:text-text-main transition-colors focus:outline-none underline">
+                I have already contacted them
+            </button>
+</div>
+</div>
+</body></html>

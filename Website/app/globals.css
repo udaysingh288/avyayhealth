@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-forest: #085041;
+  --color-teal: #0D6B56;
+  --color-offwhite: #FFF8E7;
+  --color-charcoal: #1A1A1A;
+  --color-gray: #6B7280;
+  --color-red: #C0392B;
+  --color-amber: #D97706;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #FFF8E7;
+  color: #1A1A1A;
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

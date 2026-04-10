@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Avyay Health - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#085041",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102213",
+                        "surface": "#FFFFFF",
+                        "text-main": "#3D4035",
+                        "text-muted": "#9CA39A",
+                        "app-bg": "#FAF7F2", 
+                        "soft-green": "#e6efed" // Adjusted to match the new primary tone
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'soft': '0 8px 24px rgba(8, 80, 65, 0.08)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #FAF7F2; 
+            color: #3D4035; 
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="antialiased h-screen flex justify-center bg-gray-100">
+<!-- Mobile Container -->
+<div class="w-full max-w-md bg-app-bg h-full flex flex-col relative overflow-hidden shadow-2xl">
+<!-- Header Area (Profile & Settings) -->
+<header class="flex justify-between items-center px-6 pt-12 pb-4">
+<div class="w-10 h-10 rounded-full bg-soft-green flex items-center justify-center text-primary border border-primary/10 overflow-hidden">
+<img alt="smiling mature woman in casual outdoor setting" class="w-full h-full object-cover" data-alt="smiling mature woman in casual outdoor setting with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmYt8LfzoJ6aeGmkNMqJGrgbf1YemB4q2i67D8DbJEeoFaeBFC2YJMd_hpR_BLgcZTSosSGuOZpFcT81Kne8GNgBCIE-Fs9vuVMv-hKfSThlttU6hAmlFnCpfSIikDZ9Bfo_ScB7xYOAOUFLPekDZ--F7w-0bVy1yoeTPtE0CDD--yVnrGozaDFuzGDUkN1Yxk22R0jaQujAX2wW4qH1qYLrmA33F5zZid3wJnTV_KRfhYfL1TZMj5q5KbEzTiH1v1weXetHMQvwI0"/>
+</div>
+<button class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-text-muted shadow-sm hover:bg-gray-50 transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</button>
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 overflow-y-auto no-scrollbar px-6 pb-24">
+<!-- Greeting -->
+<div class="mb-8">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-yellow-500 text-3xl" style="font-variation-settings: 'FILL' 1;">wb_sunny</span>
+<h1 class="text-3xl font-extrabold text-text-main tracking-tight">Good morning,</h1>
+</div>
+<h1 class="text-3xl font-extrabold text-text-main tracking-tight">Sarah</h1>
+</div>
+<!-- Primary Check-in Card -->
+<div class="bg-surface rounded-2xl p-6 shadow-soft mb-8 border border-gray-50 relative overflow-hidden">
+<!-- Decorative background element -->
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-soft-green rounded-full opacity-50 blur-xl"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-soft-green flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<h2 class="text-xl font-bold text-text-main">Daily Check-in</h2>
+</div>
+<p class="text-text-muted text-base mb-6 leading-relaxed">
+                    It's time for your quick health update. Let's see how you're recovering today.
+                </p>
+<button class="w-full bg-primary hover:bg-[#064034] text-white font-bold py-4 px-6 rounded-full transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 text-lg">
+<span>Start Check-in</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Recovery Progress -->
+<div class="mb-8">
+<div class="flex justify-between items-end mb-3">
+<h3 class="text-lg font-bold text-text-main">Recovery Progress</h3>
+<span class="text-sm font-semibold text-primary bg-soft-green px-3 py-1 rounded-full">Day 3</span>
+</div>
+<div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-3/14" style="width: 21%;"></div>
+</div>
+<p class="text-xs text-text-muted mt-2 text-right">Great job taking it easy!</p>
+</div>
+<!-- Today's Schedule -->
+<div>
+<h3 class="text-lg font-bold text-text-main mb-4">Today's Plan</h3>
+<div class="space-y-3">
+<!-- Task 1 (Completed) -->
+<div class="bg-white rounded-xl p-4 flex items-center gap-4 opacity-60">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="flex-1">
+<h4 class="text-base font-semibold text-text-main line-through">Morning Medication</h4>
+<p class="text-sm text-text-muted">8:00 AM • With food</p>
+</div>
+</div>
+<!-- Task 2 (Upcoming) -->
+<div class="bg-white rounded-xl p-4 flex items-center gap-4 border border-primary/20 shadow-sm relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="w-8 h-8 rounded-full border-2 border-text-muted flex items-center justify-center text-text-muted shrink-0">
+</div>
+<div class="flex-1">
+<h4 class="text-base font-semibold text-text-main">Rest &amp; Hydrate</h4>
+<p class="text-sm text-primary font-medium">10:30 AM • Drink 2 glasses of water</p>
+</div>
+</div>
+<!-- Task 3 -->
+<div class="bg-white rounded-xl p-4 flex items-center gap-4">
+<div class="w-8 h-8 rounded-full border-2 border-text-muted flex items-center justify-center text-text-muted shrink-0">
+</div>
+<div class="flex-1">
+<h4 class="text-base font-semibold text-text-main">Afternoon Walk</h4>
+<p class="text-sm text-text-muted">2:00 PM • 5 minutes indoors</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Shared Bottom Navigation -->
+<div class="absolute bottom-0 w-full z-50">
+<div class="relative flex h-auto w-full flex-col bg-[#FAF7F2] group/design-root overflow-x-hidden">
+<div class="flex gap-2 border-t border-gray-200 bg-[#FAF7F2] px-4 pb-6 pt-3 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+<a class="just flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-primary" href="#">
+<div class="text-primary flex h-8 items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+</div>
+<p class="text-primary text-xs font-bold leading-normal tracking-[0.015em]">Home</p>
+</a>
+<a class="just flex flex-1 flex-col items-center justify-end gap-1 text-text-muted hover:text-text-main transition-colors" href="#">
+<div class="text-text-muted flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<p class="text-text-muted text-xs font-medium leading-normal tracking-[0.015em]">History</p>
+</a>
+<a class="just flex flex-1 flex-col items-center justify-end gap-1 text-text-muted hover:text-text-main transition-colors" href="#">
+<div class="text-text-muted flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">assignment</span>
+</div>
+<p class="text-text-muted text-xs font-medium leading-normal tracking-[0.015em]">Care Plan</p>
+</a>
+</div>
+</div>
+</div>
+</div>
+</body></html>

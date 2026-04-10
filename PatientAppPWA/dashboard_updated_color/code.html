@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Avyay Health - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#1466ad",
+              "brand-teal": "#085041",
+              "background-light": "#f6f7f8",
+              "background-dark": "#111a21",
+            },
+            fontFamily: {
+              "display": ["Plus Jakarta Sans", "sans-serif"],
+              "body": ["IBM Plex Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            boxShadow: {
+              'clinical': '0 2px 4px rgba(15, 76, 129, 0.08)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: #F8FAFC; /* --color-background */
+            color: #0F172A; /* --color-text */
+        }
+        h1, h2, h3, h4, h5, h6, .font-display {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased pb-20">
+<!-- Header Section -->
+<header class="bg-white px-4 pt-6 pb-4 shadow-sm border-b border-[#E2E8F0] sticky top-0 z-10">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-cover bg-center border border-[#E2E8F0]" data-alt="headshot of a middle-aged man with a reassuring smile, well-lit, professional" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDmlEmymaF76urK6j_R2CxzUn0jWXeNqVE0eiLo3qzupG_eCa5s85aO2dHm4kMSajp2bBT7APRmcHOd2BluzTe08AfGmUesGGkG1dQ4DD_VZK28pOOb_rqfWBsX6jI48KKPKzmveEhuyGUDyuuyBAF9GZ9TByZUL1IRvsCwGWDCc7pEdhZGhPaVp9qUrfeGZa5DP40e7Mh46dlvPcyBGEo3rw2FFvToxTWXaeOS8_RSxUyEuP8asrKbTIwaMd8GWt5Vgtr9LzHcdDY2');">
+</div>
+<h1 class="text-2xl font-display font-bold text-[#0F172A]">Good Morning, Robert</h1>
+</div>
+<!-- Notification Icon -->
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-[#F8FAFC] text-[#0F4C81] border border-[#E2E8F0]">
+<span class="material-symbols-outlined" data-icon="notifications" data-weight="regular">notifications</span>
+</button>
+</div>
+<!-- Status Badge -->
+<div class="flex items-center">
+<div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#F0F9F7] border border-[#085041]/20">
+<span class="material-symbols-outlined text-[18px] text-brand-teal" data-icon="check_circle" data-weight="fill">check_circle</span>
+<span class="text-sm font-display font-semibold text-brand-teal tracking-wide uppercase">Status: Stable</span>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="px-4 py-6 space-y-6">
+<!-- Action Card (Primary Focus) -->
+<section>
+<h2 class="text-sm font-body font-semibold text-[#64748B] uppercase tracking-wider mb-3">Action Required</h2>
+<div class="bg-white rounded border border-[#E2E8F0] shadow-clinical overflow-hidden">
+<div class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-[#EFF6FF] text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px]" data-icon="vital_signs" data-weight="regular">vital_signs</span>
+</div>
+<div>
+<h3 class="text-lg font-display font-bold text-[#0F172A]">Today's Vitals</h3>
+<p class="text-sm text-[#64748B] mt-1">Please complete your daily check-in to update your care team.</p>
+</div>
+</div>
+<button class="w-full sm:w-auto px-6 py-3 bg-primary hover:bg-[#0F4C81] text-white rounded font-display font-semibold text-base transition-colors flex items-center justify-center gap-2">
+                        Start Check-in
+                        <span class="material-symbols-outlined text-[20px]" data-icon="arrow_forward" data-weight="regular">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Metrics Grid -->
+<section>
+<div class="flex items-center justify-between mb-3">
+<h2 class="text-sm font-body font-semibold text-[#64748B] uppercase tracking-wider">Recent Metrics</h2>
+<span class="text-xs text-[#64748B]">Updated 2h ago</span>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<!-- Blood Pressure Tile -->
+<div class="bg-white rounded border border-[#E2E8F0] p-4 shadow-clinical h-[100px] flex flex-col justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#64748B] text-[18px]" data-icon="favorite" data-weight="regular">favorite</span>
+<span class="text-sm font-body text-[#64748B] font-medium">Blood Pressure</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-2xl font-display font-bold text-[#0F172A]">120/80</span>
+<span class="text-xs text-[#64748B]">mmHg</span>
+</div>
+</div>
+<!-- Heart Rate Tile -->
+<div class="bg-white rounded border border-[#E2E8F0] p-4 shadow-clinical h-[100px] flex flex-col justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#64748B] text-[18px]" data-icon="ecg_heart" data-weight="regular">ecg_heart</span>
+<span class="text-sm font-body text-[#64748B] font-medium">Heart Rate</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-2xl font-display font-bold text-[#0F172A]">72</span>
+<span class="text-xs text-[#64748B]">bpm</span>
+</div>
+</div>
+<!-- Temperature Tile -->
+<div class="bg-white rounded border border-[#E2E8F0] p-4 shadow-clinical h-[100px] flex flex-col justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#64748B] text-[18px]" data-icon="device_thermostat" data-weight="regular">device_thermostat</span>
+<span class="text-sm font-body text-[#64748B] font-medium">Temperature</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-2xl font-display font-bold text-[#0F172A]">98.6</span>
+<span class="text-xs text-[#64748B]">°F</span>
+</div>
+</div>
+<!-- Weight Tile -->
+<div class="bg-white rounded border border-[#E2E8F0] p-4 shadow-clinical h-[100px] flex flex-col justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#64748B] text-[18px]" data-icon="scale" data-weight="regular">scale</span>
+<span class="text-sm font-body text-[#64748B] font-medium">Weight</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-2xl font-display font-bold text-[#0F172A]">185</span>
+<span class="text-xs text-[#64748B]">lbs</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Care Plan Overview -->
+<section class="mt-6">
+<h2 class="text-sm font-body font-semibold text-[#64748B] uppercase tracking-wider mb-3">Recovery Progress</h2>
+<div class="bg-white rounded border border-[#E2E8F0] shadow-clinical p-5">
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-medium text-[#0F172A]">Post-Op Day 5</span>
+<span class="text-sm font-bold text-brand-teal">On Track</span>
+</div>
+<div class="w-full bg-[#E2E8F0] h-2 rounded-full overflow-hidden">
+<div class="bg-brand-teal h-full rounded-full" style="width: 35%"></div>
+</div>
+<p class="text-sm text-[#64748B] mt-3">You are meeting all milestones. Keep resting and stay hydrated.</p>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation -->
+<div class="fixed bottom-0 left-0 right-0 z-50">
+<div class="flex gap-2 border-t border-[#f0f2f4] bg-white px-4 pb-safe pt-2 pb-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+<a class="just flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-[#111518]" href="#">
+<div class="text-[#111518] flex h-8 items-center justify-center" data-icon="House" data-size="24px" data-weight="fill">
+<svg fill="currentColor" height="24px" viewbox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+<path d="M224,115.55V208a16,16,0,0,1-16,16H168a16,16,0,0,1-16-16V168a8,8,0,0,0-8-8H112a8,8,0,0,0-8,8v40a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V115.55a16,16,0,0,1,5.17-11.78l80-75.48.11-.11a16,16,0,0,1,21.53,0,1.14,1.14,0,0,0,.11.11l80,75.48A16,16,0,0,1,224,115.55Z"></path>
+</svg>
+</div>
+<p class="text-[#111518] text-xs font-medium leading-normal tracking-[0.015em] font-display">Home</p>
+</a>
+<a class="just flex flex-1 flex-col items-center justify-end gap-1 text-[#637788]" href="#">
+<div class="text-[#637788] flex h-8 items-center justify-center" data-icon="ClipboardText" data-size="24px" data-weight="regular">
+<svg fill="currentColor" height="24px" viewbox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+<path d="M168,152a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,152Zm-8-40H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16Zm56-64V216a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V48A16,16,0,0,1,56,32H92.26a47.92,47.92,0,0,1,71.48,0H200A16,16,0,0,1,216,48ZM96,64h64a32,32,0,0,0-64,0ZM200,48H173.25A47.93,47.93,0,0,1,176,64v8a8,8,0,0,1-8,8H88a8,8,0,0,1-8-8V64a47.93,47.93,0,0,1,2.75-16H56V216H200Z"></path>
+</svg>
+</div>
+<p class="text-[#637788] text-xs font-medium leading-normal tracking-[0.015em] font-display">Check-in</p>
+</a>
+<a class="just flex flex-1 flex-col items-center justify-end gap-1 text-[#637788]" href="#">
+<div class="text-[#637788] flex h-8 items-center justify-center" data-icon="Users" data-size="24px" data-weight="regular">
+<svg fill="currentColor" height="24px" viewbox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+<path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"></path>
+</svg>
+</div>
+<p class="text-[#637788] text-xs font-medium leading-normal tracking-[0.015em] font-display">Care Team</p>
+</a>
+<a class="just flex flex-1 flex-col items-center justify-end gap-1 text-[#637788]" href="#">
+<div class="text-[#637788] flex h-8 items-center justify-center" data-icon="User" data-size="24px" data-weight="regular">
+<svg fill="currentColor" height="24px" viewbox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
+<path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+</svg>
+</div>
+<p class="text-[#637788] text-xs font-medium leading-normal tracking-[0.015em] font-display">Profile</p>
+</a>
+</div>
+</div>
+</body></html>

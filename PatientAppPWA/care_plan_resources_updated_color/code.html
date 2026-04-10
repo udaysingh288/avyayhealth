@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Care Plan &amp; Resources - Warm Recovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#085041",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102213",
+                        "text-main": "#3D4035",
+                        "text-muted": "#9CA39A",
+                        "surface": "#FFFFFF",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1.5rem", // Mapped to 24px from PRD
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "soft": "0 8px 24px rgba(8, 80, 65, 0.08)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #FAF7F2; /* Warm Oatmeal from PRD */
+            color: #3D4035; /* Deep Forest Slate */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Custom scrollbar hiding for cleaner mobile look */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden pb-24">
+<!-- Shared TopAppBar Component -->
+<div class="sticky top-0 z-50 bg-[#FAF7F2] bg-opacity-95 backdrop-blur-sm">
+<div class="flex items-center p-4 pb-2 justify-between">
+<h2 class="text-text-main text-xl font-bold leading-tight tracking-[-0.015em] flex-1 text-center pl-12 pr-12">Care Plan</h2>
+</div>
+<div class="pb-3">
+<div class="flex border-b border-[#EAE5DB] px-4 justify-between">
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-primary text-text-main pb-[13px] pt-4 flex-1" href="#">
+<p class="text-text-main text-base font-bold leading-normal tracking-[0.015em]">Schedule</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-text-muted pb-[13px] pt-4 flex-1" href="#">
+<p class="text-text-muted text-base font-bold leading-normal tracking-[0.015em]">Resources</p>
+</a>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="flex-1 px-6 pt-4 pb-8 space-y-8">
+<!-- Today's Medications Section -->
+<section>
+<h3 class="text-text-main text-lg font-bold leading-tight tracking-[-0.015em] pb-4">Today's Medications</h3>
+<div class="space-y-4">
+<!-- Medication Card 1 (Checked) -->
+<div class="bg-surface rounded-lg p-5 shadow-soft flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#f0f4f3] flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">pill</span>
+</div>
+<div>
+<h4 class="text-text-main font-bold text-base line-through opacity-70">Amoxicillin</h4>
+<p class="text-text-muted text-sm">500mg • With breakfast</p>
+</div>
+</div>
+<button aria-label="Mark as incomplete" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-white text-xl" style="font-variation-settings: 'FILL' 1;">check</span>
+</button>
+</div>
+<!-- Medication Card 2 (Unchecked) -->
+<div class="bg-surface rounded-lg p-5 shadow-soft flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#f0f4f3] flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">medication</span>
+</div>
+<div>
+<h4 class="text-text-main font-bold text-base">Ibuprofen</h4>
+<p class="text-text-muted text-sm">400mg • As needed for pain</p>
+</div>
+</div>
+<button aria-label="Mark as complete" class="w-8 h-8 rounded-full border-2 border-text-muted flex items-center justify-center shrink-0 transition-transform active:scale-95 hover:border-primary">
+</button>
+</div>
+</div>
+</section>
+<!-- Daily Habits Section -->
+<section>
+<h3 class="text-text-main text-lg font-bold leading-tight tracking-[-0.015em] pb-4">Daily Habits</h3>
+<div class="space-y-4">
+<!-- Habit Card 1 -->
+<div class="bg-surface rounded-lg p-5 shadow-soft flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#f4f7fc] flex items-center justify-center text-[#4B7bec]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+</div>
+<div>
+<h4 class="text-text-main font-bold text-base">Hydration</h4>
+<p class="text-text-muted text-sm">Drink 2L of water today</p>
+</div>
+</div>
+<button aria-label="Mark as complete" class="w-8 h-8 rounded-full border-2 border-text-muted flex items-center justify-center shrink-0 transition-transform active:scale-95 hover:border-primary">
+</button>
+</div>
+<!-- Habit Card 2 -->
+<div class="bg-surface rounded-lg p-5 shadow-soft flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#fdf5f0] flex items-center justify-center text-[#fa8231]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">directions_walk</span>
+</div>
+<div>
+<h4 class="text-text-main font-bold text-base">Gentle Movement</h4>
+<p class="text-text-muted text-sm">Short 10-minute walk</p>
+</div>
+</div>
+<button aria-label="Mark as complete" class="w-8 h-8 rounded-full border-2 border-text-muted flex items-center justify-center shrink-0 transition-transform active:scale-95 hover:border-primary">
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Sticky Emergency Footer -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-surface/90 backdrop-blur-md border-t border-[#EAE5DB] shadow-[0_-8px_24px_rgba(0,0,0,0.04)] z-50">
+<div class="max-w-md mx-auto flex items-center justify-between gap-4">
+<div>
+<p class="text-text-main font-bold text-sm">Need urgent help?</p>
+<p class="text-text-muted text-xs">Available 24/7</p>
+</div>
+<button class="bg-[#E58B88] text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-sm transition-transform active:scale-95 hover:bg-[#d47875]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">call</span>
+                Call Triage
+            </button>
+</div>
+</div>
+</body></html>
