@@ -39,7 +39,7 @@ export default function Timeline() {
     <div className="flex flex-col h-full bg-warm-oatmeal">
       <TopBar title="Recovery Timeline" />
 
-      <div className="flex-1 overflow-y-auto px-5 py-5">
+      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-28">
         {/* Summary row */}
         <div className="flex gap-3 mb-6">
           {[

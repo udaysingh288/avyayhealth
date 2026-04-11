@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { usePatientStore } from '../store/patientStore';
-import { MOCK_CHECKIN_PENDING, MOCK_SESSION } from '../utils/mockData';
+import { MOCK_CHECKIN_PENDING } from '../utils/mockData';
 
 function getGreeting(): string {
   const h = new Date().getHours();
@@ -24,7 +24,8 @@ const PLAN_ITEMS = [
 
 export default function Home() {
   const navigate = useNavigate();
-  const session = usePatientStore((s) => s.session) ?? MOCK_SESSION;
+  const session = usePatientStore((s) => s.session);
+  if (!session) return null; // AuthGuard will redirect
   const checkin = MOCK_CHECKIN_PENDING;
 
   const dayNumber = checkin.day_number;
@@ -48,6 +49,7 @@ export default function Home() {
           </span>
         </div>
         <button
+          onClick={() => alert('Settings coming soon')}
           className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-sage-muted shadow-clinical hover:bg-gray-50 transition-colors"
           aria-label="Settings"
         >
@@ -58,7 +60,7 @@ export default function Home() {
       </header>
 
       {/* Scrollable content */}
-      <main className="flex-1 overflow-y-auto hide-scrollbar px-6 pb-8">
+      <main className="flex-1 overflow-y-auto hide-scrollbar px-6 pb-28">
         {/* Greeting */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-1">

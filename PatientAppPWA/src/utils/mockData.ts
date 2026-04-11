@@ -1,4 +1,4 @@
-import type { PatientSession, TodayCheckin, DayHistory, SDOHResource, Message } from '../types';
+import type { PatientSession, TodayCheckin, DayHistory, Message } from '../types';
 
 export const MOCK_SESSION: PatientSession = {
   patient_id: 'pat-001',
@@ -98,56 +98,12 @@ export const MOCK_HISTORY: DayHistory[] = Array.from({ length: 30 }, (_, i) => {
     3: {
       day_number: 3,
       date: '2026-04-10T08:00:00Z',
-      status: 'completed',
-      risk_level: 'yellow',
-      summary: 'Ankle swelling reported. Care team alerted. Transport arranged.',
+      status: 'pending',
+      risk_level: null,
+      summary: null,
     },
   };
 
   return histories[dayNum] ?? { day_number: dayNum, date: date.toISOString(), status: 'pending', risk_level: null, summary: null };
 });
 
-export const MOCK_RESOURCES: SDOHResource[] = [
-  {
-    id: 'r-001',
-    domain: 'transportation',
-    name: 'Community Rides Program',
-    description: 'Free non-emergency medical transportation for follow-up appointments.',
-    phone: '1-800-555-7890',
-    website: null,
-    referral_made: true,
-    referral_date: '2026-04-10T08:00:00Z',
-  },
-  {
-    id: 'r-002',
-    domain: 'food_insecurity',
-    name: 'City Harvest Home Delivery',
-    description: 'Weekly nutritious meal delivery for patients recovering at home.',
-    phone: '1-800-555-2345',
-    website: 'cityharvest.org',
-    referral_made: false,
-    referral_date: null,
-  },
-];
-
-// Simulated AI follow-up questions after a patient reply
-export const FOLLOW_UP_QUESTIONS: Record<string, { response: string; riskLevel: 'green' | 'yellow' | 'red'; nextQuestion: string | null; isRed: boolean }> = {
-  default_green: {
-    response: 'Thank you for sharing that. It sounds like you\'re doing well. Keep taking your medications and try to rest when you need to.',
-    riskLevel: 'green',
-    nextQuestion: 'One more thing — are you managing to drink enough water today?',
-    isRed: false,
-  },
-  default_yellow: {
-    response: 'Thanks for letting me know. That\'s worth monitoring. I\'ve let your care team know about this. Please rest and keep an eye on how you\'re feeling.',
-    riskLevel: 'yellow',
-    nextQuestion: 'Do you have someone at home with you today?',
-    isRed: false,
-  },
-  default_red: {
-    response: 'This sounds urgent. Please call 911 or go to your nearest emergency room right away. Your care team has been notified.',
-    riskLevel: 'red',
-    nextQuestion: null,
-    isRed: true,
-  },
-};

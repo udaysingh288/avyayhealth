@@ -1,19 +1,30 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { usePatientStore } from '../store/patientStore';
-import { MOCK_CHECKIN_PENDING, MOCK_SESSION } from '../utils/mockData';
+import { MOCK_CHECKIN_PENDING } from '../utils/mockData';
+import EscalationAlert from '../components/checkin/EscalationAlert';
 import type { TodayCheckin, Message } from '../types';
 
 const RED_KEYWORDS = [
   'cannot breathe',
   "can't breathe",
+  'cant breathe',
+  'hard to breathe',
+  'trouble breathing',
   'chest pain',
+  'chest hurts',
   'blue lips',
+  'blue fingers',
   'unconscious',
   'not breathing',
   '911',
   'dying',
   'severe chest',
+  'heart attack',
+  'passed out',
+  'fainted',
+  'i need help',
 ];
 
 function containsRedKeyword(text: string): boolean {
@@ -35,15 +46,28 @@ function getQuickReplies(message: string): string[] {
 
 export default function CheckIn() {
   const navigate = useNavigate();
-  const session = usePatientStore((s) => s.session) ?? MOCK_SESSION;
+  const session = usePatientStore((s) => s.session);
+  if (!session) return null; // AuthGuard will redirect
 
-  const [checkin, setCheckin] = useState<TodayCheckin>(MOCK_CHECKIN_PENDING);
+  const storeCheckin = usePatientStore((s) => s.checkin);
+  const setStoreCheckin = usePatientStore((s) => s.setCheckin);
+  const [checkin, setCheckinLocal] = useState<TodayCheckin>(storeCheckin ?? MOCK_CHECKIN_PENDING);
   const [reply, setReply] = useState('');
   const [sending, setSending] = useState(false);
   const [showEscalation, setShowEscalation] = useState(false);
   const [awaitingFollowUp, setAwaitingFollowUp] = useState(false);
   const [selectedQuickReply, setSelectedQuickReply] = useState<string | null>(null);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
   const conversationEndRef = useRef<HTMLDivElement>(null);
+
+  // Sync local state to Zustand store so it persists across navigation
+  const setCheckin = (updater: TodayCheckin | ((prev: TodayCheckin) => TodayCheckin)) => {
+    setCheckinLocal((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      setStoreCheckin(next);
+      return next;
+    });
+  };
 
   const isCompleted = checkin.status === 'completed';
   const dayNumber = checkin.day_number;
@@ -56,17 +80,23 @@ export default function CheckIn() {
     conversationEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [checkin.conversation.length, sending]);
 
-  function selectQuickReply(text: string) {
-    setSelectedQuickReply(text);
-    setReply(text);
-  }
+  // Handle iOS keyboard pushing content
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const onResize = () => {
+      setKeyboardOffset(window.innerHeight - vv.height);
+    };
+    vv.addEventListener('resize', onResize);
+    return () => vv.removeEventListener('resize', onResize);
+  }, []);
 
   async function handleSend(textOverride?: string) {
     const text = (textOverride ?? reply).trim();
     if (!text || sending) return;
 
     const patientMsg: Message = {
-      id: `m-${Date.now()}`,
+      id: crypto.randomUUID(),
       role: 'patient',
       content: text,
       sent_at: new Date().toISOString(),
@@ -83,89 +113,104 @@ export default function CheckIn() {
       conversation: [...prev.conversation, patientMsg],
     }));
 
-    await new Promise((r) => setTimeout(r, 1400));
+    try {
+      // TODO: Replace with real API call: POST /checkin/reply
+      await new Promise((r) => setTimeout(r, 1400));
 
-    if (isRed) {
-      setShowEscalation(true);
-      setSending(false);
-      return;
-    }
+      if (isRed) {
+        setShowEscalation(true);
+        return;
+      }
 
-    const isYellow =
-      text.toLowerCase().includes('swell') ||
-      text.toLowerCase().includes('tired') ||
-      text.toLowerCase().includes('breath') ||
-      text.toLowerCase().includes('cough') ||
-      text.toLowerCase().includes('sore') ||
-      text.toLowerCase().includes('pain');
+      const isYellow =
+        text.toLowerCase().includes('swell') ||
+        text.toLowerCase().includes('tired') ||
+        text.toLowerCase().includes('breath') ||
+        text.toLowerCase().includes('cough') ||
+        text.toLowerCase().includes('sore') ||
+        text.toLowerCase().includes('pain');
 
-    let aiContent: string;
-    let nextQuestion: string | null = null;
+      let aiContent: string;
+      let nextQuestion: string | null = null;
 
-    if (isYellow) {
-      aiContent =
-        "Thank you for letting me know. That's worth keeping an eye on. I've shared this with your care team — please rest and let me know if it gets worse.";
-      nextQuestion = awaitingFollowUp
-        ? null
-        : 'One more question — are you able to get enough rest at night?';
-    } else {
-      aiContent =
-        "That's great to hear. Keep taking your medications as prescribed and let us know if anything changes.";
-      nextQuestion = awaitingFollowUp
-        ? null
-        : 'Have you been able to take all your medications today?';
-    }
+      if (isYellow) {
+        aiContent =
+          "Thank you for letting me know. That's worth keeping an eye on. I've shared this with your care team — please rest and let me know if it gets worse.";
+        nextQuestion = awaitingFollowUp
+          ? null
+          : 'One more question — are you able to get enough rest at night?';
+      } else {
+        aiContent =
+          "That's great to hear. Keep taking your medications as prescribed and let us know if anything changes.";
+        nextQuestion = awaitingFollowUp
+          ? null
+          : 'Have you been able to take all your medications today?';
+      }
 
-    const aiMsg: Message = {
-      id: `m-ai-${Date.now()}`,
-      role: 'ai',
-      content: aiContent,
-      sent_at: new Date().toISOString(),
-      risk_level: isYellow ? 'yellow' : 'green',
-    };
-
-    if (nextQuestion && !awaitingFollowUp) {
-      const followUpMsg: Message = {
-        id: `m-fup-${Date.now()}`,
+      const aiMsg: Message = {
+        id: crypto.randomUUID(),
         role: 'ai',
-        content: nextQuestion,
+        content: aiContent,
+        sent_at: new Date().toISOString(),
+        risk_level: isYellow ? 'yellow' : 'green',
+      };
+
+      if (nextQuestion && !awaitingFollowUp) {
+        const followUpMsg: Message = {
+          id: crypto.randomUUID(),
+          role: 'ai',
+          content: nextQuestion,
+          sent_at: new Date().toISOString(),
+          risk_level: null,
+        };
+
+        setCheckin((prev) => ({
+          ...prev,
+          conversation: [...prev.conversation, aiMsg, followUpMsg],
+        }));
+        setAwaitingFollowUp(true);
+      } else {
+        const completionMsg: Message = {
+          id: crypto.randomUUID(),
+          role: 'ai',
+          content: `Thank you, ${session!.first_name}! You've completed today's check-in. Rest well — we'll check in again tomorrow.`,
+          sent_at: new Date().toISOString(),
+          risk_level: null,
+        };
+
+        setCheckin((prev) => ({
+          ...prev,
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+          conversation: [...prev.conversation, aiMsg, completionMsg],
+        }));
+      }
+    } catch {
+      // Show error as AI message so patient knows something went wrong
+      const errorMsg: Message = {
+        id: crypto.randomUUID(),
+        role: 'ai',
+        content: "Sorry, we couldn't send your reply right now. Please check your internet connection and try again.",
         sent_at: new Date().toISOString(),
         risk_level: null,
       };
-
       setCheckin((prev) => ({
         ...prev,
-        conversation: [...prev.conversation, aiMsg, followUpMsg],
+        conversation: [...prev.conversation, errorMsg],
       }));
-      setAwaitingFollowUp(true);
-      setSending(false);
-    } else {
-      const completionMsg: Message = {
-        id: `m-done-${Date.now()}`,
-        role: 'ai',
-        content: `Thank you, ${session.first_name}! You've completed today's check-in. Rest well — we'll check in again tomorrow.`,
-        sent_at: new Date().toISOString(),
-        risk_level: null,
-      };
-
-      setCheckin((prev) => ({
-        ...prev,
-        status: 'completed',
-        completed_at: new Date().toISOString(),
-        conversation: [...prev.conversation, aiMsg, completionMsg],
-      }));
+    } finally {
       setSending(false);
     }
   }
 
   if (showEscalation) {
     return (
-      <EscalationScreen
+      <EscalationAlert
         hospitalName={session.hospital_name}
         onDismiss={() => {
           setShowEscalation(false);
           const aiMsg: Message = {
-            id: `m-ai-dis-${Date.now()}`,
+            id: crypto.randomUUID(),
             role: 'ai',
             content:
               "I'm glad you're okay. If you feel worse at any time, please don't hesitate to call 911. Let's continue — how is your breathing right now?",
@@ -214,7 +259,7 @@ export default function CheckIn() {
       </header>
 
       {/* Chat feed */}
-      <main className="flex-1 overflow-y-auto hide-scrollbar px-6 pb-48 pt-4 flex flex-col gap-6">
+      <main className={`flex-1 overflow-y-auto hide-scrollbar px-6 pt-4 flex flex-col gap-6 ${isCompleted ? 'pb-8' : 'pb-48'}`}>
         {checkin.conversation.map((msg) => (
           <ChatBubble key={msg.id} message={msg} />
         ))}
@@ -265,8 +310,11 @@ export default function CheckIn() {
       {/* Quick reply footer — only when pending */}
       {!isCompleted && !sending && (
         <footer
-          className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-warm-oatmeal via-warm-oatmeal/95 to-transparent pt-12 pb-8 z-20"
-          style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}
+          className="fixed bottom-0 left-0 w-full bg-gradient-to-t from-warm-oatmeal via-warm-oatmeal/95 to-transparent pt-12 pb-8 z-20"
+          style={{
+            paddingBottom: 'max(32px, env(safe-area-inset-bottom))',
+            transform: keyboardOffset > 0 ? `translateY(-${keyboardOffset}px)` : undefined,
+          }}
         >
           <div className="px-6 flex overflow-x-auto gap-3 hide-scrollbar pb-2 snap-x">
             {quickReplies.map((opt) => (
@@ -298,6 +346,7 @@ export default function CheckIn() {
                 if (e.key === 'Enter') handleSend();
               }}
               placeholder="Or type your own reply…"
+              maxLength={500}
               className="flex-1 px-4 py-3 rounded-full border border-border bg-white text-forest-slate placeholder-sage-muted
                 focus:outline-none focus:border-primary transition text-base"
               style={{ fontSize: '16px' }}
@@ -357,83 +406,4 @@ function ChatBubble({ message }: { message: Message }) {
   );
 }
 
-function EscalationScreen({
-  hospitalName,
-  onDismiss,
-}: {
-  hospitalName: string;
-  onDismiss: () => void;
-}) {
-  return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
-      style={{ backgroundColor: 'rgba(229, 139, 136, 0.15)' }}
-    >
-      <div className="w-full max-w-md mx-auto flex flex-col items-center space-y-8">
-        {/* Animated icon */}
-        <div className="w-32 h-32 rounded-full bg-white shadow-soft flex items-center justify-center text-triage-red relative">
-          <div className="absolute inset-0 rounded-full border-4 border-triage-red opacity-20 scale-110" />
-          <span
-            className="material-symbols-outlined text-triage-red"
-            style={{ fontVariationSettings: "'FILL' 1", fontSize: '64px' }}
-          >
-            warning
-          </span>
-        </div>
-
-        <div className="text-center space-y-2">
-          <h1 className="font-display font-bold text-[28px] leading-tight text-forest-slate">
-            Let's get that checked out.
-          </h1>
-          <p className="text-sage-muted text-base px-4">
-            Your answers suggest we should have a care team member review your symptoms.
-          </p>
-        </div>
-
-        {/* Next steps */}
-        <div className="w-full bg-white rounded-2xl shadow-soft p-6 space-y-4">
-          <h2 className="font-display font-bold text-lg text-forest-slate border-b border-gray-100 pb-3">
-            Next Steps
-          </h2>
-          <ul className="space-y-4 text-base text-forest-slate">
-            {[
-              'Rest comfortably in a seated position if possible.',
-              'Do not take any additional pain medication until you speak with the team.',
-              'Call the triage line using the button below.',
-            ].map((step, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-triage-red-light flex items-center justify-center text-triage-red">
-                  <span className="text-sm font-bold">{i + 1}</span>
-                </div>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Actions */}
-        <div className="w-full space-y-3">
-          <a
-            href="tel:911"
-            className="w-full h-14 bg-triage-red text-white rounded-full font-display font-bold text-lg shadow-soft flex items-center justify-center gap-2 hover:opacity-90 transition-opacity active:scale-[0.98]"
-          >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-              call
-            </span>
-            Call 911
-          </a>
-          <button
-            onClick={onDismiss}
-            className="w-full py-3 text-sm text-sage-muted font-medium underline hover:text-forest-slate transition-colors"
-          >
-            I'm okay — continue check-in
-          </button>
-        </div>
-
-        <p className="text-center text-xs text-sage-muted">
-          {hospitalName} care team has been notified.
-        </p>
-      </div>
-    </div>
-  );
-}
+// EscalationScreen removed — now using dedicated EscalationAlert component

@@ -23,7 +23,7 @@ export default function BottomNav() {
   return (
     <nav
       className="shrink-0 bg-warm-oatmeal border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}
       aria-label="Main navigation"
     >
       <div className="flex gap-2 px-4 pt-3 pb-6 max-w-md mx-auto">
@@ -57,7 +57,7 @@ export default function BottomNav() {
                 )}
               </div>
               <p
-                className={`text-[11px] leading-normal tracking-wide
+                className={`text-xs leading-normal tracking-wide
                   ${isActive ? 'font-bold' : 'font-medium'}`}
               >
                 {label}

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import ErrorBoundary from './components/shared/ErrorBoundary';
 import AuthGuard from './components/shared/AuthGuard';
 import Enroll from './pages/Enroll';
 import Home from './pages/Home';
@@ -9,6 +10,7 @@ import CareTeam from './pages/CareTeam';
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <BrowserRouter>
       <Routes>
         {/* Enrollment — no auth needed */}
@@ -32,5 +34,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </ErrorBoundary>
   );
 }

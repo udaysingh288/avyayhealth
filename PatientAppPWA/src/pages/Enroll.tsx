@@ -44,7 +44,7 @@ export default function Enroll() {
   }
 
   return (
-    <div className="min-h-screen bg-warm-oatmeal flex flex-col px-5 py-8 overflow-y-auto"
+    <div className="min-h-dvh bg-warm-oatmeal flex flex-col px-5 py-8 overflow-y-auto"
       style={{ paddingTop: 'max(32px, env(safe-area-inset-top))', paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}>
       <AnimatePresence mode="wait">
         {step === 'welcome' && (
@@ -70,6 +70,7 @@ export default function Enroll() {
           <SuccessStep
             key="success"
             firstName={firstName || MOCK_SESSION.first_name}
+            hospitalName={hospitalName}
             onInstall={() => setShowInstall(true)}
             onSkip={() => navigate('/')}
           />
@@ -185,6 +186,7 @@ function VerifyStep({ firstName, dob, error, loading, onFirstNameChange, onDobCh
               autoComplete="bday"
               value={dob}
               onChange={(e) => onDobChange(e.target.value)}
+              min="1920-01-01"
               max={new Date().toISOString().split('T')[0]}
               className="w-full px-4 py-4 text-lg font-sans border-2 border-slate-200 rounded-xl
                 bg-white text-slate-800
@@ -217,7 +219,7 @@ function VerifyStep({ firstName, dob, error, loading, onFirstNameChange, onDobCh
 // ─────────────────────────────────────────
 // Success step
 // ─────────────────────────────────────────
-function SuccessStep({ firstName, onInstall, onSkip }: { firstName: string; onInstall: () => void; onSkip: () => void }) {
+function SuccessStep({ firstName, hospitalName, onInstall, onSkip }: { firstName: string; hospitalName: string; onInstall: () => void; onSkip: () => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -238,7 +240,7 @@ function SuccessStep({ firstName, onInstall, onSkip }: { firstName: string; onIn
         You're all set, {firstName}!
       </h2>
       <p className="font-sans text-slate-500 text-lg leading-relaxed max-w-xs mb-10">
-        Your first check-in is ready. Your care team at Riverside Community Medical Center is here for you.
+        Your first check-in is ready. Your care team at {hospitalName} is here for you.
       </p>
 
       <div className="w-full space-y-3">

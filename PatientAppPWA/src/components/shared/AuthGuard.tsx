@@ -14,7 +14,7 @@ export default function AuthGuard() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-warm-oatmeal overflow-hidden">
+    <div className="flex flex-col h-dvh bg-warm-oatmeal overflow-hidden">
       <div className="flex-1 overflow-hidden flex flex-col">
         <Outlet />
       </div>

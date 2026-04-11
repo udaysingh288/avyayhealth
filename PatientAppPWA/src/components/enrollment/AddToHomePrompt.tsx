@@ -11,6 +11,8 @@ type DeviceType = 'ios' | 'android' | 'other';
 function detectDevice(): DeviceType {
   const ua = navigator.userAgent;
   if (/iPad|iPhone|iPod/.test(ua)) return 'ios';
+  // iPadOS 13+ reports as Mac desktop in Safari
+  if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return 'ios';
   if (/Android/.test(ua)) return 'android';
   return 'other';
 }
@@ -36,7 +38,7 @@ export default function AddToHomePrompt({ onDone }: AddToHomePromptProps) {
   }
 
   return (
-    <div className="min-h-screen bg-off-white flex flex-col px-5 py-8 justify-end"
+    <div className="min-h-dvh bg-warm-oatmeal flex flex-col px-5 py-8 justify-end"
       style={{ paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}>
       <motion.div
         initial={{ opacity: 0, y: 40 }}

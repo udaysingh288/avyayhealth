@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { usePatientStore } from '../store/patientStore';
-import { MOCK_SESSION } from '../utils/mockData';
+// Mock data removed — session comes from AuthGuard-protected store
 
 interface MedItem {
   id: string;
@@ -89,7 +89,8 @@ const COPD_RESOURCES = [
 ];
 
 export default function CarePlan() {
-  const session = usePatientStore((s) => s.session) ?? MOCK_SESSION;
+  const session = usePatientStore((s) => s.session);
+  if (!session) return null; // AuthGuard will redirect
   const [activeTab, setActiveTab] = useState<'schedule' | 'resources'>('schedule');
   const [meds, setMeds] = useState<MedItem[]>(INITIAL_MEDS);
   const [habits, setHabits] = useState<HabitItem[]>(INITIAL_HABITS);
@@ -181,7 +182,7 @@ export default function CarePlan() {
                     <button
                       onClick={() => toggleMed(med.id)}
                       aria-label={med.checked ? 'Mark as incomplete' : 'Mark as complete'}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95
+                      className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95
                         ${med.checked
                           ? 'bg-primary'
                           : 'border-2 border-sage-muted hover:border-primary'
@@ -238,7 +239,7 @@ export default function CarePlan() {
                     <button
                       onClick={() => toggleHabit(habit.id)}
                       aria-label={habit.checked ? 'Mark as incomplete' : 'Mark as complete'}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95
+                      className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95
                         ${habit.checked
                           ? 'bg-primary'
                           : 'border-2 border-sage-muted hover:border-primary'
@@ -286,10 +287,10 @@ export default function CarePlan() {
         )}
       </main>
 
-      {/* Sticky emergency footer */}
+      {/* Sticky emergency footer — positioned above BottomNav (~72px + safe area) */}
       <div
-        className="fixed bottom-0 left-0 right-0 p-4 bg-surface/90 backdrop-blur-md border-t border-border shadow-[0_-8px_24px_rgba(0,0,0,0.04)] z-50"
-        style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+        className="fixed left-0 right-0 p-4 bg-surface/90 backdrop-blur-md border-t border-border shadow-[0_-8px_24px_rgba(0,0,0,0.04)] z-40"
+        style={{ bottom: 'calc(72px + env(safe-area-inset-bottom))' }}
       >
         <div className="max-w-md mx-auto flex items-center justify-between gap-4">
           <div>
@@ -303,7 +304,7 @@ export default function CarePlan() {
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
               call
             </span>
-            Call Triage
+            Call 911
           </a>
         </div>
       </div>

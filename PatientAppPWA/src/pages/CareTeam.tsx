@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { usePatientStore } from '../store/patientStore';
-import { MOCK_SESSION } from '../utils/mockData';
+// Mock data removed — session comes from AuthGuard-protected store
 
 interface ContactCard {
   id: string;
@@ -35,7 +35,7 @@ function ContactCardItem({ contact }: { contact: ContactCard }) {
         <a
           href={`tel:${contact.phone}`}
           aria-label={`Call ${contact.name}`}
-          className="ml-4 w-10 h-10 rounded-full bg-status-red-bg border border-red-200 flex items-center justify-center text-status-red hover:bg-red-100 transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-status-red focus:ring-offset-1"
+          className="ml-4 w-12 h-12 rounded-full bg-status-red-bg border border-red-200 flex items-center justify-center text-status-red hover:bg-red-100 transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-status-red focus:ring-offset-1"
         >
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
             call
@@ -84,7 +84,7 @@ function ContactCardItem({ contact }: { contact: ContactCard }) {
       <a
         href={`tel:${contact.phone}`}
         aria-label={`Call ${contact.name}`}
-        className="ml-4 w-10 h-10 rounded-full bg-gray-50 border border-border flex items-center justify-center text-primary hover:bg-gray-100 transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+        className="ml-4 w-12 h-12 rounded-full bg-gray-50 border border-border flex items-center justify-center text-primary hover:bg-gray-100 transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
       >
         <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
           call
@@ -95,7 +95,8 @@ function ContactCardItem({ contact }: { contact: ContactCard }) {
 }
 
 export default function CareTeam() {
-  const session = usePatientStore((s) => s.session) ?? MOCK_SESSION;
+  const session = usePatientStore((s) => s.session);
+  if (!session) return null; // AuthGuard will redirect
   const [activeTab, setActiveTab] = useState<'my-team' | 'hospital'>('my-team');
 
   const myTeamContacts: ContactCard[] = [
