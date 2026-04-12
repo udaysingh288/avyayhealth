@@ -8,16 +8,17 @@ struct CareTeamView: View {
         VStack(spacing: 0) {
             VStack(spacing: 4) {
                 Text("Care Team")
-                    .font(.custom("DMSerifDisplay-Regular", size: 24))
-                    .foregroundColor(.textPrimary)
+                    .font(.custom("DMSerifDisplay-Regular", size: 24, relativeTo: .title))
+                    .foregroundStyle(.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
                 Text(store.session?.hospitalName ?? "Your Hospital")
-                    .font(.custom("DMSans-Regular", size: 14))
-                    .foregroundColor(.textSecondary)
+                    .font(.custom("DMSans-Regular", size: 14, relativeTo: .subheadline))
+                    .foregroundStyle(.textSecondary)
             }
             .padding(.top, 16)
             .padding(.bottom, 8)
 
-            Picker("", selection: $selectedTab) {
+            Picker("Tab", selection: $selectedTab) {
                 Text("My Team").tag(0)
                 Text("Hospital").tag(1)
             }
@@ -99,18 +100,19 @@ struct CareTeamView: View {
         HStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.system(size: 20))
-                .foregroundColor(iconColor)
+                .foregroundStyle(iconColor)
                 .frame(width: 48, height: 48)
                 .background(iconColor.opacity(0.1))
-                .cornerRadius(12)
+                .clipShape(.rect(cornerRadius: 12))
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(name)
-                    .font(.custom("DMSans-SemiBold", size: 16))
-                    .foregroundColor(.textPrimary)
+                    .font(.custom("DMSans-SemiBold", size: 16, relativeTo: .body))
+                    .foregroundStyle(.textPrimary)
                 Text(role)
-                    .font(.custom("DMSans-Regular", size: 13))
-                    .foregroundColor(.textSecondary)
+                    .font(.custom("DMSans-Regular", size: 13, relativeTo: .subheadline))
+                    .foregroundStyle(.textSecondary)
             }
 
             Spacer()
@@ -123,20 +125,22 @@ struct CareTeamView: View {
             } label: {
                 Image(systemName: "phone.fill")
                     .font(.system(size: 16))
-                    .foregroundColor(isUrgent ? .white : .forest)
+                    .foregroundStyle(isUrgent ? .white : .forest)
                     .frame(width: 44, height: 44)
                     .background(isUrgent ? Color.riskRed : Color.forestPale)
-                    .cornerRadius(12)
+                    .clipShape(.rect(cornerRadius: 12))
             }
+            .accessibilityLabel("Call \(name)")
         }
         .padding(16)
         .background(Color.white)
-        .cornerRadius(16)
+        .clipShape(.rect(cornerRadius: 16))
         .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
         .overlay(
             isUrgent
                 ? RoundedRectangle(cornerRadius: 16).stroke(Color.riskRed.opacity(0.3), lineWidth: 1)
                 : nil
         )
+        .accessibilityElement(children: .combine)
     }
 }

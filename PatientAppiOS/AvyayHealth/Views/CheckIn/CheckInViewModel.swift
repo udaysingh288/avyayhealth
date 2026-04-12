@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 @MainActor
 final class CheckInViewModel: ObservableObject {
@@ -114,7 +115,8 @@ final class CheckInViewModel: ObservableObject {
             phase: convState.phase.rawValue,
             dayNumber: dayNumber,
             condition: session.condition.rawValue,
-            firstName: session.firstName
+            firstName: session.firstName,
+            medications: session.medications
         )
 
         if let aiReply = aiReply {
@@ -155,13 +157,14 @@ final class CheckInViewModel: ObservableObject {
                 syncCheckin(store: store)
                 Task { await APIClient.shared.saveMessage(token: patientToken, message: msg) }
                 Task { await APIClient.shared.completeCheckIn(token: patientToken, riskLevel: riskLevel, summary: summary) }
+                UIAccessibility.post(notification: .announcement, argument: "Check-in complete. \(content)")
             } else {
                 conversation.append(msg)
                 syncCheckin(store: store)
                 Task { await APIClient.shared.saveMessage(token: patientToken, message: msg) }
 
                 if i < messages.count - 1 {
-                    try? await Task.sleep(nanoseconds: UInt64((0.7 + Double.random(in: 0...0.4)) * 1_000_000_000))
+                    try? await Task.sleep(for: .milliseconds(700 + Int.random(in: 0...400)))
                 }
             }
         }
@@ -201,9 +204,13 @@ final class CheckInViewModel: ObservableObject {
             let msgs = await APIClient.shared.getMessages(token: patientToken)
             for dm in msgs where dm.senderType == "coordinator" && !seenDmIds.contains(dm.id) {
                 seenDmIds.insert(dm.id)
-                let coordMsg = Message(id: "dm-\(dm.id)", role: .coordinator, content: dm.content, sentAt: dm.createdAt)
+                // Also check conversation to avoid duplicates from prior polls
+                let dmMsgId = "dm-\(dm.id)"
+                guard !conversation.contains(where: { $0.id == dmMsgId }) else { continue }
+                let coordMsg = Message(id: dmMsgId, role: .coordinator, content: dm.content, sentAt: dm.createdAt)
                 conversation.append(coordMsg)
                 haptic(.medium)
+                UIAccessibility.post(notification: .announcement, argument: "New message from coordinator: \(dm.content)")
             }
         }
     }

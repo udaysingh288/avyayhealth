@@ -53,6 +53,25 @@ struct Medication: Codable, Identifiable {
     let dose: String
     let frequency: String
     let timing: String
+
+    init(name: String, dose: String, frequency: String, timing: String) {
+        self.name = name
+        self.dose = dose
+        self.frequency = frequency
+        self.timing = timing
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        name = try c.decode(String.self, forKey: .name)
+        dose = try c.decodeIfPresent(String.self, forKey: .dose) ?? ""
+        frequency = try c.decodeIfPresent(String.self, forKey: .frequency) ?? ""
+        timing = try c.decodeIfPresent(String.self, forKey: .timing) ?? ""
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case name, dose, frequency, timing
+    }
 }
 
 struct PatientSession: Codable {
@@ -78,6 +97,39 @@ struct PatientSession: Codable {
         case coordinatorFirstName = "coordinator_first_name"
         case medications
         case token = "session_token"
+    }
+
+    init(patientId: String, firstName: String, condition: Condition, dischargeDate: String, daysInProgram: Int, totalDays: Int, hospitalName: String, coordinatorFirstName: String, medications: [Medication] = [], token: String) {
+        self.patientId = patientId
+        self.firstName = firstName
+        self.condition = condition
+        self.dischargeDate = dischargeDate
+        self.daysInProgram = daysInProgram
+        self.totalDays = totalDays
+        self.hospitalName = hospitalName
+        self.coordinatorFirstName = coordinatorFirstName
+        self.medications = medications
+        self.token = token
+    }
+}
+
+// MARK: - Accessibility Helpers
+
+extension RiskLevel {
+    var accessibilityLabel: String {
+        switch self {
+        case .green: return "Stable"
+        case .yellow: return "Needs attention"
+        case .red: return "Alert"
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .green: return "checkmark.circle.fill"
+        case .yellow: return "exclamationmark.circle.fill"
+        case .red: return "exclamationmark.triangle.fill"
+        }
     }
 }
 
@@ -181,7 +233,7 @@ struct EnrollResponse: Codable {
     let dischargeDate: String
     let daysInProgram: Int
     let totalDays: Int
-    let medications: [Medication]
+    let medications: [Medication]?
     let sessionToken: String
 
     enum CodingKeys: String, CodingKey {
@@ -196,5 +248,20 @@ struct EnrollResponse: Codable {
         case totalDays = "total_days"
         case medications
         case sessionToken = "session_token"
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        patientId = try c.decode(String.self, forKey: .patientId)
+        hospitalId = try c.decode(String.self, forKey: .hospitalId)
+        hospitalName = try c.decode(String.self, forKey: .hospitalName)
+        coordinatorFirstName = try c.decode(String.self, forKey: .coordinatorFirstName)
+        firstName = try c.decode(String.self, forKey: .firstName)
+        condition = try c.decode(Condition.self, forKey: .condition)
+        dischargeDate = try c.decode(String.self, forKey: .dischargeDate)
+        daysInProgram = try c.decodeIfPresent(Int.self, forKey: .daysInProgram) ?? 1
+        totalDays = try c.decodeIfPresent(Int.self, forKey: .totalDays) ?? 30
+        medications = try c.decodeIfPresent([Medication].self, forKey: .medications)
+        sessionToken = try c.decode(String.self, forKey: .sessionToken)
     }
 }

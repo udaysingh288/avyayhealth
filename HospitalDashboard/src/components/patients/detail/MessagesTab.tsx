@@ -63,11 +63,13 @@ export default function MessagesTab({ patientId, patientName }: MessagesTabProps
       .map((m) => m.id);
 
     if (unreadPatientMsgs.length > 0 && supabase) {
-      supabase
+      const { error: updateErr } = await supabase
         .from('direct_messages')
         .update({ read_at: new Date().toISOString() })
-        .in('id', unreadPatientMsgs)
-        .then();
+        .in('id', unreadPatientMsgs);
+      if (updateErr) {
+        console.error('Failed to mark messages as read:', updateErr);
+      }
     }
   }, [patientId]);
 
@@ -76,10 +78,24 @@ export default function MessagesTab({ patientId, patientName }: MessagesTabProps
     loadMessages().then(scrollToBottom);
   }, [loadMessages, scrollToBottom]);
 
-  // Track IDs we inserted ourselves so the realtime subscription can skip them
-  const sentIdsRef = useRef(new Set<string>());
+  // Polling fallback: refetch messages every 5 seconds to catch anything
+  // realtime misses (network issues, subscription gaps)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadMessages().then(() => {
+        // Only scroll if we're near the bottom already
+        if (scrollRef.current) {
+          const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+          if (scrollHeight - scrollTop - clientHeight < 100) {
+            scrollToBottom();
+          }
+        }
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [loadMessages, scrollToBottom]);
 
-  // Realtime subscription for new messages
+  // Realtime subscription for new messages (instant delivery when it works)
   useEffect(() => {
     if (!hasSupabase || !supabase) return;
 
@@ -95,12 +111,8 @@ export default function MessagesTab({ patientId, patientName }: MessagesTabProps
         },
         (payload) => {
           const newMsg = payload.new as DirectMessage;
-          // Skip messages we sent ourselves — already in the list via optimistic update
-          if (sentIdsRef.current.has(newMsg.id)) {
-            sentIdsRef.current.delete(newMsg.id);
-            return;
-          }
           setMessages((prev) => {
+            // Deduplicate: skip if we already have this message
             if (prev.some((m) => m.id === newMsg.id)) return prev;
             return [...prev, newMsg];
           });
@@ -112,7 +124,9 @@ export default function MessagesTab({ patientId, patientName }: MessagesTabProps
               .from('direct_messages')
               .update({ read_at: new Date().toISOString() })
               .eq('id', newMsg.id)
-              .then();
+              .then(({ error }) => {
+                if (error) console.error('Failed to mark message as read:', error);
+              });
           }
         },
       )
@@ -159,8 +173,7 @@ export default function MessagesTab({ patientId, patientName }: MessagesTabProps
         console.error('Failed to send message:', error);
         setMessages((prev) => prev.filter((m) => m.id !== tempId));
       } else if (data) {
-        // Mark this ID so the realtime listener skips it
-        sentIdsRef.current.add(data.id);
+        // Replace optimistic message with real data
         setMessages((prev) =>
           prev.map((m) =>
             m.id === tempId ? { ...optimistic, id: data.id, created_at: data.created_at } : m,
@@ -172,6 +185,8 @@ export default function MessagesTab({ patientId, patientName }: MessagesTabProps
     } finally {
       setSending(false);
       inputRef.current?.focus();
+      // Refetch to ensure consistency after send
+      setTimeout(() => loadMessages(), 500);
     }
   }
 

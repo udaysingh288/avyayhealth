@@ -10,6 +10,10 @@ final class PatientStore: ObservableObject {
     @Published var checkin: TodayCheckin?
     @Published var isEnrolled: Bool = false
 
+    /// Tracks last user interaction for 30-minute inactivity timeout (HIPAA)
+    private var lastActivityDate = Date()
+    private static let inactivityTimeout: TimeInterval = 30 * 60 // 30 minutes
+
     private init() {}
 
     func setSession(_ enrollResponse: EnrollResponse) {
@@ -22,17 +26,20 @@ final class PatientStore: ObservableObject {
             totalDays: enrollResponse.totalDays,
             hospitalName: enrollResponse.hospitalName,
             coordinatorFirstName: enrollResponse.coordinatorFirstName,
+            medications: enrollResponse.medications ?? [],
             token: enrollResponse.sessionToken
         )
         self.token = enrollResponse.sessionToken
         self.session = session
         self.isEnrolled = true
+        recordActivity()
     }
 
     func setSessionDirect(token: String, session: PatientSession) {
         self.token = token
         self.session = session
         self.isEnrolled = true
+        recordActivity()
     }
 
     func clearSession() {
@@ -40,6 +47,19 @@ final class PatientStore: ObservableObject {
         session = nil
         checkin = nil
         isEnrolled = false
+    }
+
+    // MARK: - Inactivity Timeout (HIPAA)
+
+    func recordActivity() {
+        lastActivityDate = Date()
+    }
+
+    func checkInactivityTimeout() {
+        guard isEnrolled else { return }
+        if Date().timeIntervalSince(lastActivityDate) > Self.inactivityTimeout {
+            clearSession()
+        }
     }
 
     func buildInitialCheckin() -> TodayCheckin {

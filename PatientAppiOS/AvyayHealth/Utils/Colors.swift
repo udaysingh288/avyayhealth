@@ -16,11 +16,30 @@ extension Color {
 
     static let textPrimary = Color(red: 0.118, green: 0.161, blue: 0.231)  // #1E293B
     static let textSecondary = Color(red: 0.392, green: 0.455, blue: 0.545) // #64748B
-    static let textMuted = Color(red: 0.580, green: 0.639, blue: 0.722)    // #94A3B8
+    static let textMuted = Color(red: 0.475, green: 0.533, blue: 0.612)    // #798898 — darkened from #94A3B8 for WCAG AA contrast (~4.5:1 on white)
 
     static let borderColor = Color(red: 0.886, green: 0.910, blue: 0.878)  // #E2E8F0
 
     static let coordinatorBubble = Color(red: 0.902, green: 0.933, blue: 0.925) // #E6EEEC
+}
+
+extension ShapeStyle where Self == Color {
+    static var forest: Color { .forest }
+    static var forestLight: Color { .forestLight }
+    static var forestPale: Color { .forestPale }
+    static var warmOatmeal: Color { .warmOatmeal }
+    static var accentTeal: Color { .accentTeal }
+    static var riskRed: Color { .riskRed }
+    static var riskRedBg: Color { .riskRedBg }
+    static var riskYellow: Color { .riskYellow }
+    static var riskYellowBg: Color { .riskYellowBg }
+    static var riskGreen: Color { .riskGreen }
+    static var riskGreenBg: Color { .riskGreenBg }
+    static var textPrimary: Color { .textPrimary }
+    static var textSecondary: Color { .textSecondary }
+    static var textMuted: Color { .textMuted }
+    static var borderColor: Color { .borderColor }
+    static var coordinatorBubble: Color { .coordinatorBubble }
 }
 
 extension RiskLevel {

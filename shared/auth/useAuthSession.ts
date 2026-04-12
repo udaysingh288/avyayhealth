@@ -3,10 +3,9 @@
  *
  * Mounts once at App root. Restores session from Supabase Auth,
  * fetches the coordinator's profile, and subscribes to auth changes.
- * Includes cancellation flag to prevent state updates after unmount.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { useAuthStore, type Profile } from './authStore';
 
@@ -17,6 +16,7 @@ export function useAuthSession(
   const setAuth = useAuthStore((s) => s.setAuth);
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const setLoading = useAuthStore((s) => s.setLoading);
+  const initialized = useRef(false);
 
   useEffect(() => {
     if (!hasSupabase || !supabase) {
@@ -24,57 +24,80 @@ export function useAuthSession(
       return;
     }
 
-    let cancelled = false;
+    // Prevent double initialization in React StrictMode
+    if (initialized.current) return;
+    initialized.current = true;
 
     async function loadProfile(userId: string): Promise<Profile | null> {
-      const { data, error } = await supabase!
-        .from('profiles')
-        .select('id, hospital_id, role, display_name')
-        .eq('id', userId)
-        .maybeSingle();
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.warn('[auth] failed to load profile', error.message);
+      try {
+        const { data, error } = await supabase!
+          .from('profiles')
+          .select('id, hospital_id, role, display_name')
+          .eq('id', userId)
+          .maybeSingle();
+        if (error) {
+          console.warn('[auth] failed to load profile', error.message);
+          return null;
+        }
+        return data as Profile | null;
+      } catch (err) {
+        console.warn('[auth] profile load exception', err);
         return null;
       }
-      return data as Profile | null;
     }
 
-    async function hydrate() {
-      const { data } = await supabase!.auth.getSession();
-      if (cancelled) return;
+    // Hydrate from existing session (e.g. persisted in localStorage)
+    supabase.auth.getSession().then(({ data }) => {
+      // Don't overwrite if Login already set auth
+      if (useAuthStore.getState().userId) return;
+
       if (data.session?.user) {
-        const profile = await loadProfile(data.session.user.id);
-        if (cancelled) return;
-        setAuth({
-          userId: data.session.user.id,
-          email: data.session.user.email ?? '',
-          profile,
+        loadProfile(data.session.user.id).then((profile) => {
+          // Check again — Login could have set it while we were loading profile
+          if (useAuthStore.getState().userId) return;
+          setAuth({
+            userId: data.session!.user.id,
+            email: data.session!.user.email ?? '',
+            profile,
+          });
         });
       } else {
         clearAuth();
       }
-    }
+    }).catch((err) => {
+      console.error('[auth] hydrate failed', err);
+      clearAuth();
+    });
 
-    hydrate();
-
+    // Listen for auth state changes (sign-in, sign-out, token refresh)
     const { data: sub } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        if (session?.user) {
-          const profile = await loadProfile(session.user.id);
-          setAuth({
-            userId: session.user.id,
-            email: session.user.email ?? '',
-            profile,
-          });
-        } else {
-          clearAuth();
+      async (event, session) => {
+        // If auth was already set for this user, skip (prevents Login/hook race)
+        const current = useAuthStore.getState();
+        if (current.userId && session?.user?.id === current.userId) {
+          return;
         }
+
+        if (event === 'SIGNED_OUT' || !session?.user) {
+          clearAuth();
+          return;
+        }
+
+        // New sign-in or user changed
+        const profile = await loadProfile(session.user.id);
+        // Re-check: Login page may have set auth while we loaded profile
+        const latest = useAuthStore.getState();
+        if (latest.userId === session.user.id) return;
+
+        setAuth({
+          userId: session.user.id,
+          email: session.user.email ?? '',
+          profile,
+        });
       },
     );
 
     return () => {
-      cancelled = true;
       sub.subscription.unsubscribe();
     };
   }, [supabase, hasSupabase, setAuth, clearAuth, setLoading]);

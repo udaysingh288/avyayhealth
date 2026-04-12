@@ -13,22 +13,24 @@ struct EscalationAlertView: View {
 
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 56))
-                    .foregroundColor(.riskRed)
+                    .foregroundStyle(.riskRed)
+                    .accessibilityHidden(true)
 
                 VStack(spacing: 12) {
                     Text("This sounds urgent.")
-                        .font(.custom("DMSerifDisplay-Regular", size: 28))
-                        .foregroundColor(.textPrimary)
+                        .font(.custom("DMSerifDisplay-Regular", size: 28, relativeTo: .title))
+                        .foregroundStyle(.textPrimary)
+                        .accessibilityAddTraits(.isHeader)
 
                     Text("Please call 911 or go to your nearest\nemergency room right away.")
-                        .font(.custom("DMSans-Regular", size: 17))
-                        .foregroundColor(.textSecondary)
+                        .font(.custom("DMSans-Regular", size: 17, relativeTo: .body))
+                        .foregroundStyle(.textSecondary)
                         .multilineTextAlignment(.center)
                         .lineSpacing(4)
 
                     Text("Your care team at \(hospitalName)\nhas also been notified.")
-                        .font(.custom("DMSans-Regular", size: 15))
-                        .foregroundColor(.textMuted)
+                        .font(.custom("DMSans-Regular", size: 15, relativeTo: .subheadline))
+                        .foregroundStyle(.textSecondary)
                         .multilineTextAlignment(.center)
                         .padding(.top, 8)
                 }
@@ -44,29 +46,35 @@ struct EscalationAlertView: View {
                             Image(systemName: "phone.fill")
                             Text("Call 911")
                         }
-                        .font(.custom("DMSans-SemiBold", size: 18))
-                        .foregroundColor(.white)
+                        .font(.custom("DMSans-SemiBold", size: 18, relativeTo: .headline))
+                        .foregroundStyle(.white)
                         .frame(maxWidth: .infinity, minHeight: 56)
                         .background(Color.riskRed)
-                        .cornerRadius(28)
+                        .clipShape(.rect(cornerRadius: 28))
                     }
+                    .accessibilityLabel("Call 911 emergency services")
+                    .accessibilityHint("Double tap to call emergency services immediately")
 
                     Button {
                         haptic(.medium)
                         onDismiss()
                     } label: {
                         Text("I'm okay, continue")
-                            .font(.custom("DMSans-SemiBold", size: 16))
-                            .foregroundColor(.textSecondary)
+                            .font(.custom("DMSans-SemiBold", size: 16, relativeTo: .body))
+                            .foregroundStyle(.textSecondary)
                             .frame(maxWidth: .infinity, minHeight: 48)
                             .background(Color.white)
-                            .cornerRadius(24)
+                            .clipShape(.rect(cornerRadius: 24))
                             .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.borderColor, lineWidth: 1))
                     }
+                    .accessibilityLabel("I'm okay, continue check-in")
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 40)
             }
+        }
+        .onAppear {
+            UIAccessibility.post(notification: .screenChanged, argument: "Emergency alert. This sounds urgent. Please call 911 or go to your nearest emergency room.")
         }
     }
 }

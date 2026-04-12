@@ -3,15 +3,48 @@ import SwiftUI
 @main
 struct AvyayHealthApp: App {
     @StateObject private var store = PatientStore.shared
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var isScreenProtected = false
 
     var body: some Scene {
         WindowGroup {
-            if store.isEnrolled {
-                MainTabView()
-                    .environmentObject(store)
-            } else {
-                EnrollmentView()
-                    .environmentObject(store)
+            ZStack {
+                if store.isEnrolled {
+                    MainTabView()
+                        .environmentObject(store)
+                } else {
+                    EnrollmentView()
+                        .environmentObject(store)
+                }
+
+                // HIPAA: blur PHI when app enters background/app switcher
+                if isScreenProtected {
+                    Color.warmOatmeal
+                        .ignoresSafeArea()
+                        .overlay(
+                            VStack(spacing: 12) {
+                                Image(systemName: "heart.text.clipboard")
+                                    .font(.system(size: 48))
+                                    .foregroundStyle(.forest)
+                                Text("Avyay Health")
+                                    .font(.custom("DMSerifDisplay-Regular", size: 24))
+                                    .foregroundStyle(.forest)
+                            }
+                        )
+                }
+            }
+            .onChange(of: scenePhase) { phase in
+                switch phase {
+                case .active:
+                    isScreenProtected = false
+                    store.recordActivity()
+                    store.checkInactivityTimeout()
+                case .inactive, .background:
+                    isScreenProtected = true
+                    store.recordActivity()
+                @unknown default:
+                    break
+                }
             }
         }
     }
@@ -29,30 +62,27 @@ struct MainTabView: View {
         TabView(selection: $selectedTab) {
             HomeView()
                 .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("Home")
+                    Label("Home", systemImage: "house.fill")
                 }
                 .tag(0)
                 .badge(checkinDone ? 0 : 1)
+                .accessibilityLabel(checkinDone ? "Home" : "Home, check-in pending")
 
             TimelineView()
                 .tabItem {
-                    Image(systemName: "calendar")
-                    Text("Timeline")
+                    Label("Timeline", systemImage: "calendar")
                 }
                 .tag(1)
 
             CarePlanView()
                 .tabItem {
-                    Image(systemName: "heart.text.clipboard")
-                    Text("Care Plan")
+                    Label("Care Plan", systemImage: "heart.text.clipboard")
                 }
                 .tag(2)
 
             CareTeamView()
                 .tabItem {
-                    Image(systemName: "person.2.fill")
-                    Text("Care Team")
+                    Label("Care Team", systemImage: "person.2.fill")
                 }
                 .tag(3)
         }

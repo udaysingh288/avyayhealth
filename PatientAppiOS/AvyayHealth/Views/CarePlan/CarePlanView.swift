@@ -6,22 +6,43 @@ struct CarePlanView: View {
 
     private var condition: Condition { store.session?.condition ?? .chf }
 
+    private var medications: [Medication] {
+        if let meds = store.session?.medications, !meds.isEmpty {
+            return meds
+        }
+        // Fallback defaults for when API doesn't return medications
+        if condition == .chf {
+            return [
+                Medication(name: "Furosemide (Lasix)", dose: "40mg", frequency: "once daily", timing: "Morning"),
+                Medication(name: "Lisinopril", dose: "10mg", frequency: "once daily", timing: "Morning"),
+                Medication(name: "Metoprolol", dose: "25mg", frequency: "twice daily", timing: "Morning & Evening"),
+            ]
+        } else {
+            return [
+                Medication(name: "Albuterol Inhaler", dose: "2 puffs", frequency: "as needed", timing: "As needed"),
+                Medication(name: "Tiotropium (Spiriva)", dose: "1 capsule", frequency: "once daily", timing: "Morning"),
+                Medication(name: "Prednisone", dose: "20mg", frequency: "tapering", timing: "Morning"),
+            ]
+        }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Header
             VStack(spacing: 4) {
                 Text("Care Plan")
-                    .font(.custom("DMSerifDisplay-Regular", size: 24))
-                    .foregroundColor(.textPrimary)
+                    .font(.custom("DMSerifDisplay-Regular", size: 24, relativeTo: .title))
+                    .foregroundStyle(.textPrimary)
+                    .accessibilityAddTraits(.isHeader)
                 Text(condition.label)
-                    .font(.custom("DMSans-Regular", size: 14))
-                    .foregroundColor(.textSecondary)
+                    .font(.custom("DMSans-Regular", size: 14, relativeTo: .subheadline))
+                    .foregroundStyle(.textSecondary)
             }
             .padding(.top, 16)
             .padding(.bottom, 8)
 
             // Tab selector
-            Picker("", selection: $selectedTab) {
+            Picker("View", selection: $selectedTab) {
                 Text("Today").tag(0)
                 Text("Resources").tag(1)
             }
@@ -47,12 +68,14 @@ struct CarePlanView: View {
                     Image(systemName: "phone.fill")
                     Text("Call 911")
                 }
-                .font(.custom("DMSans-SemiBold", size: 16))
-                .foregroundColor(.white)
+                .font(.custom("DMSans-SemiBold", size: 16, relativeTo: .body))
+                .foregroundStyle(.white)
                 .frame(maxWidth: .infinity, minHeight: 48)
                 .background(Color.riskRed)
-                .cornerRadius(24)
+                .clipShape(.rect(cornerRadius: 24))
             }
+            .accessibilityLabel("Call 911 emergency services")
+            .accessibilityHint("Double tap to call emergency services")
             .padding(.horizontal, 20)
             .padding(.bottom, 16)
         }
@@ -67,15 +90,9 @@ struct CarePlanView: View {
             VStack(alignment: .leading, spacing: 12) {
                 sectionHeader("Medications", icon: "pills")
 
-                medicationRow(name: condition == .chf ? "Furosemide (Lasix)" : "Albuterol Inhaler",
-                              dose: condition == .chf ? "40mg, once daily" : "2 puffs, as needed",
-                              timing: "Morning")
-                medicationRow(name: condition == .chf ? "Lisinopril" : "Tiotropium (Spiriva)",
-                              dose: condition == .chf ? "10mg, once daily" : "1 capsule, once daily",
-                              timing: "Morning")
-                medicationRow(name: condition == .chf ? "Metoprolol" : "Prednisone",
-                              dose: condition == .chf ? "25mg, twice daily" : "20mg, tapering",
-                              timing: "Morning & Evening")
+                ForEach(medications) { med in
+                    medicationRow(name: med.name, dose: "\(med.dose), \(med.frequency)", timing: med.timing)
+                }
             }
             .cardStyle()
 
@@ -134,11 +151,12 @@ struct CarePlanView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.octagon.fill")
-                        .foregroundColor(.riskRed)
+                        .foregroundStyle(.riskRed)
                     Text("Call 911 Immediately")
-                        .font(.custom("DMSans-SemiBold", size: 16))
-                        .foregroundColor(.riskRed)
+                        .font(.custom("DMSans-SemiBold", size: 16, relativeTo: .headline))
+                        .foregroundStyle(.riskRed)
                 }
+                .accessibilityAddTraits(.isHeader)
 
                 VStack(alignment: .leading, spacing: 8) {
                     emergencyRow("Severe chest pain")
@@ -149,7 +167,7 @@ struct CarePlanView: View {
             }
             .padding(20)
             .background(Color.riskRedBg)
-            .cornerRadius(16)
+            .clipShape(.rect(cornerRadius: 16))
             .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.riskRed.opacity(0.3), lineWidth: 1))
             .padding(.horizontal, 20)
 
@@ -163,10 +181,12 @@ struct CarePlanView: View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.system(size: 16))
-                .foregroundColor(.forest)
+                .foregroundStyle(.forest)
+                .accessibilityHidden(true)
             Text(title)
-                .font(.custom("DMSans-SemiBold", size: 16))
-                .foregroundColor(.textPrimary)
+                .font(.custom("DMSans-SemiBold", size: 16, relativeTo: .headline))
+                .foregroundStyle(.textPrimary)
+                .accessibilityAddTraits(.isHeader)
         }
     }
 
@@ -174,31 +194,34 @@ struct CarePlanView: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(name)
-                    .font(.custom("DMSans-Medium", size: 15))
-                    .foregroundColor(.textPrimary)
+                    .font(.custom("DMSans-Medium", size: 15, relativeTo: .body))
+                    .foregroundStyle(.textPrimary)
                 Text(dose)
-                    .font(.custom("DMSans-Regular", size: 13))
-                    .foregroundColor(.textSecondary)
+                    .font(.custom("DMSans-Regular", size: 13, relativeTo: .subheadline))
+                    .foregroundStyle(.textSecondary)
             }
             Spacer()
             Text(timing)
-                .font(.custom("DMSans-Regular", size: 12))
-                .foregroundColor(.textMuted)
+                .font(.custom("DMSans-Regular", size: 12, relativeTo: .caption))
+                .foregroundStyle(.textSecondary)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
                 .background(Color.forestPale)
-                .cornerRadius(6)
+                .clipShape(.rect(cornerRadius: 6))
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(name), \(dose), take \(timing)")
     }
 
     private func habitRow(_ text: String) -> some View {
         HStack(spacing: 12) {
             Image(systemName: "circle")
                 .font(.system(size: 20))
-                .foregroundColor(.forest.opacity(0.4))
+                .foregroundStyle(.forest.opacity(0.4))
+                .accessibilityHidden(true)
             Text(text)
-                .font(.custom("DMSans-Regular", size: 15))
-                .foregroundColor(.textPrimary)
+                .font(.custom("DMSans-Regular", size: 15, relativeTo: .body))
+                .foregroundStyle(.textPrimary)
         }
     }
 
@@ -206,21 +229,27 @@ struct CarePlanView: View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "exclamationmark.circle.fill")
                 .font(.system(size: 14))
-                .foregroundColor(.riskYellow)
+                .foregroundStyle(.riskYellow)
                 .padding(.top, 2)
+                .accessibilityHidden(true)
             Text(text)
-                .font(.custom("DMSans-Regular", size: 14))
-                .foregroundColor(.textPrimary)
+                .font(.custom("DMSans-Regular", size: 14, relativeTo: .subheadline))
+                .foregroundStyle(.textPrimary)
         }
+        .accessibilityLabel("Warning: \(text)")
     }
 
     private func emergencyRow(_ text: String) -> some View {
         HStack(spacing: 8) {
-            Circle().fill(Color.riskRed).frame(width: 6, height: 6)
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 10))
+                .foregroundStyle(.riskRed)
+                .accessibilityHidden(true)
             Text(text)
-                .font(.custom("DMSans-Medium", size: 14))
-                .foregroundColor(.riskRed)
+                .font(.custom("DMSans-Medium", size: 14, relativeTo: .subheadline))
+                .foregroundStyle(.riskRed)
         }
+        .accessibilityLabel("Emergency: \(text)")
     }
 }
 
@@ -228,7 +257,7 @@ private extension View {
     func cardStyle() -> some View {
         self.padding(20)
             .background(Color.white)
-            .cornerRadius(16)
+            .clipShape(.rect(cornerRadius: 16))
             .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
             .padding(.horizontal, 20)
     }

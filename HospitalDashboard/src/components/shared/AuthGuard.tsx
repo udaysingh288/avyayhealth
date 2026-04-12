@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { hasSupabase } from '../../lib/supabase';
@@ -7,8 +8,21 @@ import SessionWarningModal from './SessionWarningModal';
 export default function AuthGuard() {
   const userId = useAuthStore((s) => s.userId);
   const loading = useAuthStore((s) => s.loading);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
   const location = useLocation();
   const { showWarning, extendSession } = useInactivityTimer();
+
+  // Safety: if auth loading takes more than 5 seconds, assume no session
+  useEffect(() => {
+    if (!loading) return;
+    const timeout = setTimeout(() => {
+      if (useAuthStore.getState().loading) {
+        console.warn('[AuthGuard] auth loading timed out, clearing');
+        clearAuth();
+      }
+    }, 5000);
+    return () => clearTimeout(timeout);
+  }, [loading, clearAuth]);
 
   // Dev fallback — no Supabase means no gating
   if (!hasSupabase) {

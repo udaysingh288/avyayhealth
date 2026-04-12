@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
 import {
@@ -35,16 +35,25 @@ const MOCK_SNAPSHOT: DashboardData = {
 export function useDashboardData(): DashboardData {
   const profile = useAuthStore((s) => s.profile);
   const userId = useAuthStore((s) => s.userId);
+  const authLoading = useAuthStore((s) => s.loading);
   const [state, setState] = useState<DashboardData>({
     ...MOCK_SNAPSHOT,
-    loading: hasSupabase && !!userId,
+    loading: true,
   });
+  const loadingRef = useRef(false);
 
   const load = useCallback(async () => {
+    // Wait for auth to finish before deciding
+    if (authLoading) return;
+
     if (!hasSupabase || !supabase || !userId || !profile?.hospital_id) {
-      setState(MOCK_SNAPSHOT);
+      setState({ ...MOCK_SNAPSHOT, refetch: () => {} });
       return;
     }
+
+    // Prevent concurrent loads
+    if (loadingRef.current) return;
+    loadingRef.current = true;
 
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
@@ -55,18 +64,21 @@ export function useDashboardData(): DashboardData {
         isMock: false,
         loading: false,
         error: null,
-        refetch: load,
+        refetch: () => {},
       });
     } catch (err) {
       setState({
         ...MOCK_SNAPSHOT,
         loading: false,
         error: err instanceof Error ? err.message : 'Load failed',
-        refetch: load,
+        refetch: () => {},
       });
+    } finally {
+      loadingRef.current = false;
     }
-  }, [userId, profile?.hospital_id]);
+  }, [userId, profile?.hospital_id, authLoading]);
 
+  // Load when auth state settles or profile changes
   useEffect(() => {
     load();
   }, [load]);

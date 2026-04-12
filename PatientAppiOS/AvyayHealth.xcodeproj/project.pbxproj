@@ -26,6 +26,7 @@
 		D878014304FE599463734548 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B194527D4D205F9D4FB452F /* APIClient.swift */; };
 		D96114FDCADF2DAA4188C038 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7069FFE56813EFAA223E0F23 /* Types.swift */; };
 		FEAF220108D6BB386CC6260C /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE99608004129DE8BE43372 /* HomeView.swift */; };
+		E1F2A3B4C5D6E7F809A1B2C3 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* Config.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +50,7 @@
 		CBFF8A15A95E4F90091FBDCA /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		D1DFB5268B89EB0426C04F29 /* CarePlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarePlanView.swift; sourceTree = "<group>"; };
 		F9A694CECB5684BD30BF511D /* ClinicalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicalConstants.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5C /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -160,6 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				8B194527D4D205F9D4FB452F /* APIClient.swift */,
+				A1B2C3D4E5F60718293A4B5C /* Config.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -260,6 +263,7 @@
 				70A36568CBC7B7EB085EBF19 /* PhaseHandlers.swift in Sources */,
 				229D6718D953F8ADAA93CD33 /* TimelineView.swift in Sources */,
 				D96114FDCADF2DAA4188C038 /* Types.swift in Sources */,
+				E1F2A3B4C5D6E7F809A1B2C3 /* Config.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,7 +292,7 @@
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.avyayhealth.patient;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -435,7 +439,7 @@
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.avyayhealth.patient;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};

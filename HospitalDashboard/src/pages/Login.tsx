@@ -1,16 +1,28 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { supabase, hasSupabase } from '../lib/supabase';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore, type Profile } from '../store/authStore';
 
 export default function Login() {
   const userId = useAuthStore((s) => s.userId);
   const authLoading = useAuthStore((s) => s.loading);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
   const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Safety: if authLoading is stuck for more than 3 seconds, clear it
+  useEffect(() => {
+    if (!authLoading) return;
+    const t = setTimeout(() => {
+      if (useAuthStore.getState().loading) {
+        clearAuth();
+      }
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [authLoading, clearAuth]);
 
   if (authLoading) {
     return (
@@ -38,18 +50,52 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const { error: signInErr } = await supabase.auth.signInWithPassword({
+      // Wrap signIn in a timeout to catch hanging requests
+      const signInPromise = supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
+
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Sign-in timed out. Please try again.')), 15000),
+      );
+
+      const { data, error: signInErr } = await Promise.race([signInPromise, timeoutPromise]);
+
       if (signInErr) {
         setError(signInErr.message);
+        setLoading(false);
         return;
       }
-      // onAuthStateChange in useAuthSession will update the store
+
+      if (!data.session?.user) {
+        setError('Sign-in succeeded but no session was returned.');
+        setLoading(false);
+        return;
+      }
+
+      // Load profile — don't block on failure
+      let profile: Profile | null = null;
+      try {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('id, hospital_id, role, display_name')
+          .eq('id', data.session.user.id)
+          .maybeSingle();
+        profile = profileData as Profile | null;
+      } catch {
+        // Profile load failed — continue with null profile
+      }
+
+      // Set auth state directly — this triggers redirect via userId check
+      useAuthStore.getState().setAuth({
+        userId: data.session.user.id,
+        email: data.session.user.email ?? '',
+        profile,
+      });
+      // Component re-renders and the userId check above triggers <Navigate>
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign-in failed');
-    } finally {
       setLoading(false);
     }
   }

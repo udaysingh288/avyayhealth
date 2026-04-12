@@ -4,15 +4,15 @@ import Foundation
 final class APIClient {
     static let shared = APIClient()
 
-    private let supabaseURL = "https://gehcrdcgxifryfwjhpoz.supabase.co"
-    private let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdlaGNyZGNneGlmcnlmd2pocG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4OTE4NDcsImV4cCI6MjA5MTQ2Nzg0N30.QKgdbLbou6I3bOHsBjv2gXI-uptchn7trNp21xaXhjA"
+    private let supabaseURL = Config.supabaseURL
+    private let supabaseAnonKey = Config.supabaseAnonKey
     private let session = URLSession.shared
     private let decoder = JSONDecoder()
 
     private init() {}
 
-    private func edgeFunctionURL(_ name: String) -> URL {
-        URL(string: "\(supabaseURL)/functions/v1/\(name)")!
+    private func edgeFunctionURL(_ name: String) -> URL? {
+        URL(string: "\(supabaseURL)/functions/v1/\(name)")
     }
 
     private func patientHeaders(_ token: String) -> [String: String] {
@@ -34,14 +34,18 @@ final class APIClient {
 
     // MARK: - Enrollment
 
-    func enroll(hospitalCode: String, firstName: String, dob: String) async throws -> EnrollResponse {
-        var request = URLRequest(url: edgeFunctionURL("enroll-patient"))
+    func enroll(hospitalCode: String, firstName: String, dob: String, condition: String = "chf") async throws -> EnrollResponse {
+        guard let url = edgeFunctionURL("enroll-patient") else {
+            throw APIError.serverError("Invalid URL")
+        }
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         anonHeaders().forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
         request.httpBody = try JSONEncoder().encode([
             "hospital_code": hospitalCode,
             "first_name": firstName,
             "dob": dob,
+            "condition": condition,
         ])
 
         let (data, response) = try await session.data(for: request)
@@ -55,7 +59,8 @@ final class APIClient {
     // MARK: - Check-in Messages
 
     func saveMessage(token: String, message: Message) async {
-        var request = URLRequest(url: edgeFunctionURL("save-checkin-message"))
+        guard let url = edgeFunctionURL("save-checkin-message") else { return }
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         patientHeaders(token).forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
 
@@ -70,7 +75,8 @@ final class APIClient {
     }
 
     func completeCheckIn(token: String, riskLevel: RiskLevel, summary: String) async {
-        var request = URLRequest(url: edgeFunctionURL("complete-checkin"))
+        guard let url = edgeFunctionURL("complete-checkin") else { return }
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         patientHeaders(token).forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
         request.httpBody = try? JSONEncoder().encode([
@@ -90,7 +96,8 @@ final class APIClient {
         firstName: String,
         medications: [Medication] = []
     ) async -> ChatReplyResponse? {
-        var request = URLRequest(url: edgeFunctionURL("chat-reply"))
+        guard let url = edgeFunctionURL("chat-reply") else { return nil }
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         patientHeaders(token).forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
 
@@ -121,7 +128,8 @@ final class APIClient {
     // MARK: - Direct Messaging
 
     func getMessages(token: String, limit: Int = 50) async -> [DirectMessage] {
-        var request = URLRequest(url: edgeFunctionURL("get-messages"))
+        guard let url = edgeFunctionURL("get-messages") else { return [] }
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         patientHeaders(token).forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
         request.httpBody = try? JSONEncoder().encode(["limit": limit])
@@ -137,7 +145,8 @@ final class APIClient {
     }
 
     func sendDirectMessage(token: String, content: String) async {
-        var request = URLRequest(url: edgeFunctionURL("send-message"))
+        guard let url = edgeFunctionURL("send-message") else { return }
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         patientHeaders(token).forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
         request.httpBody = try? JSONEncoder().encode(["content": content])
