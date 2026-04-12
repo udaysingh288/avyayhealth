@@ -607,3 +607,9 @@ Example prompt pattern:
 
 The more specific your prompt, the less correction is needed. Always reference
 the relevant section numbers.
+
+---
+
+## 21. Engineering Standards
+
+This project follows the **Engineering Standards** defined in the root `CLAUDE.md` at the monorepo level. All standards regarding secrets management, observability, input validation, security, architecture, deployment, documentation, technical debt, testing, and time handling apply to this codebase. Read and follow them on every file, feature, and suggestion.

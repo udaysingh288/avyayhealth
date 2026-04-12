@@ -8,6 +8,22 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Patient, DashboardMetrics, Alert, CheckIn, RiskLevel } from '../types';
 
+/**
+ * Update a patient's risk_override column.
+ * Pass null to clear the override and revert to AI-determined risk.
+ */
+export async function updatePatientRiskOverride(
+  supabase: SupabaseClient,
+  patientId: string,
+  riskLevel: RiskLevel | null,
+): Promise<void> {
+  const { error } = await supabase
+    .from('patients')
+    .update({ risk_override: riskLevel === 'not_started' ? null : riskLevel })
+    .eq('id', patientId);
+  if (error) throw error;
+}
+
 export interface DashboardSnapshot {
   patients: Patient[];
   metrics: DashboardMetrics;
@@ -19,11 +35,11 @@ export async function fetchDashboardData(
   supabase: SupabaseClient,
   hospitalId: string,
 ): Promise<DashboardSnapshot> {
-  // Parallel fetch: patients, check_ins (with messages), sdoh_flags
-  const [patientsRes, checkInsRes, sdohRes] = await Promise.all([
+  // Parallel fetch: patients, check_ins (with messages), sdoh_flags, unread DMs
+  const [patientsRes, checkInsRes, sdohRes, unreadDmsRes] = await Promise.all([
     supabase
       .from('patients')
-      .select('id, first_name, last_name, dob, condition, discharge_date, days_in_program, total_days, phone, status, coordinator_id, hospital_id, created_at')
+      .select('id, first_name, last_name, dob, condition, discharge_date, days_in_program, total_days, phone, status, coordinator_id, hospital_id, created_at, risk_override')
       .eq('hospital_id', hospitalId)
       .eq('status', 'active')
       .order('created_at', { ascending: false }),
@@ -37,16 +53,28 @@ export async function fetchDashboardData(
     supabase
       .from('sdoh_flags')
       .select('id, patient_id, domain, resolved'),
+    supabase
+      .from('direct_messages')
+      .select('id, patient_id')
+      .eq('sender_type', 'patient')
+      .is('read_at', null),
   ]);
 
   if (patientsRes.error) throw patientsRes.error;
 
   const dbPatients = patientsRes.data ?? [];
 
-  // Scope check-ins and SDOH flags to this hospital's patients only
+  // Scope check-ins, SDOH flags, and DMs to this hospital's patients only
   const hospitalPatientIds = new Set(dbPatients.map((p: any) => p.id));
   const dbCheckIns = (checkInsRes.data ?? []).filter((ci: any) => hospitalPatientIds.has(ci.patient_id));
   const dbSdoh = (sdohRes.data ?? []).filter((f: any) => hospitalPatientIds.has(f.patient_id));
+
+  // Count unread DMs per patient
+  const unreadDmsByPatient = new Map<string, number>();
+  for (const dm of (unreadDmsRes.data ?? [])) {
+    if (!hospitalPatientIds.has(dm.patient_id)) continue;
+    unreadDmsByPatient.set(dm.patient_id, (unreadDmsByPatient.get(dm.patient_id) ?? 0) + 1);
+  }
 
   // Index check-ins by patient_id
   const checkinsByPatient = new Map<string, typeof dbCheckIns>();
@@ -89,7 +117,10 @@ export async function fetchDashboardData(
     }
 
     let riskLevel: RiskLevel = 'not_started';
-    if (latestCheckin?.risk_level) {
+    if (p.risk_override) {
+      // Coordinator manual override takes precedence
+      riskLevel = p.risk_override as RiskLevel;
+    } else if (latestCheckin?.risk_level) {
       riskLevel = latestCheckin.risk_level as RiskLevel;
     } else if (latestCheckin?.status === 'pending') {
       riskLevel = 'green';
@@ -125,6 +156,7 @@ export async function fetchDashboardData(
       adi_national_rank: null,
       checkin_completion_rate: totalCheckins > 0 ? completedCount / totalCheckins : 0,
       is_active: true,
+      unread_dm_count: unreadDmsByPatient.get(p.id) ?? 0,
     };
   });
 

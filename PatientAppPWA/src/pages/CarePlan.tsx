@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TopBar from '../components/shared/TopBar';
 import { usePatientStore } from '../store/patientStore';
@@ -51,7 +51,23 @@ const COPD_RESOURCES = [
 export default function CarePlan() {
   const session = usePatientStore((s) => s.session);
   const [activeTab, setActiveTab] = useState<'schedule' | 'resources'>('schedule');
-  const [meds, setMeds] = useState<MedItem[]>(INITIAL_MEDS);
+
+  // Use patient-specific medications from discharge data, fall back to defaults
+  const patientMeds = useMemo<MedItem[]>(() => {
+    if (session?.medications && session.medications.length > 0) {
+      return session.medications.map((m, i) => ({
+        id: `med-${i + 1}`,
+        name: m.name,
+        dose: m.dose,
+        timing: m.timing || m.frequency,
+        time: m.timing || '',
+        checked: false,
+      }));
+    }
+    return INITIAL_MEDS;
+  }, [session?.medications]);
+
+  const [meds, setMeds] = useState<MedItem[]>(patientMeds);
   const [habits, setHabits] = useState<HabitItem[]>(INITIAL_HABITS);
 
   if (!session) return null;

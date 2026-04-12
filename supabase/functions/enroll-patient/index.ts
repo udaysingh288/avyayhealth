@@ -23,11 +23,20 @@ import { handleCorsPreflight, jsonResponse } from '../_shared/cors.ts';
 import { supabaseAdmin } from '../_shared/supabaseAdmin.ts';
 import { signPatientToken } from '../_shared/patientJwt.ts';
 
+interface Medication {
+  name: string;
+  dose: string;
+  frequency: string;
+  timing: string;
+}
+
 interface EnrollRequest {
   hospital_code: string;
   first_name: string;
   dob: string;
   condition: 'chf' | 'copd' | 'pneumonia' | 'ami';
+  discharge_summary?: string;
+  medications?: Medication[];
 }
 
 function isValidIsoDate(s: string): boolean {
@@ -49,9 +58,21 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'invalid_json' }, 400);
   }
 
-  const { hospital_code, first_name, dob, condition } = body;
+  const { hospital_code, first_name, dob, condition, discharge_summary, medications } = body;
   if (!hospital_code || !first_name || !dob || !condition) {
     return jsonResponse({ error: 'missing_fields' }, 400);
+  }
+
+  // Validate medications array structure if provided
+  if (medications && !Array.isArray(medications)) {
+    return jsonResponse({ error: 'invalid_medications', message: 'Must be an array' }, 400);
+  }
+  if (medications) {
+    for (const med of medications) {
+      if (!med.name || typeof med.name !== 'string') {
+        return jsonResponse({ error: 'invalid_medication', message: 'Each medication must have a name' }, 400);
+      }
+    }
   }
   if (!isValidIsoDate(dob)) {
     return jsonResponse({ error: 'invalid_dob_format' }, 400);
@@ -110,6 +131,8 @@ Deno.serve(async (req) => {
         days_in_program: 1,
         total_days: 30,
         status: 'active',
+        discharge_summary: discharge_summary?.trim() || null,
+        medications: medications ?? [],
       })
       .select('*')
       .single();
@@ -136,6 +159,7 @@ Deno.serve(async (req) => {
     discharge_date: patient.discharge_date,
     days_in_program: patient.days_in_program,
     total_days: patient.total_days,
+    medications: patient.medications ?? [],
     session_token,
   });
 });

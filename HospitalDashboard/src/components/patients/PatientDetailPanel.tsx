@@ -7,29 +7,43 @@ import {
   Calendar,
   Smartphone,
   MapPin,
+  ChevronDown,
 } from 'lucide-react';
 import RiskBadge from '../shared/RiskBadge';
-import type { Patient, CoordinatorNote, CheckIn } from '../../types';
+import type { Patient, CoordinatorNote, CheckIn, RiskLevel } from '../../types';
 import { MOCK_NOTES } from '../../utils/mockData';
 import { conditionLabel } from '../../utils/riskUtils';
 import { dayOfProgram, shortDate } from '../../utils/dateUtils';
 import { useAuthStore } from '../../store/authStore';
+import { supabase, hasSupabase } from '../../lib/supabase';
+import { updatePatientRiskOverride } from '../../api/dashboardApi';
 import OverviewTab from './detail/OverviewTab';
 import ConversationTab from './detail/ConversationTab';
 import NotesTab from './detail/NotesTab';
+import MessagesTab from './detail/MessagesTab';
 
 interface PatientDetailPanelProps {
   patient: Patient;
   checkinsMap: Record<string, CheckIn[]>;
   onClose: () => void;
+  onPatientUpdated?: () => void;
 }
 
-export default function PatientDetailPanel({ patient, checkinsMap, onClose }: PatientDetailPanelProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'conversation' | 'notes'>('overview');
+const RISK_OPTIONS: { value: RiskLevel; label: string; color: string; bg: string; border: string }[] = [
+  { value: 'red', label: 'Red', color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' },
+  { value: 'yellow', label: 'Yellow', color: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-200' },
+  { value: 'green', label: 'Green', color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' },
+];
+
+export default function PatientDetailPanel({ patient, checkinsMap, onClose, onPatientUpdated }: PatientDetailPanelProps) {
+  const [activeTab, setActiveTab] = useState<'overview' | 'conversation' | 'messages' | 'notes'>('overview');
   const [noteText, setNoteText] = useState('');
   const [notes, setNotes] = useState<CoordinatorNote[]>(MOCK_NOTES[patient.id] ?? []);
+  const [riskMenuOpen, setRiskMenuOpen] = useState(false);
+  const [riskUpdating, setRiskUpdating] = useState(false);
   const profile = useAuthStore((s) => s.profile);
   const panelRef = useRef<HTMLDivElement>(null);
+  const riskMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = panelRef.current;
@@ -43,6 +57,33 @@ export default function PatientDetailPanel({ patient, checkinsMap, onClose }: Pa
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, [onClose]);
+
+  // Close risk menu on outside click
+  useEffect(() => {
+    if (!riskMenuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (riskMenuRef.current && !riskMenuRef.current.contains(e.target as Node)) {
+        setRiskMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [riskMenuOpen]);
+
+  async function handleRiskChange(newRisk: RiskLevel) {
+    if (newRisk === patient.risk_level || riskUpdating) return;
+    setRiskMenuOpen(false);
+    if (!hasSupabase || !supabase) return;
+    setRiskUpdating(true);
+    try {
+      await updatePatientRiskOverride(supabase, patient.id, newRisk);
+      onPatientUpdated?.();
+    } catch (err) {
+      console.error('Failed to update risk level:', err);
+    } finally {
+      setRiskUpdating(false);
+    }
+  }
 
   const checkins = checkinsMap[patient.id] ?? [];
 
@@ -86,7 +127,50 @@ export default function PatientDetailPanel({ patient, checkinsMap, onClose }: Pa
               <h2 className="text-base font-semibold text-slate-800 font-sans">
                 {patient.last_name ? `${patient.last_name}, ${patient.first_name}` : patient.first_name}
               </h2>
-              <RiskBadge risk={patient.risk_level} size="sm" />
+              {/* Risk badge with reclassification dropdown */}
+              <div className="relative" ref={riskMenuRef}>
+                <button
+                  onClick={() => setRiskMenuOpen(!riskMenuOpen)}
+                  disabled={riskUpdating}
+                  className="flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-forest rounded"
+                  aria-label="Change risk level"
+                  aria-expanded={riskMenuOpen}
+                  aria-haspopup="listbox"
+                >
+                  <RiskBadge risk={patient.risk_level} size="sm" />
+                  <ChevronDown size={14} className={`text-slate-400 transition-transform ${riskMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {riskMenuOpen && (
+                  <div
+                    className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 py-1 min-w-[140px]"
+                    role="listbox"
+                    aria-label="Select risk level"
+                  >
+                    {RISK_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        role="option"
+                        aria-selected={patient.risk_level === opt.value}
+                        onClick={() => handleRiskChange(opt.value)}
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-sans font-medium transition
+                          ${patient.risk_level === opt.value ? `${opt.bg} ${opt.color}` : 'text-slate-600 hover:bg-slate-50'}`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${
+                          opt.value === 'red' ? 'bg-red-500' :
+                          opt.value === 'yellow' ? 'bg-yellow-500' : 'bg-green-500'
+                        }`} />
+                        {opt.label}
+                        {patient.risk_level === opt.value && (
+                          <span className="ml-auto text-xs text-slate-400">current</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {riskUpdating && (
+                <span className="text-xs text-slate-400 font-sans animate-pulse">Updating…</span>
+              )}
             </div>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 font-sans">
               {patient.age > 0 && <span>{patient.age} yrs · {patient.sex === 'M' ? 'Male' : patient.sex === 'F' ? 'Female' : ''}</span>}
@@ -153,7 +237,7 @@ export default function PatientDetailPanel({ patient, checkinsMap, onClose }: Pa
 
         {/* Tabs */}
         <div className="px-5 border-b border-slate-100 flex gap-4 shrink-0">
-          {(['overview', 'conversation', 'notes'] as const).map((tab) => (
+          {(['overview', 'conversation', 'messages', 'notes'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -182,6 +266,12 @@ export default function PatientDetailPanel({ patient, checkinsMap, onClose }: Pa
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'overview' && <OverviewTab patient={patient} />}
           {activeTab === 'conversation' && <ConversationTab checkins={checkins} />}
+          {activeTab === 'messages' && (
+            <MessagesTab
+              patientId={patient.id}
+              patientName={patient.last_name ? `${patient.first_name} ${patient.last_name}` : patient.first_name}
+            />
+          )}
           {activeTab === 'notes' && (
             <NotesTab
               notes={notes}

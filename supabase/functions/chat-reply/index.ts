@@ -136,6 +136,8 @@ function buildSystemPrompt(
   condition: string,
   dayNumber: number,
   phase: string,
+  dischargeSummary?: string,
+  medications?: Medication[],
 ): string {
   const conditionLabel: Record<string, string> = {
     chf: 'Heart Failure (CHF)',
@@ -165,6 +167,22 @@ function buildSystemPrompt(
 - Recovery day: ${dayNumber} of 30
 - Current conversation phase: ${phase}
 ${isSdohDay ? `- TODAY IS AN SDOH SCREENING DAY — after symptoms and medications, ask about: ${sdohDomain?.replace(/_/g, ' ')}` : ''}
+${dischargeSummary ? `
+## Discharge Summary (CONFIDENTIAL — never read this verbatim to the patient)
+${dischargeSummary}
+Use this to understand the patient's clinical context, but NEVER quote it directly. Refer to specifics naturally, e.g. "How is the swelling in your ankles?" not "Per your discharge summary..."
+` : ''}
+${medications && medications.length > 0 ? `
+## Patient's Discharge Medications
+${medications.map((m) => `- ${m.name} ${m.dose} — ${m.frequency}${m.timing ? ` (${m.timing})` : ''}`).join('\n')}
+
+IMPORTANT medication check instructions:
+- When asking about medications, reference the SPECIFIC medications above by name
+- If the patient says "yes" or "I took them", confirm which ones: "Great — so you took your ${medications.map(m => m.name).join(', ')}?"
+- If the patient says "some" or is vague, ask which specific ones they took or missed
+- If the patient mentions a medication NOT on this list, note it for the coordinator
+- Never advise stopping or changing any medication
+` : ''}
 
 ## Conversation Flow
 The check-in follows this protocol:
@@ -236,12 +254,21 @@ interface ChatMessage {
   content: string;
 }
 
+interface Medication {
+  name: string;
+  dose: string;
+  frequency: string;
+  timing: string;
+}
+
 interface ChatReplyRequest {
   messages: ChatMessage[];
   phase: string;
   day_number: number;
   condition: string;
   first_name: string;
+  discharge_summary?: string;
+  medications?: Medication[];
 }
 
 interface AIResponse {
@@ -319,6 +346,7 @@ function fallbackResponse(
   messages: ChatMessage[],
   firstName: string,
   phase: string,
+  medications?: Medication[],
 ): AIResponse {
   const lastPatient = [...messages].reverse().find((m) => m.role === 'patient');
   const text = lastPatient?.content?.toLowerCase() ?? '';
@@ -340,6 +368,13 @@ function fallbackResponse(
   }
 
   // Phase-based responses
+  const medNames = medications && medications.length > 0
+    ? medications.map((m) => m.name).join(', ')
+    : null;
+  const medQuestion = medNames
+    ? `Have you been able to take your medications today? That includes your ${medNames}.`
+    : 'Have you been able to take all your medications today?';
+
   if (phase === 'symptom_check' || phase === 'symptom_followup') {
     const hasSymptom = /breath|swell|pain|cough|dizz|fever|tired|weak|worse|bad|not good|terrible/i.test(text);
     if (hasSymptom) {
@@ -349,7 +384,7 @@ function fallbackResponse(
         next_phase: 'medication_check',
         is_complete: false,
         summary: `Reports symptoms: "${text.slice(0, 100)}"`,
-        follow_up: 'Have you been able to take all your medications today?',
+        follow_up: medQuestion,
       };
     }
     return {
@@ -358,7 +393,7 @@ function fallbackResponse(
       next_phase: 'medication_check',
       is_complete: false,
       summary: 'Patient reports feeling well',
-      follow_up: 'Have you been able to take all your medications today?',
+      follow_up: medQuestion,
     };
   }
 
@@ -409,7 +444,7 @@ function isValidMessage(m: unknown): m is ChatMessage {
 // ─── Main handler ──────────────────────────────────────────────────
 
 Deno.serve(withPatientAuth<ChatReplyRequest>(async ({ body }) => {
-  const { messages, phase, day_number, condition, first_name } = body;
+  const { messages, phase, day_number, condition, first_name, discharge_summary, medications } = body;
 
   // Validate required fields exist
   if (!messages || !phase || !day_number || !condition || !first_name) {
@@ -448,11 +483,11 @@ Deno.serve(withPatientAuth<ChatReplyRequest>(async ({ body }) => {
 
   if (ANTHROPIC_API_KEY) {
     try {
-      const systemPrompt = buildSystemPrompt(first_name, condition, day_number, phase);
+      const systemPrompt = buildSystemPrompt(first_name, condition, day_number, phase, discharge_summary, medications);
       result = await callClaude(systemPrompt, messages);
     } catch (err) {
       console.error('[chat-reply] Claude call failed, using fallback:', err);
-      result = fallbackResponse(messages, first_name, phase);
+      result = fallbackResponse(messages, first_name, phase, medications);
     }
   } else {
     // No API key — use rule-based fallback

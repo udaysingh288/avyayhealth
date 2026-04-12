@@ -72,7 +72,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
           : 'Care Coordinator';
 
   return (
-    <aside className="w-60 flex-shrink-0 bg-white border-r border-slate-200 flex flex-col h-screen">
+    <aside className="w-52 flex-shrink-0 bg-white border-r border-slate-200 flex flex-col h-screen">
       {/* Logo area */}
       <div className="px-4 py-5 border-b border-slate-100">
         <div className="flex items-center justify-between">
@@ -89,7 +89,9 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
             </div>
             <div>
               <div className="text-sm font-semibold text-forest font-sans">Avyay Health</div>
-              <div className="text-xs text-slate-400 font-sans">Coordinator Portal</div>
+              <div className="text-xs text-slate-400 font-sans">
+                {profile?.role === 'quality_director' ? 'Quality Portal' : 'Coordinator Portal'}
+              </div>
             </div>
           </div>
           {/* Close button — visible on mobile only */}

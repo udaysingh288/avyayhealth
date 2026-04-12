@@ -353,3 +353,81 @@ The website mirrors the pitch deck narrative:
 
 *This file is the single source of truth for building avyayhealth.com.
 Last updated: April 2026 | Avyay Health, Inc. | Confidential*
+
+---
+
+# Engineering Standards for This Project
+
+> These standards apply to **every app** in this monorepo: Website, HospitalDashboard, PatientAppPWA, PatientAppiOS, QualityDashboard, and all Supabase edge functions.
+
+## Secrets & Environment
+
+- NEVER hardcode API keys, tokens, passwords, or secrets in code or config files
+- All secrets go in `.env` files; ensure `.env` is in `.gitignore`
+- Maintain separate credentials for dev, staging, and prod — never share tokens across environments
+- Use environment variables accessed via a central config module, not scattered `process.env` / `import.meta.env` calls
+
+## Observability (from Day One)
+
+- Integrate crash/error reporting on the first day, not after complaints arrive
+- Add structured logging that writes to a persistent sink (file, service) — not just stdout
+- Expose a `/health` or `/healthz` endpoint for every backend service
+- Log meaningful context in errors: what failed, with what inputs, at what stage
+
+## External Services & APIs
+
+- Wrap every third-party API in a dedicated service/adapter layer — never call it inline
+- Add rate limiting on all auth endpoints and write operations from the start
+- Handle API errors explicitly: timeouts, retries with backoff, unexpected response shapes
+- Design the wrapper so swapping providers requires touching only one file
+
+## Input Validation & Security
+
+- Validate and sanitize ALL input server-side — never trust the client
+- The happy path is not enough. Always handle: missing fields, wrong types, empty strings, null, out-of-range values
+- Set CORS to specific allowed origins — never use `*` in production
+- Sanitize anything that will be rendered or stored
+
+## Architecture
+
+- Break logic into small, single-responsibility modules from the start — no monolithic controllers
+- Never change database schema by hand. Use versioned migrations only
+- Separate concerns: routing, business logic, data access, and external calls each belong in their own layer
+- If you're tempted to put more than one major responsibility in a file, split it
+
+## Environments & Deployment
+
+- Three environments minimum: dev, staging (mirrors prod), prod
+- Staging must use production-equivalent config and data shape
+- Deployments come from the CI/CD pipeline — never from a local machine or manual script
+- Set up CI (automated tests on every push) and CD (automated deploy on merge) early — even a basic setup beats none
+
+## Documentation
+
+- Every project must have a README.md covering: local setup, environment variables needed, how to run, how to deploy
+- Document non-obvious decisions inline with a `# Why:` comment
+- If you are the only person who knows how to run or deploy this, that is a risk — fix it
+
+## Technical Debt
+
+- If something is hacky, either fix it now or create a tracked issue with a deadline
+- "I'll clean it up later" is not acceptable. Later never comes
+- Feature flags must be real flags (env var, config value) — not commented-out code
+- Any TODO left in code must include what, why, and when
+
+## Testing
+
+- Test unhappy paths explicitly: network failures, unexpected API responses, invalid input, empty states
+- Do not rely on "it worked on my machine"
+- If you add a backup or restore mechanism, test a full restore before calling it done
+- Write tests alongside features, not after shipping
+
+## Time Handling
+
+- Store all timestamps in UTC
+- Convert to local time only at the display layer
+- Never mix UTC, local time, and framework defaults in the same flow
+
+## The Mental Model
+
+You are a brilliant, fast engineer who needs a senior to guide architecture, security, and long-term maintainability decisions. That senior is the developer working with you. You flag risks, ask clarifying questions on ambiguous architecture choices, and never cut corners silently. When something feels like a shortcut, say so.

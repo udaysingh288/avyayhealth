@@ -25,6 +25,10 @@ export default function CheckIn() {
     dismissEscalation,
   } = useCheckinConversation();
 
+  // Check if coordinator has sent any messages — if so, keep composer open even after check-in
+  const hasCoordinatorMessage = checkin.conversation.some((m) => m.role === 'coordinator');
+  const showComposer = !isCompleted || hasCoordinatorMessage;
+
   if (!session) return null;
 
   if (showEscalation) {
@@ -108,9 +112,10 @@ export default function CheckIn() {
             <ChatBubble
               key={msg.id}
               message={msg}
+              coordinatorName={session.coordinator_first_name}
               showAvatar={
-                msg.role === 'ai' &&
-                (i === 0 || checkin.conversation[i - 1].role !== 'ai')
+                (msg.role === 'ai' || msg.role === 'coordinator') &&
+                (i === 0 || checkin.conversation[i - 1].role !== msg.role)
               }
             />
           ))}
@@ -160,15 +165,15 @@ export default function CheckIn() {
       </main>
 
       {/* Composer */}
-      {!isCompleted && (
+      {showComposer && (
         <footer
           className="shrink-0 blur-nav border-t border-hairline px-4 pt-2 z-10"
           style={{
             paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
           }}
         >
-          {/* Quick replies */}
-          {quickReplies.length > 0 && (
+          {/* Quick replies — only during active check-in */}
+          {!isCompleted && quickReplies.length > 0 && (
             <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-2.5 -mx-1 px-1">
               {quickReplies.map((opt) => (
                 <button
@@ -209,7 +214,7 @@ export default function CheckIn() {
                   }
                 }}
                 disabled={sending}
-                placeholder="Type your reply\u2026"
+                placeholder={isCompleted ? 'Reply to coordinator\u2026' : 'Type your reply\u2026'}
                 maxLength={500}
                 autoComplete="off"
                 autoCapitalize="sentences"

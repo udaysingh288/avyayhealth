@@ -9,6 +9,11 @@ export const MOCK_SESSION: PatientSession = {
   total_days: 30,
   hospital_name: 'Riverside Community Medical Center',
   coordinator_first_name: 'Sarah',
+  medications: [
+    { name: 'Lisinopril', dose: '10 mg', frequency: 'Once daily', timing: 'With breakfast' },
+    { name: 'Furosemide', dose: '20 mg', frequency: 'Once daily', timing: 'Morning' },
+    { name: 'Metoprolol', dose: '25 mg', frequency: 'Once daily', timing: 'Evening' },
+  ],
   token: 'demo-patient-token',
 };
 

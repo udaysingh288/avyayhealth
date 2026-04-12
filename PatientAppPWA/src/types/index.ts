@@ -15,6 +15,13 @@ export type SDOHDomain =
   | 'utility_difficulty'
   | 'interpersonal_safety';
 
+export interface Medication {
+  name: string;
+  dose: string;
+  frequency: string;
+  timing: string;
+}
+
 export interface PatientSession {
   patient_id: string;
   first_name: string;
@@ -24,12 +31,13 @@ export interface PatientSession {
   total_days: number;
   hospital_name: string;
   coordinator_first_name: string;
+  medications: Medication[];
   token: string;
 }
 
 export interface Message {
   id: string;
-  role: 'ai' | 'patient';
+  role: 'ai' | 'patient' | 'coordinator';
   content: string;
   sent_at: string;
   risk_level: RiskLevel | null;

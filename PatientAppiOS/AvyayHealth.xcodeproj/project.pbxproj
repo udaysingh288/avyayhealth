@@ -1,0 +1,466 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1AB0CBF6A9F394A230908AEF /* DateUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5CC00CC7DC2CECA70A84740 /* DateUtils.swift */; };
+		22602B7F623A62473434F987 /* ClinicalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A694CECB5684BD30BF511D /* ClinicalConstants.swift */; };
+		229D6718D953F8ADAA93CD33 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2335CE2C5C4BCE9B46BA1CC /* TimelineView.swift */; };
+		262B9471C13622837822B21E /* CareTeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C91F36DF272662CC3F69A35 /* CareTeamView.swift */; };
+		3639FAA2B2B8177E0C524064 /* CheckInViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 028EF36A4218FBEDB2CFB527 /* CheckInViewModel.swift */; };
+		48698E3A5269C7381EC7FEE2 /* ConversationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B7332178988E18369346C4D /* ConversationEngine.swift */; };
+		5B5B1FCF0BE4CD1D5752D1E1 /* CarePlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1DFB5268B89EB0426C04F29 /* CarePlanView.swift */; };
+		63DA20B31DE637BBED5A13AD /* EscalationAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E9CDB4D1533715C580CA35 /* EscalationAlertView.swift */; };
+		70A36568CBC7B7EB085EBF19 /* PhaseHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8BB5061E6BB1E359B350C76 /* PhaseHandlers.swift */; };
+		8C80B5CC9F01E0DBB3F4575F /* AvyayHealthApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58777ECDC3C52696AD68039C /* AvyayHealthApp.swift */; };
+		97CF94554AAF1E1E21ED14B4 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBFF8A15A95E4F90091FBDCA /* Colors.swift */; };
+		B839EA277DDDD153793E4947 /* CheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77C1B60D76FFC4F9D3EACBA4 /* CheckInView.swift */; };
+		C45CE2CC1D93A799558EF4AA /* ChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A64D8408F03A8F1746114A1 /* ChatBubble.swift */; };
+		CEA29D116EA54F124D5D106C /* PatientStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1209CC4AA438E00B86B29B1B /* PatientStore.swift */; };
+		CF465C392CAE6A58C41ECA87 /* EnrollmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B9841A88EB0425B8264BE46 /* EnrollmentView.swift */; };
+		D843EC6BEA263B9EC2D4FE1A /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06B0BA7ABD6E5AD9E503AF1B /* Haptics.swift */; };
+		D878014304FE599463734548 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B194527D4D205F9D4FB452F /* APIClient.swift */; };
+		D96114FDCADF2DAA4188C038 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7069FFE56813EFAA223E0F23 /* Types.swift */; };
+		FEAF220108D6BB386CC6260C /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE99608004129DE8BE43372 /* HomeView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		028EF36A4218FBEDB2CFB527 /* CheckInViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInViewModel.swift; sourceTree = "<group>"; };
+		06B0BA7ABD6E5AD9E503AF1B /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		0EE99608004129DE8BE43372 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		1209CC4AA438E00B86B29B1B /* PatientStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatientStore.swift; sourceTree = "<group>"; };
+		1B7332178988E18369346C4D /* ConversationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationEngine.swift; sourceTree = "<group>"; };
+		3B9841A88EB0425B8264BE46 /* EnrollmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrollmentView.swift; sourceTree = "<group>"; };
+		3C91F36DF272662CC3F69A35 /* CareTeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareTeamView.swift; sourceTree = "<group>"; };
+		4A64D8408F03A8F1746114A1 /* ChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubble.swift; sourceTree = "<group>"; };
+		576C159C6ECBE258713B1453 /* AvyayHealth.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AvyayHealth.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		58777ECDC3C52696AD68039C /* AvyayHealthApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvyayHealthApp.swift; sourceTree = "<group>"; };
+		7069FFE56813EFAA223E0F23 /* Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
+		77C1B60D76FFC4F9D3EACBA4 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
+		83E9CDB4D1533715C580CA35 /* EscalationAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EscalationAlertView.swift; sourceTree = "<group>"; };
+		8B194527D4D205F9D4FB452F /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		A2335CE2C5C4BCE9B46BA1CC /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
+		A5CC00CC7DC2CECA70A84740 /* DateUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtils.swift; sourceTree = "<group>"; };
+		A8BB5061E6BB1E359B350C76 /* PhaseHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhaseHandlers.swift; sourceTree = "<group>"; };
+		CBFF8A15A95E4F90091FBDCA /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		D1DFB5268B89EB0426C04F29 /* CarePlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarePlanView.swift; sourceTree = "<group>"; };
+		F9A694CECB5684BD30BF511D /* ClinicalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicalConstants.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		130E8176FA76EAB527571B35 /* CarePlan */ = {
+			isa = PBXGroup;
+			children = (
+				D1DFB5268B89EB0426C04F29 /* CarePlanView.swift */,
+			);
+			path = CarePlan;
+			sourceTree = "<group>";
+		};
+		1FE3BC05B2F31E6C08DB3EB8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				576C159C6ECBE258713B1453 /* AvyayHealth.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2C1A9793297DDB8B6BCD5893 /* AvyayHealth */ = {
+			isa = PBXGroup;
+			children = (
+				58777ECDC3C52696AD68039C /* AvyayHealthApp.swift */,
+				BB15DAD2EBC5B98D5DA287C4 /* Engine */,
+				7319050112A527C69AAF7AB7 /* Models */,
+				BAA6F63F1A623A3E9B702548 /* Services */,
+				37552AB9BCB05B2982AB42A5 /* Utils */,
+				9C856A063D197E467B9F3BF9 /* Views */,
+			);
+			path = AvyayHealth;
+			sourceTree = "<group>";
+		};
+		2C6D8DBF60E0625E87481606 /* CheckIn */ = {
+			isa = PBXGroup;
+			children = (
+				4A64D8408F03A8F1746114A1 /* ChatBubble.swift */,
+				77C1B60D76FFC4F9D3EACBA4 /* CheckInView.swift */,
+				028EF36A4218FBEDB2CFB527 /* CheckInViewModel.swift */,
+				83E9CDB4D1533715C580CA35 /* EscalationAlertView.swift */,
+			);
+			path = CheckIn;
+			sourceTree = "<group>";
+		};
+		37552AB9BCB05B2982AB42A5 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				CBFF8A15A95E4F90091FBDCA /* Colors.swift */,
+				A5CC00CC7DC2CECA70A84740 /* DateUtils.swift */,
+				06B0BA7ABD6E5AD9E503AF1B /* Haptics.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		41AF064FFFF3E6B82E16B685 /* Enrollment */ = {
+			isa = PBXGroup;
+			children = (
+				3B9841A88EB0425B8264BE46 /* EnrollmentView.swift */,
+			);
+			path = Enrollment;
+			sourceTree = "<group>";
+		};
+		6CDA1112E4A1FC226524F996 /* Timeline */ = {
+			isa = PBXGroup;
+			children = (
+				A2335CE2C5C4BCE9B46BA1CC /* TimelineView.swift */,
+			);
+			path = Timeline;
+			sourceTree = "<group>";
+		};
+		7319050112A527C69AAF7AB7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1209CC4AA438E00B86B29B1B /* PatientStore.swift */,
+				7069FFE56813EFAA223E0F23 /* Types.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		8DD506B0CA83A1ECA32CF229 = {
+			isa = PBXGroup;
+			children = (
+				2C1A9793297DDB8B6BCD5893 /* AvyayHealth */,
+				1FE3BC05B2F31E6C08DB3EB8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9C856A063D197E467B9F3BF9 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				130E8176FA76EAB527571B35 /* CarePlan */,
+				B966E4F61177022ADB9EF4F9 /* CareTeam */,
+				2C6D8DBF60E0625E87481606 /* CheckIn */,
+				41AF064FFFF3E6B82E16B685 /* Enrollment */,
+				E73A115FB50D628ABDBA29CB /* Home */,
+				6CDA1112E4A1FC226524F996 /* Timeline */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		B966E4F61177022ADB9EF4F9 /* CareTeam */ = {
+			isa = PBXGroup;
+			children = (
+				3C91F36DF272662CC3F69A35 /* CareTeamView.swift */,
+			);
+			path = CareTeam;
+			sourceTree = "<group>";
+		};
+		BAA6F63F1A623A3E9B702548 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				8B194527D4D205F9D4FB452F /* APIClient.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		BB15DAD2EBC5B98D5DA287C4 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				F9A694CECB5684BD30BF511D /* ClinicalConstants.swift */,
+				1B7332178988E18369346C4D /* ConversationEngine.swift */,
+				A8BB5061E6BB1E359B350C76 /* PhaseHandlers.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		E73A115FB50D628ABDBA29CB /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				0EE99608004129DE8BE43372 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2A04171F85C2B9045F218FB2 /* AvyayHealth */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F8FD01E52C7DAFB594D0B883 /* Build configuration list for PBXNativeTarget "AvyayHealth" */;
+			buildPhases = (
+				22A438A62870EAAC22AFCA2A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AvyayHealth;
+			packageProductDependencies = (
+			);
+			productName = AvyayHealth;
+			productReference = 576C159C6ECBE258713B1453 /* AvyayHealth.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E8C6F837B0EE4FC58810AE71 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					2A04171F85C2B9045F218FB2 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 0976D0213147EEE22825A335 /* Build configuration list for PBXProject "AvyayHealth" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 8DD506B0CA83A1ECA32CF229;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1FE3BC05B2F31E6C08DB3EB8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2A04171F85C2B9045F218FB2 /* AvyayHealth */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		22A438A62870EAAC22AFCA2A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D878014304FE599463734548 /* APIClient.swift in Sources */,
+				8C80B5CC9F01E0DBB3F4575F /* AvyayHealthApp.swift in Sources */,
+				5B5B1FCF0BE4CD1D5752D1E1 /* CarePlanView.swift in Sources */,
+				262B9471C13622837822B21E /* CareTeamView.swift in Sources */,
+				C45CE2CC1D93A799558EF4AA /* ChatBubble.swift in Sources */,
+				B839EA277DDDD153793E4947 /* CheckInView.swift in Sources */,
+				3639FAA2B2B8177E0C524064 /* CheckInViewModel.swift in Sources */,
+				22602B7F623A62473434F987 /* ClinicalConstants.swift in Sources */,
+				97CF94554AAF1E1E21ED14B4 /* Colors.swift in Sources */,
+				48698E3A5269C7381EC7FEE2 /* ConversationEngine.swift in Sources */,
+				1AB0CBF6A9F394A230908AEF /* DateUtils.swift in Sources */,
+				CF465C392CAE6A58C41ECA87 /* EnrollmentView.swift in Sources */,
+				63DA20B31DE637BBED5A13AD /* EscalationAlertView.swift in Sources */,
+				D843EC6BEA263B9EC2D4FE1A /* Haptics.swift in Sources */,
+				FEAF220108D6BB386CC6260C /* HomeView.swift in Sources */,
+				CEA29D116EA54F124D5D106C /* PatientStore.swift in Sources */,
+				70A36568CBC7B7EB085EBF19 /* PhaseHandlers.swift in Sources */,
+				229D6718D953F8ADAA93CD33 /* TimelineView.swift in Sources */,
+				D96114FDCADF2DAA4188C038 /* Types.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		613001A4CC69E72A8E56B1DA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AvyayHealth/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.avyayhealth.patient;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6180A3B47040E4CB4CDF478B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		7C9B9C99E2ADBD7EDF93798E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A61DFD22274BD1BEDCE019F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AvyayHealth/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.avyayhealth.patient;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0976D0213147EEE22825A335 /* Build configuration list for PBXProject "AvyayHealth" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6180A3B47040E4CB4CDF478B /* Debug */,
+				7C9B9C99E2ADBD7EDF93798E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F8FD01E52C7DAFB594D0B883 /* Build configuration list for PBXNativeTarget "AvyayHealth" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A61DFD22274BD1BEDCE019F2 /* Debug */,
+				613001A4CC69E72A8E56B1DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E8C6F837B0EE4FC58810AE71 /* Project object */;
+}

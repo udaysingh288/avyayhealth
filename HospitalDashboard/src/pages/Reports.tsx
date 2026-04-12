@@ -12,10 +12,10 @@ import {
 import TopBar from '../components/layout/TopBar';
 import { ENGAGEMENT_TREND } from '../utils/mockData';
 import { conditionLabel } from '../utils/riskUtils';
-import { useDashboardData } from '../hooks/useDashboardData';
+import { useSharedDashboardData } from '../context/DashboardContext';
 
 export default function Reports() {
-  const { patients, metrics } = useDashboardData();
+  const { patients, metrics } = useSharedDashboardData();
 
   const riskData = [
     { name: 'Red', value: metrics.red_count, color: '#DC2626' },

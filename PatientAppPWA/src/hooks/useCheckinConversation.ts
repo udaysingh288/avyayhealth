@@ -8,6 +8,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePatientStore } from '../store/patientStore';
 import { haptic } from '../utils/haptics';
 import { saveMessage, completeCheckIn, getChatReply } from '../api/checkins';
+import { getMessages, sendDirectMessage } from '../api/messages';
 import {
   processReply,
   createInitialState,
@@ -99,6 +100,42 @@ export function useCheckinConversation() {
     return () => vv.removeEventListener('resize', handle);
   }, []);
 
+  // Poll for coordinator direct messages and inject into conversation
+  const seenDmIdsRef = useRef(new Set<string>());
+  useEffect(() => {
+    if (!session?.token) return;
+    let cancelled = false;
+
+    async function pollDMs() {
+      const msgs = await getMessages({ patientToken: session!.token });
+      if (cancelled) return;
+      for (const dm of msgs) {
+        if (dm.sender_type === 'coordinator' && !seenDmIdsRef.current.has(dm.id)) {
+          seenDmIdsRef.current.add(dm.id);
+          const coordMsg: Message = {
+            id: `dm-${dm.id}`,
+            role: 'coordinator',
+            content: dm.content,
+            sent_at: dm.created_at,
+            risk_level: null,
+          };
+          setCheckin((prev) => ({
+            ...prev,
+            conversation: [...prev.conversation, coordMsg],
+          }));
+          haptic('medium');
+        }
+      }
+    }
+
+    pollDMs();
+    const interval = setInterval(pollDMs, 8000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [session?.token, setCheckin]);
+
   const patientToken = session?.token ?? '';
   const isCompleted = checkin.status === 'completed';
   const dayNumber = checkin.day_number;
@@ -146,9 +183,41 @@ export function useCheckinConversation() {
 
   async function handleSend(textOverride?: string) {
     const text = (textOverride ?? reply).trim();
-    if (!text || sending || !session) return;
+    if (!text || !session) return;
 
     haptic('light');
+
+    // Check if there are coordinator messages in the conversation
+    // If the check-in is completed, any reply goes to coordinator as a DM
+    // If the check-in is active, only reply to coordinator if the last non-patient message is from them
+    const hasCoordinatorMsg = checkin.conversation.some((m) => m.role === 'coordinator');
+    const lastNonPatient = [...checkin.conversation].reverse().find((m) => m.role !== 'patient');
+    const isReplyToCoordinator = isCompleted
+      ? hasCoordinatorMsg
+      : lastNonPatient?.role === 'coordinator';
+
+    if (isReplyToCoordinator) {
+      const patientMsg: Message = {
+        id: crypto.randomUUID(),
+        role: 'patient',
+        content: text,
+        sent_at: new Date().toISOString(),
+        risk_level: null,
+      };
+      setReply('');
+      setCheckin((prev) => ({
+        ...prev,
+        conversation: [...prev.conversation, patientMsg],
+      }));
+      void sendDirectMessage({ patientToken, content: text });
+      return;
+    }
+
+    // If check-in is completed and no coordinator messages, don't process
+    if (isCompleted) return;
+
+    // Block duplicate AI sends
+    if (sending) return;
 
     const patientMsg: Message = {
       id: crypto.randomUUID(),
@@ -176,10 +245,12 @@ export function useCheckinConversation() {
         return;
       }
 
-      const conversationForApi = [...checkin.conversation, patientMsg].map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
+      const conversationForApi = [...checkin.conversation, patientMsg]
+        .filter((m) => m.role === 'ai' || m.role === 'patient')
+        .map((m) => ({
+          role: m.role as 'ai' | 'patient',
+          content: m.content,
+        }));
 
       const aiReply = await getChatReply({
         patientToken,
@@ -188,6 +259,7 @@ export function useCheckinConversation() {
         dayNumber,
         condition: session.condition,
         firstName: session.first_name,
+        medications: session.medications,
       });
 
       if (aiReply) {

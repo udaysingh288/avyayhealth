@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
+import { DashboardProvider } from '../../context/DashboardContext';
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
+    <DashboardProvider>
     <div className="flex h-screen bg-off-white overflow-hidden">
       {/* Mobile overlay backdrop */}
       {sidebarOpen && (
@@ -54,5 +56,6 @@ export default function Layout() {
         </main>
       </div>
     </div>
+    </DashboardProvider>
   );
 }

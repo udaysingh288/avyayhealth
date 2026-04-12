@@ -22,6 +22,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: 72,
     checkin_completion_rate: 0.85,
     is_active: true,
+    unread_dm_count: 0,
   },
   {
     id: 'p-002',
@@ -44,6 +45,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: 88,
     checkin_completion_rate: 0.67,
     is_active: true,
+    unread_dm_count: 0,
   },
   {
     id: 'p-003',
@@ -66,6 +68,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: 45,
     checkin_completion_rate: 0.9,
     is_active: true,
+    unread_dm_count: 0,
   },
   {
     id: 'p-004',
@@ -88,6 +91,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: 61,
     checkin_completion_rate: 0.78,
     is_active: true,
+    unread_dm_count: 0,
   },
   {
     id: 'p-005',
@@ -110,6 +114,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: 55,
     checkin_completion_rate: 0.92,
     is_active: true,
+    unread_dm_count: 0,
   },
   {
     id: 'p-006',
@@ -132,6 +137,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: 68,
     checkin_completion_rate: 0.75,
     is_active: true,
+    unread_dm_count: 0,
   },
   {
     id: 'p-007',
@@ -154,6 +160,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: 32,
     checkin_completion_rate: 0.97,
     is_active: true,
+    unread_dm_count: 0,
   },
   {
     id: 'p-008',
@@ -176,6 +183,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: 28,
     checkin_completion_rate: 0.95,
     is_active: true,
+    unread_dm_count: 0,
   },
   {
     id: 'p-009',
@@ -198,6 +206,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: null,
     checkin_completion_rate: 0.93,
     is_active: true,
+    unread_dm_count: 0,
   },
   {
     id: 'p-010',
@@ -220,6 +229,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: 50,
     checkin_completion_rate: 0,
     is_active: true,
+    unread_dm_count: 0,
   },
   {
     id: 'p-011',
@@ -242,6 +252,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: 79,
     checkin_completion_rate: 0.88,
     is_active: true,
+    unread_dm_count: 0,
   },
   {
     id: 'p-012',
@@ -264,6 +275,7 @@ export const MOCK_PATIENTS: Patient[] = [
     adi_national_rank: 22,
     checkin_completion_rate: 0.96,
     is_active: true,
+    unread_dm_count: 0,
   },
 ];
 

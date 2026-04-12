@@ -61,6 +61,7 @@ export async function enrollPatient(params: {
     discharge_date: string;
     days_in_program: number;
     total_days: number;
+    medications: { name: string; dose: string; frequency: string; timing: string }[];
     session_token: string;
   };
 
@@ -73,6 +74,7 @@ export async function enrollPatient(params: {
     total_days: data.total_days,
     hospital_name: data.hospital_name,
     coordinator_first_name: data.coordinator_first_name,
+    medications: data.medications ?? [],
     token: data.session_token,
   };
 }

@@ -5,7 +5,7 @@ import RiskBadge from '../components/shared/RiskBadge';
 import type { Alert } from '../types';
 import { relativeTime, timeStamp } from '../utils/dateUtils';
 import { useAuthStore } from '../store/authStore';
-import { useDashboardData } from '../hooks/useDashboardData';
+import { useSharedDashboardData } from '../context/DashboardContext';
 
 type ActionType = 'called' | 'escalated' | 'other';
 
@@ -17,7 +17,7 @@ interface AckState {
 
 export default function Alerts() {
   const profile = useAuthStore((s) => s.profile);
-  const { alerts: liveAlerts } = useDashboardData();
+  const { alerts: liveAlerts } = useSharedDashboardData();
   const [alerts, setAlerts] = useState<Alert[]>(liveAlerts);
   const [ackState, setAckState] = useState<AckState | null>(null);
   const [activeTab, setActiveTab] = useState<'unacknowledged' | 'all'>('unacknowledged');

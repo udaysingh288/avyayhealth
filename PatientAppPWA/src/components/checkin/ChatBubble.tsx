@@ -20,11 +20,14 @@ export function AvatarDot() {
 export default function ChatBubble({
   message,
   showAvatar,
+  coordinatorName,
 }: {
   message: Message;
   showAvatar: boolean;
+  coordinatorName?: string;
 }) {
   const isAI = message.role === 'ai';
+  const isCoordinator = message.role === 'coordinator';
 
   if (isAI) {
     return (
@@ -52,6 +55,41 @@ export default function ChatBubble({
     );
   }
 
+  if (isCoordinator) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 6, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+        className="flex items-end gap-2 max-w-[88%] mr-auto"
+      >
+        <div className="w-8 shrink-0">
+          {showAvatar && (
+            <div className="w-8 h-8 rounded-full bg-[#0D6B56] flex items-center justify-center shrink-0 shadow-ios-sm">
+              <span className="material-symbols-outlined text-white" style={{ fontSize: '16px', fontVariationSettings: "'FILL' 1" }}>
+                person
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col">
+          {showAvatar && (
+            <p className="text-[11px] font-semibold mb-1 ml-1 text-[#0D6B56]">
+              {coordinatorName ?? 'Care Coordinator'}
+            </p>
+          )}
+          <div className="bg-[#E6EEEC] shadow-ios-sm rounded-[22px] rounded-bl-md px-4 py-3 text-[15px] leading-[1.45] text-forest-slate border border-[#0D6B56]/15">
+            {message.content}
+          </div>
+          <p className="text-[10px] text-sage-muted/70 mt-1 ml-1">
+            {shortTime(message.sent_at)}
+          </p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Patient message
   return (
     <motion.div
       initial={{ opacity: 0, y: 6, scale: 0.98 }}

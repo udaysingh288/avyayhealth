@@ -10,4 +10,5 @@ export type {
   Coordinator,
   DashboardMetrics,
   CoordinatorNote,
+  DirectMessage,
 } from '@shared/types/dashboard';

@@ -675,3 +675,9 @@ When asking Claude or Copilot to build a feature, use this pattern:
 
 Always remind Claude of the elderly patient constraint. It changes
 every design decision — font size, button size, copy tone, complexity.
+
+---
+
+## 19. Engineering Standards
+
+This project follows the **Engineering Standards** defined in the root `CLAUDE.md` at the monorepo level. All standards regarding secrets management, observability, input validation, security, architecture, deployment, documentation, technical debt, testing, and time handling apply to this codebase. Read and follow them on every file, feature, and suggestion.

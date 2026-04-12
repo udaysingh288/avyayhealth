@@ -23,6 +23,7 @@ export interface Patient {
   adi_national_rank: number | null;
   checkin_completion_rate: number;
   is_active: boolean;
+  unread_dm_count: number;
 }
 
 export interface CheckIn {
@@ -79,5 +80,15 @@ export interface CoordinatorNote {
   coordinator_id: string;
   coordinator_name: string;
   note: string;
+  created_at: string;
+}
+
+export interface DirectMessage {
+  id: string;
+  patient_id: string;
+  sender_type: 'patient' | 'coordinator';
+  sender_id: string;
+  content: string;
+  read_at: string | null;
   created_at: string;
 }

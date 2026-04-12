@@ -36,7 +36,7 @@ export default function MetricCard({
   return (
     <Tag
       onClick={onClick}
-      className={`flex-1 min-w-[120px] shrink-0 sm:shrink sm:min-w-0 border rounded-lg px-4 py-4 text-left transition
+      className={`border rounded-lg px-4 py-4 text-left transition
         ${variantStyles[variant]}
         ${active ? 'ring-2 ring-offset-1 ring-forest' : ''}
         ${onClick ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-forest' : ''}

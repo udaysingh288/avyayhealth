@@ -7,7 +7,7 @@ import AlertBanner from '../components/alerts/AlertBanner';
 import RiskBadge from '../components/shared/RiskBadge';
 import SDOHIcons from '../components/patients/SDOHIcons';
 import PatientDetailPanel from '../components/patients/PatientDetailPanel';
-import { useDashboardData } from '../hooks/useDashboardData';
+import { useSharedDashboardData } from '../context/DashboardContext';
 import { riskSortOrder, conditionLabel, actionLabel } from '../utils/riskUtils';
 import { relativeTime, dayOfProgram } from '../utils/dateUtils';
 import type { Patient, RiskLevel, Condition } from '../types';
@@ -24,7 +24,7 @@ function actionButtonClass(risk: RiskLevel) {
 }
 
 export default function Dashboard() {
-  const { patients: allPatients, metrics, checkinsMap, loading, isMock, refetch } = useDashboardData();
+  const { patients: allPatients, metrics, checkinsMap, loading, isMock, refetch } = useSharedDashboardData();
   const [riskFilter, setRiskFilter] = useState<RiskFilter>('all');
   const [conditionFilter, setConditionFilter] = useState<ConditionFilter>('all');
   const [search, setSearch] = useState('');
@@ -86,9 +86,9 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="flex-1 p-4 sm:p-6 overflow-auto">
-        {/* Metrics row — scrollable on mobile, wraps on tablet+ */}
-        <div className="flex gap-3 mb-6 overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap sm:overflow-visible">
+      <div className="flex-1 p-4 sm:p-6 overflow-auto min-w-0">
+        {/* Metrics row — grid on all screens */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
           <MetricCard
             label="Active patients"
             value={metrics.total_active_patients}
@@ -127,9 +127,9 @@ export default function Dashboard() {
         </div>
 
         {/* Table + chart grid — stacked on mobile, side-by-side on xl */}
-        <div className="flex flex-col xl:flex-row gap-5 items-start">
+        <div className="flex flex-col xl:flex-row gap-5 items-start min-w-0">
           {/* Patient table */}
-          <div className="w-full xl:flex-1 xl:min-w-0 bg-white rounded-lg border border-slate-200">
+          <div className="w-full xl:flex-1 min-w-0 bg-white rounded-lg border border-slate-200">
             {/* Table toolbar */}
             <div className="px-4 sm:px-5 py-3.5 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="relative flex-1 min-w-0 sm:min-w-48">
@@ -174,23 +174,23 @@ export default function Dashboard() {
 
             {/* Table */}
             <div className="overflow-x-auto">
-              <table className="w-full text-sm font-sans" aria-label="Patient list">
+              <table className="w-full text-xs font-sans whitespace-nowrap" aria-label="Patient list">
                 <thead>
                   <tr className="border-b border-slate-100 text-left">
-                    <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Patient</th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Condition</th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Risk</th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Program</th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Last check-in</th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Last reply</th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">SDOH</th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Action</th>
+                    <th className="px-3 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Patient</th>
+                    <th className="px-2 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Condition</th>
+                    <th className="px-2 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Risk</th>
+                    <th className="px-2 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Program</th>
+                    <th className="px-2 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Last check-in</th>
+                    <th className="px-2 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Last reply</th>
+                    <th className="px-2 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">SDOH</th>
+                    <th className="px-2 py-2.5 text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {patients.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="px-5 py-12 text-center text-sm text-slate-400 font-sans">
+                      <td colSpan={8} className="px-4 py-12 text-center text-sm text-slate-400 font-sans">
                         {allPatients.length === 0
                           ? 'No patients enrolled yet. Patients will appear here once enrolled at discharge.'
                           : 'No patients match the current filters.'}
@@ -214,7 +214,7 @@ export default function Dashboard() {
               </table>
             </div>
 
-            <div className="px-5 py-3 border-t border-slate-100 flex items-center gap-1.5">
+            <div className="px-4 py-3 border-t border-slate-100 flex items-center gap-1.5">
               <Clock size={12} className="text-slate-400" aria-hidden="true" />
               <span className="text-xs text-slate-400 font-sans">
                 Auto-refreshes every 2 minutes
@@ -223,7 +223,7 @@ export default function Dashboard() {
           </div>
 
           {/* Right column — full width on mobile, fixed width on xl */}
-          <div className="w-full xl:w-72 xl:shrink-0 space-y-4">
+          <div className="w-full xl:w-60 xl:shrink-0 space-y-4">
             <EngagementChart />
             <SDOHSummaryCard patients={allPatients} />
           </div>
@@ -236,6 +236,10 @@ export default function Dashboard() {
           patient={selectedPatient}
           checkinsMap={checkinsMap}
           onClose={() => setSelectedPatient(null)}
+          onPatientUpdated={() => {
+            refetch();
+            setSelectedPatient(null);
+          }}
         />
       )}
     </div>
@@ -253,8 +257,8 @@ interface PatientRowProps {
 
 function PatientRow({ patient, isSelected, onSelect }: PatientRowProps) {
   const summary = patient.last_reply_summary
-    ? patient.last_reply_summary.length > 58
-      ? patient.last_reply_summary.slice(0, 58) + '…'
+    ? patient.last_reply_summary.length > 40
+      ? patient.last_reply_summary.slice(0, 40) + '…'
       : patient.last_reply_summary
     : '—';
 
@@ -270,38 +274,43 @@ function PatientRow({ patient, isSelected, onSelect }: PatientRowProps) {
       aria-selected={isSelected}
       aria-label={`${patient.last_name || patient.first_name} — ${patient.risk_level} risk`}
     >
-      <td className="px-5 py-3.5 whitespace-nowrap">
-        <div className="font-medium text-slate-800">
+      <td className="px-3 py-2.5">
+        <div className="font-medium text-slate-800 whitespace-nowrap flex items-center gap-1.5">
           {patient.last_name ? `${patient.last_name}, ${patient.first_name}` : patient.first_name}
+          {patient.unread_dm_count > 0 && (
+            <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] bg-blue-500 text-white text-[10px] font-bold rounded-full px-1" title={`${patient.unread_dm_count} unread message${patient.unread_dm_count > 1 ? 's' : ''}`}>
+              {patient.unread_dm_count}
+            </span>
+          )}
         </div>
-        <div className="text-xs text-slate-400 mt-0.5">
+        <div className="text-[11px] text-slate-400 mt-0.5">
           {patient.age > 0 ? `${patient.age}` : ''}
           {patient.sex !== 'Other' ? patient.sex : ''}
           {patient.channel ? ` · ${patient.channel.toUpperCase()}` : ''}
         </div>
       </td>
-      <td className="px-4 py-3.5 whitespace-nowrap text-slate-600">
+      <td className="px-2 py-2.5 text-slate-600 whitespace-nowrap">
         {conditionLabel(patient.condition)}
       </td>
-      <td className="px-4 py-3.5">
+      <td className="px-2 py-2.5">
         <RiskBadge risk={patient.risk_level} size="sm" />
       </td>
-      <td className="px-4 py-3.5 text-slate-500 text-xs whitespace-nowrap">
+      <td className="px-2 py-2.5 text-slate-500 whitespace-nowrap">
         {dayOfProgram(patient.days_in_program)}
       </td>
-      <td className="px-4 py-3.5 text-slate-500 text-xs whitespace-nowrap">
+      <td className="px-2 py-2.5 text-slate-500 whitespace-nowrap">
         {relativeTime(patient.last_checkin_at)}
       </td>
-      <td className="px-4 py-3.5 text-slate-600 text-xs max-w-[200px]">
+      <td className="px-2 py-2.5 text-slate-600 max-w-[180px] truncate">
         <span title={patient.last_reply_summary ?? undefined}>{summary}</span>
       </td>
-      <td className="px-4 py-3.5">
+      <td className="px-2 py-2.5">
         <SDOHIcons flags={patient.sdoh_flags} compact />
       </td>
-      <td className="px-4 py-3.5 whitespace-nowrap">
+      <td className="px-2 py-2.5">
         <button
           onClick={(e) => { e.stopPropagation(); onSelect(); }}
-          className={`text-xs font-medium px-2.5 py-1.5 rounded transition font-sans
+          className={`text-[11px] font-medium px-2 py-1 rounded transition font-sans whitespace-nowrap
             focus:outline-none focus:ring-2 focus:ring-forest
             ${actionButtonClass(patient.risk_level)}`}
         >

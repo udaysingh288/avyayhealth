@@ -75,6 +75,7 @@ export async function getChatReply(params: {
   dayNumber: number;
   condition: string;
   firstName: string;
+  medications?: { name: string; dose: string; frequency: string; timing: string }[];
 }): Promise<ChatReplyResponse | null> {
   if (!hasSupabase) return null;
 
@@ -88,6 +89,7 @@ export async function getChatReply(params: {
         day_number: params.dayNumber,
         condition: params.condition,
         first_name: params.firstName,
+        medications: params.medications,
       }),
     });
 
