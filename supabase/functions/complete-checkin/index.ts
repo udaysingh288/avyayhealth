@@ -17,46 +17,16 @@
 //   { check_in_id, status }
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
-import { handleCorsPreflight, jsonResponse } from '../_shared/cors.ts';
+import { jsonResponse } from '../_shared/cors.ts';
 import { supabaseAdmin } from '../_shared/supabaseAdmin.ts';
-import { verifyPatientToken } from '../_shared/patientJwt.ts';
+import { withPatientAuth } from '../_shared/withPatientAuth.ts';
 
 interface CompleteRequest {
   risk_level: 'red' | 'yellow' | 'green';
   summary: string;
 }
 
-Deno.serve(async (req) => {
-  const preflight = handleCorsPreflight(req);
-  if (preflight) return preflight;
-
-  if (req.method !== 'POST') {
-    return jsonResponse({ error: 'method_not_allowed' }, 405);
-  }
-
-  const patientToken =
-    req.headers.get('x-patient-token') ??
-    req.headers.get('X-Patient-Token') ??
-    '';
-  if (!patientToken) {
-    return jsonResponse({ error: 'missing_patient_token' }, 401);
-  }
-
-  let claims;
-  try {
-    claims = await verifyPatientToken(patientToken);
-  } catch (err) {
-    console.error('patient token verify failed', err);
-    return jsonResponse({ error: 'invalid_patient_token' }, 401);
-  }
-
-  let body: CompleteRequest;
-  try {
-    body = (await req.json()) as CompleteRequest;
-  } catch {
-    return jsonResponse({ error: 'invalid_json' }, 400);
-  }
-
+Deno.serve(withPatientAuth<CompleteRequest>(async ({ claims, body }) => {
   const { risk_level, summary } = body;
   if (!risk_level || !summary) {
     return jsonResponse({ error: 'missing_fields' }, 400);
@@ -124,4 +94,4 @@ Deno.serve(async (req) => {
   }
 
   return jsonResponse({ check_in_id: checkInId, status: finalStatus });
-});
+}));

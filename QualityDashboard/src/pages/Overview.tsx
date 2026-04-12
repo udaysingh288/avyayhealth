@@ -25,7 +25,7 @@ export default function Overview() {
 
   if (loading) {
     return (
-      <div className="px-8 py-7 max-w-[1280px]">
+      <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-[1280px]">
         <div className="text-slate-500 font-sans text-sm">Loading hospital data…</div>
       </div>
     );
@@ -52,7 +52,7 @@ export default function Overview() {
   const sdohTotal = Object.values(sdohFlags).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="px-8 py-7 max-w-[1280px]">
+    <div className="px-4 sm:px-8 py-5 sm:py-7 max-w-[1280px]">
       <header className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <div className="text-[12px] uppercase tracking-wider text-slate-500 font-sans font-semibold">
@@ -74,7 +74,7 @@ export default function Overview() {
       </header>
 
       {/* Top stats row */}
-      <div className="grid grid-cols-4 gap-4 mb-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5">
         <Stat
           label="Active patients"
           value={hospital.activePatients}
@@ -105,7 +105,7 @@ export default function Overview() {
       </div>
 
       {/* Second row */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
         <Stat
           label="HRRP penalty exposure"
           value={formatCurrency(HRRP.currentAnnualPenalty)}
@@ -132,7 +132,7 @@ export default function Overview() {
       </div>
 
       {/* Condition + coordinator summary */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <Card
           title="Condition breakdown"
           subtitle="30-day readmission rate by condition"

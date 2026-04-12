@@ -24,9 +24,7 @@ export default function Enroll() {
   const [loading, setLoading] = useState(false);
   const [showInstall, setShowInstall] = useState(false);
 
-  const [hospitalName, setHospitalName] = useState(
-    code ? 'Riverside Community Medical Center' : 'Your Hospital',
-  );
+  const [hospitalName, setHospitalName] = useState('Your Hospital');
 
   async function handleVerify(e: FormEvent) {
     e.preventDefault();

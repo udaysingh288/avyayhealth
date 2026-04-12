@@ -3,82 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import TopBar from '../components/shared/TopBar';
 import { usePatientStore } from '../store/patientStore';
 import { haptic } from '../utils/haptics';
-
-interface MedItem {
-  id: string;
-  name: string;
-  dose: string;
-  timing: string;
-  time: string;
-  checked: boolean;
-}
-
-interface HabitItem {
-  id: string;
-  label: string;
-  description: string;
-  icon: string;
-  iconColor: string;
-  iconBg: string;
-  checked: boolean;
-}
-
-const INITIAL_MEDS: MedItem[] = [
-  {
-    id: 'med-1',
-    name: 'Lisinopril',
-    dose: '10 mg',
-    timing: 'With breakfast',
-    time: '8:00 AM',
-    checked: true,
-  },
-  {
-    id: 'med-2',
-    name: 'Furosemide',
-    dose: '20 mg',
-    timing: 'Once daily',
-    time: '9:00 AM',
-    checked: false,
-  },
-  {
-    id: 'med-3',
-    name: 'Metoprolol',
-    dose: '25 mg',
-    timing: 'Evening',
-    time: '6:00 PM',
-    checked: false,
-  },
-];
-
-const INITIAL_HABITS: HabitItem[] = [
-  {
-    id: 'hab-1',
-    label: 'Hydration',
-    description: '6 to 8 glasses of water',
-    icon: 'water_drop',
-    iconColor: '#1E73BE',
-    iconBg: '#EBF3FA',
-    checked: false,
-  },
-  {
-    id: 'hab-2',
-    label: 'Gentle movement',
-    description: '10-minute walk',
-    icon: 'directions_walk',
-    iconColor: '#D97706',
-    iconBg: '#FDF4E7',
-    checked: false,
-  },
-  {
-    id: 'hab-3',
-    label: 'Elevate feet',
-    description: '15 minutes after lunch',
-    icon: 'airline_seat_recline_normal',
-    iconColor: '#16A34A',
-    iconBg: '#EDFAF0',
-    checked: false,
-  },
-];
+import { INITIAL_MEDS, INITIAL_HABITS } from '../data/carePlanDefaults';
+import type { MedItem, HabitItem } from '../data/carePlanDefaults';
 
 const CHF_RESOURCES = [
   {

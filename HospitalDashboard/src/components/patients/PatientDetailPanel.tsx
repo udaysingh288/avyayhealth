@@ -4,18 +4,19 @@ import {
   Phone,
   CheckCheck,
   AlertTriangle,
-  MessageSquare,
   Calendar,
   Smartphone,
   MapPin,
 } from 'lucide-react';
 import RiskBadge from '../shared/RiskBadge';
-import SDOHIcons, { domainConfig } from './SDOHIcons';
 import type { Patient, CoordinatorNote, CheckIn } from '../../types';
 import { MOCK_NOTES } from '../../utils/mockData';
 import { conditionLabel } from '../../utils/riskUtils';
-import { dayOfProgram, timeStamp, shortDate, relativeTime } from '../../utils/dateUtils';
+import { dayOfProgram, shortDate } from '../../utils/dateUtils';
 import { useAuthStore } from '../../store/authStore';
+import OverviewTab from './detail/OverviewTab';
+import ConversationTab from './detail/ConversationTab';
+import NotesTab from './detail/NotesTab';
 
 interface PatientDetailPanelProps {
   patient: Patient;
@@ -75,7 +76,7 @@ export default function PatientDetailPanel({ patient, checkinsMap, onClose }: Pa
         role="dialog"
         aria-modal="true"
         aria-label={`Patient detail: ${patient.last_name || patient.first_name}`}
-        className="fixed right-0 top-0 h-full w-[480px] bg-white shadow-2xl z-50 flex flex-col
+        className="fixed right-0 top-0 h-full w-full sm:w-[480px] bg-white shadow-2xl z-50 flex flex-col
           outline-none overflow-hidden"
       >
         {/* Header */}
@@ -107,7 +108,7 @@ export default function PatientDetailPanel({ patient, checkinsMap, onClose }: Pa
         </div>
 
         {/* Quick info */}
-        <div className="px-5 py-3 bg-slate-50 border-b border-slate-100 flex gap-5 text-xs font-sans shrink-0">
+        <div className="px-5 py-3 bg-slate-50 border-b border-slate-100 flex gap-5 text-xs font-sans shrink-0 overflow-x-auto">
           <div>
             <span className="text-slate-400 block">Channel</span>
             <span className="font-medium text-slate-700 flex items-center gap-1 mt-0.5">
@@ -135,16 +136,16 @@ export default function PatientDetailPanel({ patient, checkinsMap, onClose }: Pa
         </div>
 
         {/* Action buttons */}
-        <div className="px-5 py-3 border-b border-slate-100 flex gap-2 shrink-0">
-          <button className="flex items-center gap-1.5 text-xs font-medium font-sans px-3 py-2 rounded-md bg-forest text-white hover:bg-forest-light transition focus:outline-none focus:ring-2 focus:ring-forest focus:ring-offset-1">
+        <div className="px-5 py-3 border-b border-slate-100 flex gap-2 shrink-0 overflow-x-auto">
+          <button className="flex items-center gap-1.5 text-xs font-medium font-sans px-3 py-2 rounded-md bg-forest text-white hover:bg-forest-light transition focus:outline-none focus:ring-2 focus:ring-forest focus:ring-offset-1 whitespace-nowrap">
             <Phone size={13} aria-hidden="true" />
             Log a call
           </button>
-          <button className="flex items-center gap-1.5 text-xs font-medium font-sans px-3 py-2 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition focus:outline-none focus:ring-2 focus:ring-forest focus:ring-offset-1">
+          <button className="flex items-center gap-1.5 text-xs font-medium font-sans px-3 py-2 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition focus:outline-none focus:ring-2 focus:ring-forest focus:ring-offset-1 whitespace-nowrap">
             <CheckCheck size={13} aria-hidden="true" />
             Mark reviewed
           </button>
-          <button className="flex items-center gap-1.5 text-xs font-medium font-sans px-3 py-2 rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1">
+          <button className="flex items-center gap-1.5 text-xs font-medium font-sans px-3 py-2 rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 whitespace-nowrap">
             <AlertTriangle size={13} aria-hidden="true" />
             Escalate
           </button>
@@ -192,224 +193,5 @@ export default function PatientDetailPanel({ patient, checkinsMap, onClose }: Pa
         </div>
       </div>
     </>
-  );
-}
-
-// ──────────────────────────────────────────────
-// Overview tab
-// ──────────────────────────────────────────────
-function OverviewTab({ patient }: { patient: Patient }) {
-  const completionPct = Math.round(patient.checkin_completion_rate * 100);
-
-  const bars = Array.from({ length: 30 }, (_, i) => ({
-    day: i + 1,
-    responded: i < patient.days_in_program
-      ? Math.random() < patient.checkin_completion_rate
-      : null,
-  }));
-
-  return (
-    <div className="p-5 space-y-5">
-      <section>
-        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 font-sans">Current status</h3>
-        <div className="flex items-start gap-3">
-          <RiskBadge risk={patient.risk_level} size="lg" />
-          {patient.last_reply_summary && (
-            <p className="text-sm text-slate-700 font-sans leading-snug flex-1">
-              "{patient.last_reply_summary}"
-            </p>
-          )}
-        </div>
-        <p className="text-xs text-slate-400 font-sans mt-1.5">
-          Last check-in: {relativeTime(patient.last_checkin_at)}
-        </p>
-      </section>
-
-      {patient.sdoh_flags.length > 0 && (
-        <section>
-          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 font-sans">SDOH flags</h3>
-          <div className="space-y-2">
-            {patient.sdoh_flags.map((domain) => {
-              const { label } = domainConfig[domain];
-              const isSafety = domain === 'interpersonal_safety';
-              return (
-                <div key={domain} className={`flex items-start gap-2.5 rounded-lg p-3 text-sm ${isSafety ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'}`}>
-                  {isSafety
-                    ? <AlertTriangle size={14} className="text-red-600 mt-0.5 shrink-0" aria-hidden="true" />
-                    : <SDOHIcons flags={[domain]} compact={false} />}
-                  <div>
-                    <div className={`font-medium font-sans text-xs ${isSafety ? 'text-red-700' : 'text-amber-700'}`}>
-                      {isSafety ? 'Safety concern flagged' : label}
-                    </div>
-                    <div className="text-xs font-sans text-slate-500 mt-0.5">
-                      {isSafety ? 'Coordinator follow-up required. Details are restricted.' : 'Referred to community resources · Pending'}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {patient.adi_national_rank !== null && (
-        <section>
-          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 font-sans">Neighborhood disadvantage</h3>
-          <div className="flex items-center gap-3">
-            <div className="flex-1 bg-slate-100 rounded-full h-2">
-              <div className="h-2 rounded-full bg-amber-400 transition-all" style={{ width: `${patient.adi_national_rank}%` }} role="progressbar" aria-valuenow={patient.adi_national_rank} aria-valuemin={0} aria-valuemax={100} />
-            </div>
-            <span className="text-sm font-medium text-slate-700 font-sans whitespace-nowrap">
-              {patient.adi_national_rank >= 80 ? 'High' : patient.adi_national_rank >= 50 ? 'Moderate' : 'Low'} (Rank {patient.adi_national_rank}/100)
-            </span>
-          </div>
-        </section>
-      )}
-
-      <section>
-        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 font-sans">30-day check-in pattern</h3>
-        <div className="flex items-end gap-0.5 h-10" aria-label={`${completionPct}% check-in completion over 30 days`}>
-          {bars.map((b) => (
-            <div key={b.day} className={`flex-1 rounded-sm transition ${b.responded === null ? 'bg-slate-100 h-3' : b.responded ? 'bg-forest h-8' : 'bg-red-200 h-4'}`} title={b.responded === null ? `Day ${b.day}: pending` : b.responded ? `Day ${b.day}: responded` : `Day ${b.day}: no reply`} />
-          ))}
-        </div>
-        <div className="flex justify-between text-xs text-slate-400 font-sans mt-1.5">
-          <span>Day 1</span>
-          <span className="font-medium text-slate-600">{completionPct}% completion</span>
-          <span>Day 30</span>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────
-// Conversation tab
-// ──────────────────────────────────────────────
-function ConversationTab({ checkins }: { checkins: CheckIn[] }) {
-  if (checkins.length === 0) {
-    return (
-      <div className="p-5 text-center">
-        <MessageSquare size={32} className="text-slate-300 mx-auto mb-3" aria-hidden="true" />
-        <p className="text-sm text-slate-400 font-sans">
-          No check-ins yet. First check-in will be sent within 24 hours of discharge.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="p-5 space-y-5">
-      {checkins.map((ci) => (
-        <div key={ci.id} className="space-y-2">
-          <div className="text-center">
-            <span className="text-xs text-slate-400 font-sans bg-white px-2 border-b border-slate-100">
-              {timeStamp(ci.sent_at)}
-            </span>
-          </div>
-
-          {/* AI message */}
-          <div className="flex gap-2">
-            <div className="w-7 h-7 rounded-full bg-forest flex items-center justify-center shrink-0 mt-0.5">
-              <span className="text-white text-xs font-bold font-sans">A</span>
-            </div>
-            <div className="flex-1">
-              <div className="text-xs text-slate-500 font-sans mb-1">Avyay Health · AI check-in</div>
-              <div className="bg-slate-800 text-white text-sm font-mono rounded-lg rounded-tl-none px-3.5 py-2.5 leading-relaxed max-w-[340px]">
-                {ci.ai_summary ?? 'Daily check-in question sent'}
-              </div>
-            </div>
-          </div>
-
-          {/* Patient reply */}
-          {ci.patient_message && (
-            <div className="flex gap-2 flex-row-reverse">
-              <div className="w-7 h-7 rounded-full bg-slate-300 flex items-center justify-center shrink-0 mt-0.5">
-                <span className="text-slate-600 text-xs font-bold font-sans">P</span>
-              </div>
-              <div className="flex-1 flex flex-col items-end">
-                <div className="text-xs text-slate-500 font-sans mb-1">
-                  Patient · {ci.replied_at ? relativeTime(ci.replied_at) : ''}
-                </div>
-                <div
-                  className="bg-slate-100 text-slate-800 text-sm font-sans rounded-lg rounded-tr-none px-3.5 py-2.5 leading-relaxed max-w-[300px]"
-                  style={{ userSelect: 'none' }}
-                  onCopy={(e) => {
-                    e.preventDefault();
-                    alert('Copying patient messages is restricted per privacy policy.');
-                  }}
-                >
-                  {ci.patient_message}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Escalation */}
-          {ci.escalated && (
-            <div className="ml-9 flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-              <AlertTriangle size={13} className="text-red-600 shrink-0" aria-hidden="true" />
-              <div>
-                <span className="text-xs font-semibold text-red-700 font-sans block">Escalated to RED</span>
-                <span className="text-xs text-red-600 font-sans">{ci.escalation_reason}</span>
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────
-// Notes tab
-// ──────────────────────────────────────────────
-interface NotesTabProps {
-  notes: CoordinatorNote[];
-  noteText: string;
-  onNoteChange: (v: string) => void;
-  onSubmit: () => void;
-}
-
-function NotesTab({ notes, noteText, onNoteChange, onSubmit }: NotesTabProps) {
-  return (
-    <div className="p-5 space-y-4">
-      <div>
-        <label htmlFor="note-input" className="block text-xs font-semibold text-slate-600 font-sans mb-1.5">
-          Add coordinator note
-        </label>
-        <textarea
-          id="note-input"
-          value={noteText}
-          onChange={(e) => onNoteChange(e.target.value)}
-          placeholder="Document your action, observation, or follow-up…"
-          rows={3}
-          className="w-full text-sm font-sans border border-slate-200 rounded-lg px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-forest focus:border-forest transition resize-none placeholder-slate-400 text-slate-800"
-        />
-        <button
-          onClick={onSubmit}
-          disabled={!noteText.trim()}
-          className="mt-2 text-xs font-medium font-sans px-3.5 py-2 rounded-md bg-forest text-white hover:bg-forest-light transition disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-forest focus:ring-offset-1"
-        >
-          Save note
-        </button>
-      </div>
-
-      {notes.length === 0 ? (
-        <p className="text-sm text-slate-400 font-sans text-center py-6">No notes yet. Add one above.</p>
-      ) : (
-        <div className="space-y-3">
-          {notes.map((note) => (
-            <div key={note.id} className="bg-slate-50 rounded-lg border border-slate-200 px-4 py-3">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-semibold text-slate-700 font-sans">{note.coordinator_name}</span>
-                <span className="text-xs text-slate-400 font-sans">{timeStamp(note.created_at)}</span>
-              </div>
-              <p className="text-sm text-slate-700 font-sans leading-relaxed">{note.note}</p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
   );
 }

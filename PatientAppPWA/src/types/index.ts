@@ -1,3 +1,9 @@
+/**
+ * PatientAppPWA type definitions.
+ * Structural interfaces come from @shared/types/patient.
+ * Enum types are narrower than the dashboard apps (no 'not_started', no 'hip_knee'/'cabg').
+ */
+
 export type RiskLevel = 'red' | 'yellow' | 'green';
 export type Condition = 'chf' | 'copd' | 'pneumonia' | 'ami';
 export type CheckInStatus = 'pending' | 'completed' | 'missed' | 'escalated';

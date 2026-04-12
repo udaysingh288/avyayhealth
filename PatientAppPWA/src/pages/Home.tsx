@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { usePatientStore } from '../store/patientStore';
 import { haptic } from '../utils/haptics';
+import { PLAN_ITEMS } from '../data/carePlanDefaults';
+import type { PlanItem } from '../data/carePlanDefaults';
 import type { TodayCheckin } from '../types';
 
 function getGreeting(): string {
@@ -25,50 +27,6 @@ function formattedToday(): string {
     day: 'numeric',
   });
 }
-
-interface PlanItem {
-  id: string;
-  label: string;
-  sub: string;
-  icon: string;
-  iconTint: string;
-  iconBg: string;
-  done: boolean;
-  dueTime?: string;
-}
-
-const PLAN_ITEMS: PlanItem[] = [
-  {
-    id: 'med',
-    label: 'Morning medication',
-    sub: 'With breakfast',
-    icon: 'pill',
-    iconTint: '#053027',
-    iconBg: '#E6EEEC',
-    done: true,
-    dueTime: '8:00 AM',
-  },
-  {
-    id: 'hydrate',
-    label: 'Hydrate',
-    sub: 'Two glasses of water',
-    icon: 'water_drop',
-    iconTint: '#1E73BE',
-    iconBg: '#EBF3FA',
-    done: false,
-    dueTime: '11:00 AM',
-  },
-  {
-    id: 'walk',
-    label: 'Light walk',
-    sub: 'Five minutes indoors',
-    icon: 'directions_walk',
-    iconTint: '#D97706',
-    iconBg: '#FDF4E7',
-    done: false,
-    dueTime: '2:00 PM',
-  },
-];
 
 export default function Home() {
   const navigate = useNavigate();

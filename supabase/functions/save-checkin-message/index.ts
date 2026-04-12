@@ -7,7 +7,7 @@
 //
 // POST /functions/v1/save-checkin-message
 // headers:
-//   Authorization: Bearer <patient session token>
+//   X-Patient-Token: <patient session token>
 // body:
 //   {
 //     role: "ai" | "patient",
@@ -18,9 +18,9 @@
 //   { check_in_id, message_id, day_number }
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
-import { handleCorsPreflight, jsonResponse } from '../_shared/cors.ts';
+import { jsonResponse } from '../_shared/cors.ts';
 import { supabaseAdmin } from '../_shared/supabaseAdmin.ts';
-import { verifyPatientToken } from '../_shared/patientJwt.ts';
+import { withPatientAuth } from '../_shared/withPatientAuth.ts';
 
 interface SaveMessageRequest {
   role: 'ai' | 'patient';
@@ -28,40 +28,7 @@ interface SaveMessageRequest {
   risk_level?: 'red' | 'yellow' | 'green';
 }
 
-Deno.serve(async (req) => {
-  const preflight = handleCorsPreflight(req);
-  if (preflight) return preflight;
-
-  if (req.method !== 'POST') {
-    return jsonResponse({ error: 'method_not_allowed' }, 405);
-  }
-
-  // Patient session token — note we look at a custom header because the
-  // Supabase `Authorization: Bearer <supabase-jwt>` slot is also used by
-  // the platform. We read `x-patient-token` to avoid collision.
-  const patientToken =
-    req.headers.get('x-patient-token') ??
-    req.headers.get('X-Patient-Token') ??
-    '';
-  if (!patientToken) {
-    return jsonResponse({ error: 'missing_patient_token' }, 401);
-  }
-
-  let claims;
-  try {
-    claims = await verifyPatientToken(patientToken);
-  } catch (err) {
-    console.error('patient token verify failed', err);
-    return jsonResponse({ error: 'invalid_patient_token' }, 401);
-  }
-
-  let body: SaveMessageRequest;
-  try {
-    body = (await req.json()) as SaveMessageRequest;
-  } catch {
-    return jsonResponse({ error: 'invalid_json' }, 400);
-  }
-
+Deno.serve(withPatientAuth<SaveMessageRequest>(async ({ claims, body }) => {
   const { role, content, risk_level } = body;
   if (!role || !content) {
     return jsonResponse({ error: 'missing_fields' }, 400);
@@ -136,4 +103,4 @@ Deno.serve(async (req) => {
     message_id: msg.id,
     day_number: dayNumber,
   });
-});
+}));

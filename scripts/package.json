@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "create-demo-users": "node create-demo-users.mjs"
+    "create-demo-users": "node create-demo-users.mjs",
+    "reset-and-seed": "node reset-and-seed.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4"

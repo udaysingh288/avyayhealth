@@ -6,6 +6,7 @@
   --color-forest: #053027;
   --color-teal: #0D6B56;
   --color-offwhite: #FFF8E7;
+  --color-cream: #F9F7F2;
   --color-charcoal: #1A1A1A;
   --color-gray: #6B7280;
   --color-red: #C0392B;
@@ -17,15 +18,16 @@ html {
 }
 
 body {
-  background-color: #FFF8E7;
+  background-color: #ffffff;
   color: #1A1A1A;
   font-family: var(--font-dm-sans), sans-serif;
 }
 
+/* Fade in on scroll */
 .fade-in {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
+  transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
 .fade-in.visible {
@@ -37,4 +39,46 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Marquee animation for quote scroller */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 45s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Hover lift for cards */
+.hover-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* Subtle scale on hover */
+.hover-scale {
+  transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.03);
+}
+
+/* Button hover glow */
+.hover-glow {
+  transition: all 0.25s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 4px 20px rgba(5, 48, 39, 0.25);
 }

@@ -1,29 +1,14 @@
 import { create } from 'zustand';
 import type { PatientSession, TodayCheckin } from '../types';
 
-const STORAGE_KEY = 'avyay-patient-session';
-
-function loadPersistedSession(): { token: string; session: PatientSession } | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (parsed?.token && parsed?.session) return parsed;
-  } catch { /* corrupt data — ignore */ }
-  return null;
-}
-
-function persistSession(token: string, session: PatientSession) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ token, session }));
-  } catch { /* storage full — ignore */ }
-}
-
-function clearPersistedSession() {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch { /* ignore */ }
-}
+/**
+ * Patient session store — in-memory only.
+ *
+ * HIPAA: Patient tokens and session data (first_name, condition) must NEVER
+ * be persisted to localStorage or sessionStorage. If the app is refreshed
+ * or closed, the patient re-enters name + DOB to re-authenticate.
+ * This is the intended UX for elderly patients on shared devices.
+ */
 
 interface PatientState {
   token: string | null;
@@ -34,19 +19,11 @@ interface PatientState {
   setCheckin: (checkin: TodayCheckin) => void;
 }
 
-const persisted = loadPersistedSession();
-
 export const usePatientStore = create<PatientState>((set) => ({
-  token: persisted?.token ?? null,
-  session: persisted?.session ?? null,
+  token: null,
+  session: null,
   checkin: null,
-  setSession: (token, session) => {
-    persistSession(token, session);
-    set({ token, session });
-  },
-  clearSession: () => {
-    clearPersistedSession();
-    set({ token: null, session: null, checkin: null });
-  },
+  setSession: (token, session) => set({ token, session }),
+  clearSession: () => set({ token: null, session: null, checkin: null }),
   setCheckin: (checkin) => set({ checkin }),
 }));

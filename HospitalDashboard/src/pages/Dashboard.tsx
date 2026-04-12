@@ -86,9 +86,9 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="flex-1 p-6 overflow-auto">
-        {/* Metrics row */}
-        <div className="flex gap-3 mb-6">
+      <div className="flex-1 p-4 sm:p-6 overflow-auto">
+        {/* Metrics row — scrollable on mobile, wraps on tablet+ */}
+        <div className="flex gap-3 mb-6 overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap sm:overflow-visible">
           <MetricCard
             label="Active patients"
             value={metrics.total_active_patients}
@@ -126,13 +126,13 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Table + chart grid */}
-        <div className="flex gap-5 items-start">
+        {/* Table + chart grid — stacked on mobile, side-by-side on xl */}
+        <div className="flex flex-col xl:flex-row gap-5 items-start">
           {/* Patient table */}
-          <div className="flex-1 min-w-0 bg-white rounded-lg border border-slate-200">
+          <div className="w-full xl:flex-1 xl:min-w-0 bg-white rounded-lg border border-slate-200">
             {/* Table toolbar */}
-            <div className="px-5 py-3.5 border-b border-slate-100 flex items-center gap-3 flex-wrap">
-              <div className="relative flex-1 min-w-48">
+            <div className="px-4 sm:px-5 py-3.5 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="relative flex-1 min-w-0 sm:min-w-48">
                 <Search
                   size={14}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
@@ -222,8 +222,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Right column */}
-          <div className="w-72 shrink-0 space-y-4">
+          {/* Right column — full width on mobile, fixed width on xl */}
+          <div className="w-full xl:w-72 xl:shrink-0 space-y-4">
             <EngagementChart />
             <SDOHSummaryCard patients={allPatients} />
           </div>

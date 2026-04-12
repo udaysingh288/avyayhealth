@@ -1,9 +1,6 @@
 import { MOCK_SESSION } from '../utils/mockData';
 import type { PatientSession, Condition } from '../types';
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const hasSupabase = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+import { hasSupabase, edgeFunctionUrl, anonHeaders } from './client';
 
 /**
  * Enrolls a patient via the `enroll-patient` edge function.
@@ -27,13 +24,9 @@ export async function enrollPatient(params: {
     return { ...MOCK_SESSION, first_name: firstName };
   }
 
-  const res = await fetch(`${SUPABASE_URL}/functions/v1/enroll-patient`, {
+  const res = await fetch(edgeFunctionUrl('enroll-patient'), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      apikey: SUPABASE_ANON_KEY,
-    },
+    headers: anonHeaders(),
     body: JSON.stringify({
       hospital_code: hospitalCode,
       first_name: firstName,
