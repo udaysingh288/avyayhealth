@@ -2,19 +2,29 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
-    VitePWA({
-      registerType: 'autoUpdate',
-      manifest: false,
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-      },
-    }),
+    // Only enable PWA service worker in production — it causes caching
+    // issues during development, especially on iOS standalone mode.
+    ...(mode === 'production'
+      ? [
+          VitePWA({
+            registerType: 'autoUpdate',
+            manifest: false,
+            workbox: {
+              globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+            },
+          }),
+        ]
+      : []),
   ],
   server: {
-    port: 3003,
+    port: 5173,
     host: true,
+    // Allow phone on local network to connect to HMR websocket
+    hmr: {
+      host: '192.168.1.167',
+    },
   },
-});
+}));

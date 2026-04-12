@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        forest: "#085041",
+        forest: "#053027",
         teal: "#0D6B56",
         offwhite: "#FFF8E7",
         charcoal: "#1A1A1A",

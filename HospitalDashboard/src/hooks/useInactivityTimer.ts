@@ -7,7 +7,7 @@ const WARNING_MS = 60 * 1000; // show warning 60s before logout
 
 export function useInactivityTimer() {
   const clearAuth = useAuthStore((s) => s.clearAuth);
-  const token = useAuthStore((s) => s.token);
+  const userId = useAuthStore((s) => s.userId);
   const navigate = useNavigate();
   const [showWarning, setShowWarning] = useState(false);
   const logoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -18,7 +18,7 @@ export function useInactivityTimer() {
     if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
     if (warnTimerRef.current) clearTimeout(warnTimerRef.current);
 
-    if (!token) return;
+    if (!userId) return;
 
     warnTimerRef.current = setTimeout(() => {
       setShowWarning(true);
@@ -31,7 +31,7 @@ export function useInactivityTimer() {
   }
 
   useEffect(() => {
-    if (!token) return;
+    if (!userId) return;
 
     reset();
 
@@ -44,7 +44,7 @@ export function useInactivityTimer() {
       if (warnTimerRef.current) clearTimeout(warnTimerRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [userId]);
 
   return { showWarning, extendSession: reset };
 }

@@ -1,54 +1,57 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
+import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
-import type { Coordinator } from '../types';
-
-const DEMO_CREDENTIALS = {
-  email: 'sarah.chen@riversidemed.org',
-  password: 'demo1234',
-};
-
-const DEMO_COORDINATOR: Coordinator = {
-  id: 'c-001',
-  display_name: 'Sarah Chen',
-  email: 'sarah.chen@riversidemed.org',
-  hospital_id: 'h-001',
-  hospital_name: 'Riverside Community Medical Center',
-  role: 'coordinator',
-};
 
 export default function Login() {
-  const navigate = useNavigate();
-  const setAuth = useAuthStore((s) => s.setAuth);
+  const userId = useAuthStore((s) => s.userId);
+  const authLoading = useAuthStore((s) => s.loading);
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-off-white">
+        <div className="text-slate-500 font-sans text-sm">Loading…</div>
+      </div>
+    );
+  }
+
+  if (userId) {
+    const from = (location.state as { from?: string } | null)?.from ?? '/dashboard';
+    return <Navigate to={from} replace />;
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 800));
-
-    if (
-      email.trim().toLowerCase() === DEMO_CREDENTIALS.email &&
-      password === DEMO_CREDENTIALS.password
-    ) {
-      setAuth('demo-jwt-token', DEMO_COORDINATOR);
-      navigate('/dashboard');
-    } else {
-      setError('Invalid email or password. Use the demo credentials below.');
+    if (!hasSupabase || !supabase) {
+      setError(
+        'Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env and restart.',
+      );
+      return;
     }
-    setLoading(false);
-  }
 
-  function fillDemo() {
-    setEmail(DEMO_CREDENTIALS.email);
-    setPassword(DEMO_CREDENTIALS.password);
-    setError('');
+    setLoading(true);
+    try {
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (signInErr) {
+        setError(signInErr.message);
+        return;
+      }
+      // onAuthStateChange in useAuthSession will update the store
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Sign-in failed');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -57,10 +60,13 @@ export default function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 bg-forest rounded-xl mb-4">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M14 2C9.58 2 6 5.58 6 10C6 15.5 14 26 14 26C14 26 22 15.5 22 10C22 5.58 18.42 2 14 2Z" fill="white" opacity="0.9"/>
-              <rect x="11" y="7" width="6" height="1.8" rx="0.9" fill="#27500A"/>
-              <rect x="12.1" y="6" width="3.8" height="6" rx="0.9" fill="#27500A"/>
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path
+                d="M16 28 C16 28 3 19 3 10.5 C3 6.91 5.91 4 9.5 4 C11.74 4 13.73 5.14 16 7.3 C18.27 5.14 20.26 4 22.5 4 C26.09 4 29 6.91 29 10.5 C29 19 16 28 16 28 Z"
+                fill="white"
+              />
+              <rect x="14.6" y="9" width="2.8" height="9" rx="0.6" fill="#053027" />
+              <rect x="11.5" y="12.1" width="9" height="2.8" rx="0.6" fill="#053027" />
             </svg>
           </div>
           <h1 className="font-serif text-2xl text-forest mb-1">Avyay Health</h1>
@@ -84,8 +90,9 @@ export default function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
                   className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm font-sans text-slate-800 placeholder-slate-400
-                    focus:outline-none focus:ring-2 focus:ring-forest focus:border-forest transition"
+                    focus:outline-none focus:ring-2 focus:ring-forest focus:border-forest transition disabled:opacity-60"
                   placeholder="you@hospital.org"
                 />
               </div>
@@ -101,8 +108,9 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
                   className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm font-sans text-slate-800 placeholder-slate-400
-                    focus:outline-none focus:ring-2 focus:ring-forest focus:border-forest transition"
+                    focus:outline-none focus:ring-2 focus:ring-forest focus:border-forest transition disabled:opacity-60"
                   placeholder="••••••••"
                 />
               </div>
@@ -119,7 +127,7 @@ export default function Login() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !email || !password}
               className="mt-6 w-full bg-forest text-white font-sans font-medium text-sm px-4 py-2.5 rounded-lg
                 hover:bg-forest-light focus:outline-none focus:ring-2 focus:ring-forest focus:ring-offset-2
                 disabled:opacity-60 disabled:cursor-not-allowed transition"
@@ -138,21 +146,11 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <p className="text-xs text-slate-500 mb-2 font-sans">Demo credentials:</p>
-            <button
-              type="button"
-              onClick={fillDemo}
-              className="w-full text-left bg-slate-50 rounded-lg px-3.5 py-3 text-xs font-mono text-slate-600
-                hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-forest transition border border-slate-200"
-            >
-              <div><span className="text-slate-400">Email: </span>{DEMO_CREDENTIALS.email}</div>
-              <div className="mt-0.5"><span className="text-slate-400">Password: </span>{DEMO_CREDENTIALS.password}</div>
-            </button>
-          </div>
+          <p className="text-xs text-slate-500 font-sans text-center mt-5">
+            Contact your Avyay Health account manager if you need access.
+          </p>
         </div>
 
-        {/* Security note */}
         <p className="text-center text-xs text-slate-400 mt-5 font-sans">
           Sessions expire after 15 minutes of inactivity.
         </p>

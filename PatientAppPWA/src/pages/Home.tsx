@@ -1,204 +1,406 @@
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { usePatientStore } from '../store/patientStore';
-import { MOCK_CHECKIN_PENDING } from '../utils/mockData';
+import { haptic } from '../utils/haptics';
+import type { TodayCheckin } from '../types';
 
 function getGreeting(): string {
   const h = new Date().getHours();
-  if (h < 12) return 'morning';
-  if (h < 17) return 'afternoon';
-  return 'evening';
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
 }
 
-function getSunIcon(): string {
+function getTimeIcon(): string {
   const h = new Date().getHours();
   if (h < 12) return 'wb_sunny';
   if (h < 17) return 'partly_cloudy_day';
   return 'nights_stay';
 }
 
-const PLAN_ITEMS = [
-  { id: 'med', label: 'Morning Medication', sub: '8:00 AM · With food', done: true },
-  { id: 'rest', label: 'Rest & Hydrate', sub: 'Drink 2 glasses of water', done: false, highlight: true },
-  { id: 'walk', label: 'Afternoon Walk', sub: '2:00 PM · 5 minutes indoors', done: false },
+function formattedToday(): string {
+  return new Date().toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+interface PlanItem {
+  id: string;
+  label: string;
+  sub: string;
+  icon: string;
+  iconTint: string;
+  iconBg: string;
+  done: boolean;
+  dueTime?: string;
+}
+
+const PLAN_ITEMS: PlanItem[] = [
+  {
+    id: 'med',
+    label: 'Morning medication',
+    sub: 'With breakfast',
+    icon: 'pill',
+    iconTint: '#053027',
+    iconBg: '#E6EEEC',
+    done: true,
+    dueTime: '8:00 AM',
+  },
+  {
+    id: 'hydrate',
+    label: 'Hydrate',
+    sub: 'Two glasses of water',
+    icon: 'water_drop',
+    iconTint: '#1E73BE',
+    iconBg: '#EBF3FA',
+    done: false,
+    dueTime: '11:00 AM',
+  },
+  {
+    id: 'walk',
+    label: 'Light walk',
+    sub: 'Five minutes indoors',
+    icon: 'directions_walk',
+    iconTint: '#D97706',
+    iconBg: '#FDF4E7',
+    done: false,
+    dueTime: '2:00 PM',
+  },
 ];
 
 export default function Home() {
   const navigate = useNavigate();
   const session = usePatientStore((s) => s.session);
-  if (!session) return null; // AuthGuard will redirect
-  const checkin = MOCK_CHECKIN_PENDING;
+  const storeCheckin = usePatientStore((s) => s.checkin);
+
+  if (!session) return null;
+
+  const checkin: TodayCheckin = storeCheckin ?? {
+    checkin_id: `ci-day${session.days_in_program}`,
+    day_number: session.days_in_program,
+    status: 'pending',
+    question: '',
+    conversation: [],
+    completed_at: null,
+  };
 
   const dayNumber = checkin.day_number;
   const totalDays = session.total_days;
   const progressPct = Math.round((dayNumber / totalDays) * 100);
+  const daysLeft = totalDays - dayNumber;
   const isCompleted = checkin.status === 'completed';
 
-  const greeting = getGreeting();
-  const sunIcon = getSunIcon();
-
   return (
-    <div className="flex flex-col h-full bg-warm-oatmeal">
-      {/* Header */}
-      <header
-        className="flex justify-between items-center px-6 pb-4 shrink-0"
-        style={{ paddingTop: 'max(48px, env(safe-area-inset-top))' }}
-      >
-        <div className="w-10 h-10 rounded-full bg-primary-pale flex items-center justify-center text-primary border border-primary/10 overflow-hidden">
-          <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
-            person
-          </span>
-        </div>
-        <button
-          onClick={() => alert('Settings coming soon')}
-          className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-sage-muted shadow-clinical hover:bg-gray-50 transition-colors"
-          aria-label="Settings"
-        >
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>
-            settings
-          </span>
-        </button>
-      </header>
-
+    <div className="flex flex-col h-full bg-warm-oatmeal overflow-hidden">
       {/* Scrollable content */}
-      <main className="flex-1 overflow-y-auto hide-scrollbar px-6 pb-28">
+      <main
+        className="flex-1 overflow-y-auto scroll-y hide-scrollbar px-5 pb-8"
+        style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}
+      >
+        {/* Header: avatar + settings */}
+        <motion.header
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+          className="flex justify-between items-center mb-6 pt-2"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-ios-sm">
+              <span className="text-white font-bold text-[17px]">
+                {session.first_name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-sage-muted font-semibold">
+                {formattedToday()}
+              </p>
+              <p className="text-[15px] text-forest-slate font-semibold leading-tight">
+                Day {dayNumber} of {totalDays}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => haptic('light')}
+            className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-sage-muted shadow-ios-sm tap-scale active:bg-gray-50"
+            aria-label="Notifications"
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: '22px', fontVariationSettings: "'FILL' 0" }}
+            >
+              notifications
+            </span>
+          </button>
+        </motion.header>
+
         {/* Greeting */}
-        <div className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.05, ease: [0.32, 0.72, 0, 1] }}
+          className="mb-5"
+        >
           <div className="flex items-center gap-2 mb-1">
             <span
-              className="material-symbols-outlined text-yellow-500 text-3xl"
-              style={{ fontVariationSettings: "'FILL' 1", fontSize: '30px' }}
+              className="material-symbols-outlined text-[#D97706]"
+              style={{ fontVariationSettings: "'FILL' 1", fontSize: '22px' }}
             >
-              {sunIcon}
+              {getTimeIcon()}
             </span>
-            <h1 className="text-3xl font-extrabold text-forest-slate tracking-tight">
-              Good {greeting},
-            </h1>
+            <p className="text-[15px] font-semibold text-forest-secondary">
+              {getGreeting()}
+            </p>
           </div>
-          <h1 className="text-3xl font-extrabold text-forest-slate tracking-tight">
-            {session.first_name}
+          <h1 className="text-[32px] font-extrabold text-forest-slate tracking-[-0.02em] leading-[1.05]">
+            {session.first_name}.
           </h1>
-        </div>
+        </motion.div>
 
         {/* Primary Check-in Card */}
-        <div className="bg-surface rounded-2xl p-6 shadow-soft mb-8 border border-gray-50 relative overflow-hidden">
-          {/* Decorative background blob */}
-          <div className="absolute -right-6 -top-6 w-24 h-24 bg-primary-pale rounded-full opacity-60 blur-xl pointer-events-none" />
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary-pale flex items-center justify-center text-primary">
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  favorite
-                </span>
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1, ease: [0.32, 0.72, 0, 1] }}
+          className="relative card-ios-lg p-6 mb-6 overflow-hidden"
+        >
+          {/* Decorative gradient */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-90"
+            aria-hidden="true"
+            style={{
+              background:
+                'radial-gradient(120% 80% at 100% 0%, rgba(5,48,39,0.05) 0%, transparent 55%)',
+            }}
+          />
+          <div className="relative">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-primary-soft flex items-center justify-center">
+                  <span
+                    className="material-symbols-outlined text-primary"
+                    style={{ fontVariationSettings: "'FILL' 1", fontSize: '20px' }}
+                  >
+                    favorite
+                  </span>
+                </div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-wide text-primary/70 font-bold">
+                    Daily Check-in
+                  </p>
+                  <h2 className="text-[17px] font-bold text-forest-slate leading-tight">
+                    {isCompleted ? 'Completed for today' : 'Ready for you'}
+                  </h2>
+                </div>
               </div>
-              <h2 className="text-xl font-bold text-forest-slate">Daily Check-in</h2>
+              {!isCompleted && (
+                <span className="flex items-center gap-1 bg-[#FEF2F2] text-[#DC2626] px-2.5 py-1 rounded-full text-[11px] font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#DC2626] animate-pulse" />
+                  Pending
+                </span>
+              )}
             </div>
 
-            {isCompleted ? (
-              <>
-                <p className="text-sage-muted text-base mb-6 leading-relaxed">
-                  You've completed today's check-in. Great work staying on top of your recovery!
-                </p>
-                <button
-                  onClick={() => navigate('/checkin')}
-                  className="w-full bg-primary-pale text-primary font-bold py-4 px-6 rounded-full transition-all active:scale-95 flex items-center justify-center gap-2 text-base"
-                >
-                  <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
+            <p className="text-[15px] text-forest-secondary leading-[1.5] mb-5">
+              {isCompleted
+                ? "You've shared how you're feeling today. Your care team has been updated."
+                : "A two-minute conversation with your care team. We'll ask about any symptoms and flag anything concerning."}
+            </p>
+
+            <button
+              onClick={() => {
+                haptic('medium');
+                navigate('/checkin');
+              }}
+              className={`w-full h-[54px] rounded-full font-semibold text-[17px] tracking-[-0.01em]
+                flex items-center justify-center gap-2 tap-scale transition-colors
+                ${
+                  isCompleted
+                    ? 'bg-primary-pale text-primary active:bg-primary-soft'
+                    : 'bg-primary text-white active:bg-primary-light shadow-ios'
+                }`}
+            >
+              {isCompleted ? (
+                <>
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: '20px', fontVariationSettings: "'FILL' 1" }}
+                  >
                     check_circle
                   </span>
-                  <span>View Today's Check-in</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="text-sage-muted text-base mb-6 leading-relaxed">
-                  It's time for your quick health update. Let's see how you're recovering today.
-                </p>
-                <button
-                  onClick={() => navigate('/checkin')}
-                  className="w-full bg-primary hover:bg-primary-light text-white font-bold py-4 px-6 rounded-full transition-all active:scale-95 shadow-md flex items-center justify-center gap-2 text-lg"
-                >
-                  <span>Start Check-in</span>
-                  <span className="material-symbols-outlined">arrow_forward</span>
-                </button>
-              </>
-            )}
+                  View today's check-in
+                </>
+              ) : (
+                <>
+                  Start check-in
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: '20px' }}
+                  >
+                    arrow_forward
+                  </span>
+                </>
+              )}
+            </button>
           </div>
-        </div>
+        </motion.section>
 
-        {/* Recovery Progress */}
-        <div className="mb-8">
-          <div className="flex justify-between items-end mb-3">
-            <h3 className="text-lg font-bold text-forest-slate">Recovery Progress</h3>
-            <span className="text-sm font-semibold text-primary bg-primary-pale px-3 py-1 rounded-full">
-              Day {dayNumber}
-            </span>
+        {/* Recovery Progress card */}
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15, ease: [0.32, 0.72, 0, 1] }}
+          className="card-ios p-5 mb-6"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-sage-muted font-bold mb-0.5">
+                Recovery Progress
+              </p>
+              <h3 className="text-[20px] font-bold text-forest-slate tracking-tight">
+                {progressPct}% complete
+              </h3>
+            </div>
+            <ProgressRing percent={progressPct} />
           </div>
-          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary rounded-full transition-all duration-700"
-              style={{ width: `${progressPct}%` }}
+          <div className="h-1.5 bg-primary-soft rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPct}%` }}
+              transition={{ duration: 0.9, delay: 0.2, ease: [0.32, 0.72, 0, 1] }}
+              className="h-full bg-primary rounded-full"
             />
           </div>
-          <p className="text-xs text-sage-muted mt-2 text-right">
-            {progressPct}% complete · Keep it up!
-          </p>
-        </div>
+          <div className="flex justify-between mt-2 text-[12px] text-sage-muted font-medium">
+            <span>Day {dayNumber}</span>
+            <span>{daysLeft} days to go</span>
+          </div>
+        </motion.section>
 
-        {/* Today's Plan */}
-        <div>
-          <h3 className="text-lg font-bold text-forest-slate mb-4">Today's Plan</h3>
-          <div className="space-y-3">
-            {PLAN_ITEMS.map((item) => (
-              <PlanItem key={item.id} {...item} />
+        {/* Today's Plan — iOS-style grouped list */}
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2, ease: [0.32, 0.72, 0, 1] }}
+          className="mb-4"
+        >
+          <div className="flex items-center justify-between mb-3 px-1">
+            <h3 className="text-[17px] font-bold text-forest-slate tracking-tight">
+              Today's plan
+            </h3>
+            <button
+              onClick={() => navigate('/care-plan')}
+              className="text-[14px] font-semibold text-primary active:opacity-70 transition-opacity"
+            >
+              See all
+            </button>
+          </div>
+          <div className="card-ios overflow-hidden">
+            {PLAN_ITEMS.map((item, i) => (
+              <PlanRow key={item.id} item={item} isLast={i === PLAN_ITEMS.length - 1} />
             ))}
           </div>
-        </div>
+        </motion.section>
       </main>
     </div>
   );
 }
 
-function PlanItem({
-  label,
-  sub,
-  done,
-  highlight,
-}: {
-  label: string;
-  sub: string;
-  done: boolean;
-  highlight?: boolean;
-}) {
+// ─── Progress Ring ───────────────────────────
+function ProgressRing({ percent }: { percent: number }) {
+  const size = 54;
+  const stroke = 5;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const offset = c - (percent / 100) * c;
+
   return (
-    <div
-      className={`bg-white rounded-xl p-4 flex items-center gap-4 relative overflow-hidden
-        ${done ? 'opacity-60' : ''}
-        ${highlight ? 'border border-primary/20 shadow-sm' : ''}
-      `}
-    >
-      {/* Left accent bar for highlighted item */}
-      {highlight && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl" />
-      )}
-
-      {done ? (
-        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shrink-0 ml-0">
-          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1", fontSize: '16px' }}>
-            check
-          </span>
-        </div>
-      ) : (
-        <div className="w-8 h-8 rounded-full border-2 border-sage-muted flex items-center justify-center shrink-0" />
-      )}
-
-      <div className="flex-1 min-w-0">
-        <h4 className={`text-base font-semibold text-forest-slate ${done ? 'line-through' : ''}`}>
-          {label}
-        </h4>
-        <p className={`text-sm ${highlight ? 'text-primary font-medium' : 'text-sage-muted'}`}>
-          {sub}
-        </p>
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke="#E6EEEC"
+          strokeWidth={stroke}
+          fill="none"
+        />
+        <motion.circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke="#053027"
+          strokeWidth={stroke}
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          initial={{ strokeDashoffset: c }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1, delay: 0.3, ease: [0.32, 0.72, 0, 1] }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-[13px] font-bold text-primary">{percent}%</span>
       </div>
     </div>
+  );
+}
+
+// ─── Plan Row ───────────────────────────
+function PlanRow({ item, isLast }: { item: PlanItem; isLast: boolean }) {
+  return (
+    <button
+      onClick={() => haptic('light')}
+      className={`w-full flex items-center gap-3.5 px-4 py-3.5 text-left tap-scale-sm active:bg-black/[0.02] transition-colors ${
+        !isLast ? 'hairline-b' : ''
+      }`}
+    >
+      <div
+        className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+        style={{ backgroundColor: item.iconBg }}
+      >
+        <span
+          className="material-symbols-outlined"
+          style={{
+            fontVariationSettings: "'FILL' 1",
+            fontSize: '20px',
+            color: item.iconTint,
+          }}
+        >
+          {item.icon}
+        </span>
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <p
+          className={`text-[15px] font-semibold text-forest-slate leading-tight ${
+            item.done ? 'line-through opacity-50' : ''
+          }`}
+        >
+          {item.label}
+        </p>
+        <p className="text-[13px] text-sage-muted mt-0.5">
+          {item.sub} {item.dueTime && `· ${item.dueTime}`}
+        </p>
+      </div>
+
+      <div
+        className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all ${
+          item.done
+            ? 'bg-primary'
+            : 'border-[1.5px] border-sage-muted/40 bg-transparent'
+        }`}
+      >
+        {item.done && (
+          <span
+            className="material-symbols-outlined text-white"
+            style={{ fontSize: '15px', fontVariationSettings: "'FILL' 1, 'wght' 700" }}
+          >
+            check
+          </span>
+        )}
+      </div>
+    </button>
   );
 }

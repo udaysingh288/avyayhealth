@@ -7,7 +7,7 @@ import AlertBanner from '../components/alerts/AlertBanner';
 import RiskBadge from '../components/shared/RiskBadge';
 import SDOHIcons from '../components/patients/SDOHIcons';
 import PatientDetailPanel from '../components/patients/PatientDetailPanel';
-import { MOCK_PATIENTS, MOCK_METRICS } from '../utils/mockData';
+import { useDashboardData } from '../hooks/useDashboardData';
 import { riskSortOrder, conditionLabel, actionLabel } from '../utils/riskUtils';
 import { relativeTime, dayOfProgram } from '../utils/dateUtils';
 import type { Patient, RiskLevel, Condition } from '../types';
@@ -24,13 +24,14 @@ function actionButtonClass(risk: RiskLevel) {
 }
 
 export default function Dashboard() {
+  const { patients: allPatients, metrics, checkinsMap, loading, isMock, refetch } = useDashboardData();
   const [riskFilter, setRiskFilter] = useState<RiskFilter>('all');
   const [conditionFilter, setConditionFilter] = useState<ConditionFilter>('all');
   const [search, setSearch] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
 
   const patients = useMemo(() => {
-    let list = [...MOCK_PATIENTS];
+    let list = [...allPatients];
 
     if (riskFilter !== 'all') {
       list = list.filter((p) => p.risk_level === riskFilter);
@@ -50,39 +51,53 @@ export default function Dashboard() {
     list.sort((a, b) => {
       const riskDiff = riskSortOrder(a.risk_level) - riskSortOrder(b.risk_level);
       if (riskDiff !== 0) return riskDiff;
-      // Within same risk: sort by last check-in recency
       const aTime = a.last_checkin_at ? new Date(a.last_checkin_at).getTime() : 0;
       const bTime = b.last_checkin_at ? new Date(b.last_checkin_at).getTime() : 0;
       return bTime - aTime;
     });
 
     return list;
-  }, [riskFilter, conditionFilter, search]);
+  }, [allPatients, riskFilter, conditionFilter, search]);
 
-  const unacknowledgedCount = MOCK_METRICS.unacknowledged_alerts;
+  if (loading) {
+    return (
+      <div className="flex flex-col h-full">
+        <TopBar title="Patient Overview" lastUpdated="loading…" onRefresh={() => {}} />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-slate-500 font-sans text-sm">Loading dashboard…</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">
       <TopBar
         title="Patient Overview"
         lastUpdated="just now"
-        onRefresh={() => {}}
+        onRefresh={refetch}
       />
 
-      <AlertBanner count={unacknowledgedCount} />
+      <AlertBanner count={metrics.unacknowledged_alerts} />
+
+      {isMock && (
+        <div className="mx-6 mt-3 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-700 font-sans">
+          Showing demo data — sign in with Supabase credentials to see live patients.
+        </div>
+      )}
 
       <div className="flex-1 p-6 overflow-auto">
         {/* Metrics row */}
         <div className="flex gap-3 mb-6">
           <MetricCard
             label="Active patients"
-            value={MOCK_METRICS.total_active_patients}
+            value={metrics.total_active_patients}
             onClick={() => setRiskFilter('all')}
             active={riskFilter === 'all'}
           />
           <MetricCard
             label="Red alerts"
-            value={MOCK_METRICS.red_count}
+            value={metrics.red_count}
             subLabel="Need immediate call"
             variant="red"
             onClick={() => setRiskFilter('red')}
@@ -90,7 +105,7 @@ export default function Dashboard() {
           />
           <MetricCard
             label="Yellow — watch"
-            value={MOCK_METRICS.yellow_count}
+            value={metrics.yellow_count}
             subLabel="Follow up today"
             variant="yellow"
             onClick={() => setRiskFilter('yellow')}
@@ -98,14 +113,14 @@ export default function Dashboard() {
           />
           <MetricCard
             label="Green — stable"
-            value={MOCK_METRICS.green_count}
+            value={metrics.green_count}
             variant="green"
             onClick={() => setRiskFilter('green')}
             active={riskFilter === 'green'}
           />
           <MetricCard
             label="Engagement rate"
-            value={`${Math.round(MOCK_METRICS.daily_response_rate * 100)}%`}
+            value={`${Math.round(metrics.daily_response_rate * 100)}%`}
             subLabel="Today"
             variant="blue"
           />
@@ -117,7 +132,6 @@ export default function Dashboard() {
           <div className="flex-1 min-w-0 bg-white rounded-lg border border-slate-200">
             {/* Table toolbar */}
             <div className="px-5 py-3.5 border-b border-slate-100 flex items-center gap-3 flex-wrap">
-              {/* Search */}
               <div className="relative flex-1 min-w-48">
                 <Search
                   size={14}
@@ -135,7 +149,6 @@ export default function Dashboard() {
                 />
               </div>
 
-              {/* Condition filter */}
               <div className="flex items-center gap-1.5">
                 <SlidersHorizontal size={13} className="text-slate-400" aria-hidden="true" />
                 <span className="text-xs text-slate-500 font-sans">Condition:</span>
@@ -164,37 +177,23 @@ export default function Dashboard() {
               <table className="w-full text-sm font-sans" aria-label="Patient list">
                 <thead>
                   <tr className="border-b border-slate-100 text-left">
-                    <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">
-                      Patient
-                    </th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">
-                      Condition
-                    </th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                      Risk
-                    </th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">
-                      Program
-                    </th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">
-                      Last check-in
-                    </th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                      Last reply
-                    </th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                      SDOH
-                    </th>
-                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                      Action
-                    </th>
+                    <th className="px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Patient</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Condition</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Risk</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Program</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">Last check-in</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Last reply</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">SDOH</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {patients.length === 0 ? (
                     <tr>
                       <td colSpan={8} className="px-5 py-12 text-center text-sm text-slate-400 font-sans">
-                        No patients match the current filters.
+                        {allPatients.length === 0
+                          ? 'No patients enrolled yet. Patients will appear here once enrolled at discharge.'
+                          : 'No patients match the current filters.'}
                       </td>
                     </tr>
                   ) : (
@@ -215,7 +214,6 @@ export default function Dashboard() {
               </table>
             </div>
 
-            {/* Footer */}
             <div className="px-5 py-3 border-t border-slate-100 flex items-center gap-1.5">
               <Clock size={12} className="text-slate-400" aria-hidden="true" />
               <span className="text-xs text-slate-400 font-sans">
@@ -224,11 +222,10 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Right column — chart + SDOH summary */}
+          {/* Right column */}
           <div className="w-72 shrink-0 space-y-4">
             <EngagementChart />
-            <SDOHSummaryCard />
-            <CMSSummaryCard />
+            <SDOHSummaryCard patients={allPatients} />
           </div>
         </div>
       </div>
@@ -237,6 +234,7 @@ export default function Dashboard() {
       {selectedPatient && (
         <PatientDetailPanel
           patient={selectedPatient}
+          checkinsMap={checkinsMap}
           onClose={() => setSelectedPatient(null)}
         />
       )}
@@ -270,14 +268,16 @@ function PatientRow({ patient, isSelected, onSelect }: PatientRowProps) {
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onSelect()}
       aria-selected={isSelected}
-      aria-label={`${patient.last_name}, ${patient.first_name} — ${patient.risk_level} risk`}
+      aria-label={`${patient.last_name || patient.first_name} — ${patient.risk_level} risk`}
     >
       <td className="px-5 py-3.5 whitespace-nowrap">
         <div className="font-medium text-slate-800">
-          {patient.last_name}, {patient.first_name}
+          {patient.last_name ? `${patient.last_name}, ${patient.first_name}` : patient.first_name}
         </div>
         <div className="text-xs text-slate-400 mt-0.5">
-          {patient.age}{patient.sex === 'Other' ? '' : patient.sex} · {patient.channel.toUpperCase()}
+          {patient.age > 0 ? `${patient.age}` : ''}
+          {patient.sex !== 'Other' ? patient.sex : ''}
+          {patient.channel ? ` · ${patient.channel.toUpperCase()}` : ''}
         </div>
       </td>
       <td className="px-4 py-3.5 whitespace-nowrap text-slate-600">
@@ -315,9 +315,9 @@ function PatientRow({ patient, isSelected, onSelect }: PatientRowProps) {
 // ──────────────────────────────────────────────
 // SDOH summary card
 // ──────────────────────────────────────────────
-function SDOHSummaryCard() {
+function SDOHSummaryCard({ patients }: { patients: Patient[] }) {
   const counts: Partial<Record<string, number>> = {};
-  MOCK_PATIENTS.forEach((p) => {
+  patients.forEach((p) => {
     p.sdoh_flags.forEach((f) => {
       counts[f] = (counts[f] ?? 0) + 1;
     });
@@ -339,34 +339,6 @@ function SDOHSummaryCard() {
             <span className="font-semibold text-slate-700">{count}</span>
           </div>
         ))}
-      </div>
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────
-// CMS reimbursement summary
-// ──────────────────────────────────────────────
-function CMSSummaryCard() {
-  return (
-    <div className="bg-forest rounded-lg p-5 text-white">
-      <h3 className="text-sm font-semibold font-sans mb-1">CMS Revenue Potential</h3>
-      <p className="text-xs font-sans opacity-70 mb-3">Based on 47 active patients</p>
-      <div className="text-2xl font-bold font-sans mb-0.5">$148,608</div>
-      <p className="text-xs font-sans opacity-70">estimated annual reimbursement</p>
-      <div className="mt-3 pt-3 border-t border-white/20 space-y-1">
-        <div className="flex justify-between text-xs font-sans">
-          <span className="opacity-70">RPM codes (99454–99458)</span>
-          <span>$145/mo</span>
-        </div>
-        <div className="flex justify-between text-xs font-sans">
-          <span className="opacity-70">CCM (99490)</span>
-          <span>$66/mo</span>
-        </div>
-        <div className="flex justify-between text-xs font-sans">
-          <span className="opacity-70">TCM per discharge (99496)</span>
-          <span>$298</span>
-        </div>
       </div>
     </div>
   );

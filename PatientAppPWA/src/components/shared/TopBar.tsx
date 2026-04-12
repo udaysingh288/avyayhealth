@@ -1,44 +1,61 @@
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { haptic } from '../../utils/haptics';
 
 interface TopBarProps {
   title?: string;
+  subtitle?: string;
   showBack?: boolean;
   right?: React.ReactNode;
   transparent?: boolean;
 }
 
-export default function TopBar({ title, showBack, right, transparent }: TopBarProps) {
+export default function TopBar({
+  title,
+  subtitle,
+  showBack,
+  right,
+  transparent,
+}: TopBarProps) {
   const navigate = useNavigate();
 
   return (
     <header
-      className={`flex items-center justify-between px-5 py-4 shrink-0
-        ${transparent ? 'bg-transparent' : 'bg-white border-b border-slate-100'}`}
-      style={{ paddingTop: 'max(16px, env(safe-area-inset-top))' }}
+      className={`shrink-0 sticky top-0 z-20 ${
+        transparent ? 'bg-transparent' : 'blur-nav hairline-b'
+      }`}
+      style={{ paddingTop: 'max(14px, env(safe-area-inset-top))' }}
     >
-      <div className="w-10">
-        {showBack && (
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center justify-center w-10 h-10 -ml-1 rounded-full
-              hover:bg-slate-100 active:bg-slate-200 transition
-              focus:outline-none focus:ring-2 focus:ring-forest"
-            aria-label="Go back"
-          >
-            <ArrowLeft size={22} className="text-slate-700" />
-          </button>
-        )}
-      </div>
+      <div className="flex items-center justify-between px-4 pb-3 min-h-[44px]">
+        <div className="w-11 flex items-center">
+          {showBack && (
+            <button
+              onClick={() => {
+                haptic('light');
+                navigate(-1);
+              }}
+              className="flex items-center justify-center w-11 h-11 -ml-2 rounded-full
+                active:bg-black/5 transition tap-scale
+                focus:outline-none focus:ring-2 focus:ring-primary/40"
+              aria-label="Go back"
+            >
+              <ArrowLeft size={22} className="text-forest-slate" strokeWidth={2.4} />
+            </button>
+          )}
+        </div>
 
-      {title && (
-        <h1 className="font-sans font-semibold text-slate-800 text-base text-center flex-1 mx-2">
-          {title}
-        </h1>
-      )}
+        <div className="flex-1 flex flex-col items-center text-center px-2">
+          {title && (
+            <h1 className="font-sans font-bold text-[17px] text-forest-slate leading-tight tracking-tight">
+              {title}
+            </h1>
+          )}
+          {subtitle && (
+            <p className="text-[12px] text-sage-muted font-medium mt-0.5">{subtitle}</p>
+          )}
+        </div>
 
-      <div className="w-10 flex justify-end">
-        {right}
+        <div className="w-11 flex items-center justify-end">{right}</div>
       </div>
     </header>
   );

@@ -1,16 +1,30 @@
 import { create } from 'zustand';
-import type { Coordinator } from '../types';
+
+export interface Profile {
+  id: string;
+  hospital_id: string | null;
+  role: 'care_coordinator' | 'quality_director' | 'admin';
+  display_name: string | null;
+}
 
 interface AuthState {
-  token: string | null;
-  coordinator: Coordinator | null;
-  setAuth: (token: string, coordinator: Coordinator) => void;
+  userId: string | null;
+  email: string | null;
+  profile: Profile | null;
+  loading: boolean;
+  setAuth: (userId: string, email: string, profile: Profile | null) => void;
   clearAuth: () => void;
+  setLoading: (v: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  token: null,
-  coordinator: null,
-  setAuth: (token, coordinator) => set({ token, coordinator }),
-  clearAuth: () => set({ token: null, coordinator: null }),
+  userId: null,
+  email: null,
+  profile: null,
+  loading: true,
+  setAuth: (userId, email, profile) =>
+    set({ userId, email, profile, loading: false }),
+  clearAuth: () =>
+    set({ userId: null, email: null, profile: null, loading: false }),
+  setLoading: (loading) => set({ loading }),
 }));

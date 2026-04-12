@@ -16,8 +16,8 @@ export default function EngagementChart() {
           <AreaChart data={ENGAGEMENT_TREND} margin={{ top: 4, right: 4, left: -32, bottom: 0 }}>
             <defs>
               <linearGradient id="engGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#27500A" stopOpacity={0.15} />
-                <stop offset="95%" stopColor="#27500A" stopOpacity={0} />
+                <stop offset="5%" stopColor="#053027" stopOpacity={0.15} />
+                <stop offset="95%" stopColor="#053027" stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
@@ -46,11 +46,11 @@ export default function EngagementChart() {
             <Area
               type="monotone"
               dataKey="rate"
-              stroke="#27500A"
+              stroke="#053027"
               strokeWidth={2}
               fill="url(#engGrad)"
               dot={false}
-              activeDot={{ r: 4, fill: '#27500A' }}
+              activeDot={{ r: 4, fill: '#053027' }}
             />
           </AreaChart>
         </ResponsiveContainer>

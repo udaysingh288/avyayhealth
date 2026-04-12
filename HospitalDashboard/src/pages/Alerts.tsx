@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AlertTriangle, CheckCircle, Clock, User } from 'lucide-react';
 import TopBar from '../components/layout/TopBar';
 import RiskBadge from '../components/shared/RiskBadge';
 import type { Alert } from '../types';
-import { MOCK_ALERTS } from '../utils/mockData';
 import { relativeTime, timeStamp } from '../utils/dateUtils';
 import { useAuthStore } from '../store/authStore';
+import { useDashboardData } from '../hooks/useDashboardData';
 
 type ActionType = 'called' | 'escalated' | 'other';
 
@@ -16,10 +16,16 @@ interface AckState {
 }
 
 export default function Alerts() {
-  const coordinator = useAuthStore((s) => s.coordinator);
-  const [alerts, setAlerts] = useState<Alert[]>(MOCK_ALERTS);
+  const profile = useAuthStore((s) => s.profile);
+  const { alerts: liveAlerts } = useDashboardData();
+  const [alerts, setAlerts] = useState<Alert[]>(liveAlerts);
   const [ackState, setAckState] = useState<AckState | null>(null);
   const [activeTab, setActiveTab] = useState<'unacknowledged' | 'all'>('unacknowledged');
+
+  // Sync when live data refreshes (new escalations from DB)
+  useEffect(() => {
+    setAlerts(liveAlerts);
+  }, [liveAlerts]);
 
   const unack = alerts.filter((a) => !a.acknowledged);
   const acked = alerts.filter((a) => a.acknowledged);
@@ -38,7 +44,7 @@ export default function Alerts() {
               ...a,
               acknowledged: true,
               acknowledged_at: new Date().toISOString(),
-              acknowledged_by: coordinator?.display_name ?? 'Coordinator',
+              acknowledged_by: profile?.display_name ?? 'Coordinator',
               action_taken: buildActionText(ackState),
             }
           : a

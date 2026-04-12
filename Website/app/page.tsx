@@ -27,14 +27,16 @@ function useFadeIn() {
 // ─── Logo ─────────────────────────────────────────────────────────────────────
 function Logo() {
   return (
-    <div className="bg-[#085041] rounded-xl px-3 py-2 flex items-center gap-3">
-      <svg width="28" height="32" viewBox="0 0 28 32" fill="none">
+    <div className="bg-[#053027] rounded-xl px-3 py-2 flex items-center gap-3">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        {/* Heart */}
         <path
-          d="M14 30C14 30 1 19.5 1 11C1 5.477 6.925 1 14 1C21.075 1 27 5.477 27 11C27 19.5 14 30 14 30Z"
+          d="M16 28 C16 28 3 19 3 10.5 C3 6.91 5.91 4 9.5 4 C11.74 4 13.73 5.14 16 7.3 C18.27 5.14 20.26 4 22.5 4 C26.09 4 29 6.91 29 10.5 C29 19 16 28 16 28 Z"
           fill="white"
         />
-        <rect x="11" y="6" width="2.5" height="8" rx="1" fill="#085041" />
-        <rect x="8" y="9" width="8" height="2.5" rx="1" fill="#085041" />
+        {/* Cross cutout */}
+        <rect x="14.6" y="9" width="2.8" height="9" rx="0.6" fill="#053027" />
+        <rect x="11.5" y="12.1" width="9" height="2.8" rx="0.6" fill="#053027" />
       </svg>
       <div className="border-l border-white/30 pl-3">
         <div className="text-white text-lg font-bold tracking-tight leading-none">
@@ -69,8 +71,8 @@ function Nav() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-[#085041] shadow-lg" : "bg-transparent"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#053027] ${
+        scrolled ? "shadow-lg" : ""
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -80,24 +82,20 @@ function Nav() {
             <a
               key={l.label}
               href={l.href}
-              className={`transition-colors ${
-                scrolled
-                  ? "text-white/80 hover:text-white"
-                  : "text-[#1A1A1A]/70 hover:text-[#1A1A1A]"
-              }`}
+              className="transition-colors text-white/80 hover:text-white"
             >
               {l.label}
             </a>
           ))}
           <a
             href="#contact"
-            className="bg-white text-[#085041] px-4 py-2 rounded-lg font-semibold hover:bg-[#FFF8E7] transition-colors text-sm"
+            className="bg-white text-[#053027] px-4 py-2 rounded-lg font-semibold hover:bg-[#FFF8E7] transition-colors text-sm"
           >
             Book a Call
           </a>
         </div>
         <button
-          className={`md:hidden ${scrolled ? "text-white" : "text-[#1A1A1A]"}`}
+          className="md:hidden text-white"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
@@ -111,7 +109,7 @@ function Nav() {
         </button>
       </div>
       {menuOpen && (
-        <div className="md:hidden bg-[#085041] px-6 pb-6 flex flex-col gap-4">
+        <div className="md:hidden bg-[#053027] px-6 pb-6 flex flex-col gap-4">
           {links.map((l) => (
             <a
               key={l.label}
@@ -124,7 +122,7 @@ function Nav() {
           ))}
           <a
             href="#contact"
-            className="bg-white text-[#085041] px-4 py-2 rounded-lg font-semibold text-sm text-center"
+            className="bg-white text-[#053027] px-4 py-2 rounded-lg font-semibold text-sm text-center"
             onClick={() => setMenuOpen(false)}
           >
             Book a Call
@@ -157,11 +155,14 @@ function SMSMockup() {
           </div>
           {/* Chat header */}
           <div className="bg-gray-900 px-4 py-3 flex items-center gap-3 border-b border-gray-800">
-            <div className="w-9 h-9 rounded-full bg-[#085041] flex items-center justify-center flex-shrink-0">
-              <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
-                <path d="M8 16C8 16 1 11 1 6C1 3.24 4.134 1 8 1C11.866 1 15 3.24 15 6C15 11 8 16 8 16Z" fill="white" />
-                <rect x="6.5" y="3.5" width="2" height="5" rx="0.8" fill="#085041" />
-                <rect x="4" y="5.5" width="7" height="2" rx="0.8" fill="#085041" />
+            <div className="w-9 h-9 rounded-full bg-[#053027] flex items-center justify-center flex-shrink-0">
+              <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
+                <path
+                  d="M16 28 C16 28 3 19 3 10.5 C3 6.91 5.91 4 9.5 4 C11.74 4 13.73 5.14 16 7.3 C18.27 5.14 20.26 4 22.5 4 C26.09 4 29 6.91 29 10.5 C29 19 16 28 16 28 Z"
+                  fill="white"
+                />
+                <rect x="14.6" y="9" width="2.8" height="9" rx="0.6" fill="#053027" />
+                <rect x="11.5" y="12.1" width="9" height="2.8" rx="0.6" fill="#053027" />
               </svg>
             </div>
             <div>
@@ -214,18 +215,21 @@ function DashboardMockup() {
     { name: "Jennifer L., 55F", condition: "Chronic Pain", risk: "green", time: "5 hrs ago", reply: "Pain is manageable, sleeping better", action: "No action" },
   ];
 
-  const riskDot: Record<string, string> = { red: "bg-[#C0392B]", yellow: "bg-[#D97706]", green: "bg-[#085041]" };
+  const riskDot: Record<string, string> = { red: "bg-[#C0392B]", yellow: "bg-[#D97706]", green: "bg-[#053027]" };
   const riskLabel: Record<string, string> = { red: "RED", yellow: "YELLOW", green: "GREEN" };
-  const riskText: Record<string, string> = { red: "text-[#C0392B]", yellow: "text-[#D97706]", green: "text-[#085041]" };
+  const riskText: Record<string, string> = { red: "text-[#C0392B]", yellow: "text-[#D97706]", green: "text-[#053027]" };
 
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
       {/* Header */}
-      <div className="bg-[#085041] px-6 py-3 flex items-center justify-between">
+      <div className="bg-[#053027] px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2 text-white text-sm font-semibold">
           <div className="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center">
-            <svg width="12" height="14" viewBox="0 0 12 14" fill="white">
-              <path d="M6 12C6 12 1 8 1 4.5C1 2.5 3.2 1 6 1C8.8 1 11 2.5 11 4.5C11 8 6 12 6 12Z" />
+            <svg width="14" height="14" viewBox="0 0 32 32" fill="none">
+              <path
+                d="M16 28 C16 28 3 19 3 10.5 C3 6.91 5.91 4 9.5 4 C11.74 4 13.73 5.14 16 7.3 C18.27 5.14 20.26 4 22.5 4 C26.09 4 29 6.91 29 10.5 C29 19 16 28 16 28 Z"
+                fill="white"
+              />
             </svg>
           </div>
           Patient Risk
@@ -244,7 +248,7 @@ function DashboardMockup() {
           { label: "Active Patients", value: "47", color: "text-[#1A1A1A]" },
           { label: "Red Alerts", value: "3", color: "text-[#C0392B]" },
           { label: "Yellow — Watch", value: "8", color: "text-[#D97706]" },
-          { label: "Green — Stable", value: "36", color: "text-[#085041]" },
+          { label: "Green — Stable", value: "36", color: "text-[#053027]" },
           { label: "Engagement Rate", value: "84%", color: "text-[#0D6B56]" },
         ].map((m) => (
           <div key={m.label} className="px-3 py-3 text-center">
@@ -286,7 +290,7 @@ function DashboardMockup() {
                   <span className={`text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap ${
                     p.action === "Call now" ? "bg-[#C0392B]/10 text-[#C0392B]"
                     : p.action === "Follow up today" ? "bg-[#D97706]/10 text-[#D97706]"
-                    : "bg-[#085041]/10 text-[#085041]"
+                    : "bg-[#053027]/10 text-[#053027]"
                   }`}>
                     {p.action}
                   </span>
@@ -336,7 +340,7 @@ export default function Home() {
       <section className="min-h-screen flex items-center pt-20 px-6 bg-[#FFF8E7]">
         <div className="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-16 items-center py-20">
           <div>
-            <div className="inline-block bg-[#085041]/10 text-[#085041] text-xs font-semibold px-3 py-1.5 rounded-full mb-6 tracking-wide uppercase">
+            <div className="inline-block bg-[#053027]/10 text-[#053027] text-xs font-semibold px-3 py-1.5 rounded-full mb-6 tracking-wide uppercase">
               Free 90-Day Pilot — No Budget Required
             </div>
             <h1 className="font-serif text-5xl md:text-6xl lg:text-[4.5rem] text-[#1A1A1A] leading-[1.1] mb-6">
@@ -346,10 +350,10 @@ export default function Home() {
               Avyay Health contacts every discharged patient daily for 30 days — by SMS or app — and alerts your care team before deterioration becomes a readmission.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a href="#contact" className="bg-[#085041] text-white px-8 py-4 rounded-xl font-semibold text-base hover:bg-[#0D6B56] transition-colors text-center">
+              <a href="#contact" className="bg-[#053027] text-white px-8 py-4 rounded-xl font-semibold text-base hover:bg-[#0D6B56] transition-colors text-center">
                 Book a free 20-minute call →
               </a>
-              <a href="#how-it-works" className="border border-[#1A1A1A]/20 text-[#1A1A1A] px-8 py-4 rounded-xl font-semibold text-base hover:border-[#085041] hover:text-[#085041] transition-colors text-center">
+              <a href="#how-it-works" className="border border-[#1A1A1A]/20 text-[#1A1A1A] px-8 py-4 rounded-xl font-semibold text-base hover:border-[#053027] hover:text-[#053027] transition-colors text-center">
                 See how it works ↓
               </a>
             </div>
@@ -373,15 +377,15 @@ export default function Home() {
       </section>
 
       {/* 2 — Problem */}
-      <FadeSection id="problem" className="bg-[#1A1A1A]">
+      <FadeSection id="problem" className="bg-[#FFF8E7]">
         <div className="text-center mb-16">
-          <div className="inline-block bg-white/10 text-white/50 text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
+          <div className="inline-block bg-[#053027]/10 text-[#053027] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
             The Post-Discharge Gap
           </div>
-          <h2 className="font-serif text-4xl md:text-5xl text-white mb-4">
+          <h2 className="font-serif text-4xl md:text-5xl text-[#1A1A1A] mb-4">
             Your patients leave. Most systems lose them.
           </h2>
-          <p className="text-white/40 text-sm">From 52 hospital professionals surveyed — March 2026</p>
+          <p className="text-[#6B7280] text-sm">From 52 hospital professionals surveyed — March 2026</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-16">
@@ -391,18 +395,18 @@ export default function Home() {
             { stat: "46%", desc: "still rely on nurses making manual follow-up calls — adding to burnout" },
             { stat: "37%", desc: "cite patient comprehension failure as a core breakdown point" },
           ].map((item) => (
-            <div key={item.stat} className="bg-white/5 border border-white/8 rounded-2xl p-7">
-              <div className="font-serif text-4xl text-white mb-3">{item.stat}</div>
-              <p className="text-white/50 text-sm leading-relaxed">{item.desc}</p>
+            <div key={item.stat} className="bg-white border border-gray-100 rounded-2xl p-7 shadow-sm">
+              <div className="font-serif text-4xl text-[#053027] mb-3">{item.stat}</div>
+              <p className="text-[#6B7280] text-sm leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
 
-        <blockquote className="border-l-4 border-[#0D6B56] pl-6 mb-16 max-w-2xl">
-          <p className="text-white/75 text-lg italic leading-relaxed mb-3">
+        <blockquote className="border-l-4 border-[#053027] pl-6 mb-16 max-w-2xl">
+          <p className="text-[#1A1A1A] text-lg italic leading-relaxed mb-3">
             &ldquo;Many patients don&apos;t answer the phone. Often their contact info in the EMR is not accurate. Without a verified number, we simply cannot follow up.&rdquo;
           </p>
-          <footer className="text-white/35 text-sm">— Discharge Nurse, Survey Respondent, March 2026</footer>
+          <footer className="text-[#6B7280] text-sm">— Discharge Nurse, Survey Respondent, March 2026</footer>
         </blockquote>
 
         <div className="grid md:grid-cols-3 gap-5">
@@ -411,10 +415,10 @@ export default function Home() {
             { value: "2,400+", desc: "Hospitals penalized under HRRP in FY2026. Penalties reach up to 3% of Medicare base payments" },
             { value: "~20%", desc: "Medicare patients readmitted within 30 days. A 300-bed hospital faces $2M+ in annual HRRP penalty exposure" },
           ].map((item) => (
-            <div key={item.value} className="bg-white/5 border border-white/8 rounded-2xl p-7">
-              <div className="w-full h-1 rounded-full bg-[#0D6B56]/40 mb-5"></div>
-              <div className="font-serif text-5xl text-white mb-3">{item.value}</div>
-              <p className="text-white/45 text-sm leading-relaxed">{item.desc}</p>
+            <div key={item.value} className="bg-white border border-gray-100 rounded-2xl p-7 shadow-sm">
+              <div className="w-full h-1 rounded-full bg-[#053027]/30 mb-5"></div>
+              <div className="font-serif text-5xl text-[#053027] mb-3">{item.value}</div>
+              <p className="text-[#6B7280] text-sm leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -423,7 +427,7 @@ export default function Home() {
       {/* 3 — How It Works */}
       <FadeSection id="how-it-works" className="bg-[#FFF8E7]">
         <div className="text-center mb-16">
-          <div className="inline-block bg-[#085041]/10 text-[#085041] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
+          <div className="inline-block bg-[#053027]/10 text-[#053027] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
             How It Works
           </div>
           <h2 className="font-serif text-4xl md:text-5xl text-[#1A1A1A]">
@@ -454,8 +458,8 @@ export default function Home() {
               highlight: true,
             },
           ].map((step) => (
-            <div key={step.num} className={`rounded-2xl p-8 ${step.highlight ? "bg-[#085041] text-white" : "bg-white border border-gray-100"}`}>
-              <div className={`font-serif text-5xl mb-4 ${step.highlight ? "text-white/25" : "text-[#085041]/15"}`}>{step.num}</div>
+            <div key={step.num} className={`rounded-2xl p-8 ${step.highlight ? "bg-[#053027] text-white" : "bg-white border border-gray-100"}`}>
+              <div className={`font-serif text-5xl mb-4 ${step.highlight ? "text-white/25" : "text-[#053027]/15"}`}>{step.num}</div>
               <h3 className={`font-serif text-2xl mb-4 ${step.highlight ? "text-white" : "text-[#1A1A1A]"}`}>{step.title}</h3>
               <p className={`text-sm leading-relaxed ${step.highlight ? "text-white/65" : "text-[#6B7280]"}`}>{step.body}</p>
             </div>
@@ -466,7 +470,7 @@ export default function Home() {
       {/* 4 — Dashboard */}
       <FadeSection id="dashboard" className="bg-white">
         <div className="text-center mb-12">
-          <div className="inline-block bg-[#085041]/10 text-[#085041] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
+          <div className="inline-block bg-[#053027]/10 text-[#053027] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
             One Dashboard, Every Patient
           </div>
           <h2 className="font-serif text-4xl md:text-5xl text-[#1A1A1A] mb-4">
@@ -482,7 +486,7 @@ export default function Home() {
       {/* 5 — Why We're Different */}
       <FadeSection id="why-us" className="bg-[#FFF8E7]">
         <div className="text-center mb-12">
-          <div className="inline-block bg-[#085041]/10 text-[#085041] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
+          <div className="inline-block bg-[#053027]/10 text-[#053027] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
             Why We&apos;re Different
           </div>
           <h2 className="font-serif text-4xl md:text-5xl text-[#1A1A1A] mb-4">
@@ -499,7 +503,7 @@ export default function Home() {
               <tr className="border-b border-gray-100">
                 <th className="text-left px-6 py-4 font-medium text-[#6B7280] text-xs uppercase tracking-wide w-36">Feature</th>
                 <th className="px-6 py-4 text-center">
-                  <span className="bg-[#085041] text-white text-xs font-bold px-3 py-1.5 rounded-lg inline-block">Avyay Health</span>
+                  <span className="bg-[#053027] text-white text-xs font-bold px-3 py-1.5 rounded-lg inline-block">Avyay Health</span>
                 </th>
                 <th className="text-center px-6 py-4 font-medium text-[#6B7280] text-xs uppercase tracking-wide">Manual Calls</th>
                 <th className="text-center px-6 py-4 font-medium text-[#6B7280] text-xs uppercase tracking-wide">IVR / Portals</th>
@@ -540,7 +544,7 @@ export default function Home() {
                 <tr key={row.feature} className="hover:bg-gray-50/50">
                   <td className="px-6 py-5 font-medium text-[#1A1A1A] text-sm">{row.feature}</td>
                   <td className="px-6 py-5 text-center">
-                    <span className="text-[#085041] font-semibold text-sm">{row.avyay}</span>
+                    <span className="text-[#053027] font-semibold text-sm">{row.avyay}</span>
                   </td>
                   <td className="px-6 py-5 text-center text-[#6B7280] text-sm">{row.manual}</td>
                   <td className="px-6 py-5 text-center text-[#6B7280] text-sm">{row.ivr}</td>
@@ -553,7 +557,7 @@ export default function Home() {
       </FadeSection>
 
       {/* 6 — Business Case */}
-      <FadeSection id="business-case" className="bg-[#085041]">
+      <FadeSection id="business-case" className="bg-[#053027]">
         <div className="text-center mb-16">
           <div className="inline-block bg-white/15 text-white/60 text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
             Business Case
@@ -629,7 +633,7 @@ export default function Home() {
       <FadeSection id="pilot" className="bg-[#FFF8E7]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-block bg-[#085041]/10 text-[#085041] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
+            <div className="inline-block bg-[#053027]/10 text-[#053027] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
               Free Pilot
             </div>
             <h2 className="font-serif text-4xl md:text-5xl text-[#1A1A1A] mb-4">
@@ -652,7 +656,7 @@ export default function Home() {
                   "Complete outcomes report: readmission data, engagement metrics, SDOH flags",
                 ].map((item) => (
                   <li key={item} className="flex gap-3 text-sm text-[#6B7280]">
-                    <span className="text-[#085041] flex-shrink-0 mt-0.5">✓</span>
+                    <span className="text-[#053027] flex-shrink-0 mt-0.5">✓</span>
                     {item}
                   </li>
                 ))}
@@ -663,7 +667,7 @@ export default function Home() {
               <ul className="space-y-3">
                 {["ADT discharge data feed", "1 clinical champion", "30 minutes to onboard"].map((item) => (
                   <li key={item} className="flex gap-3 text-sm text-[#6B7280]">
-                    <span className="text-[#085041] flex-shrink-0">→</span>
+                    <span className="text-[#053027] flex-shrink-0">→</span>
                     {item}
                   </li>
                 ))}
@@ -671,14 +675,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="bg-[#085041]/5 border border-[#085041]/15 rounded-2xl p-10 text-center">
+          <div className="bg-[#053027]/5 border border-[#053027]/15 rounded-2xl p-10 text-center">
             <p className="text-[#1A1A1A] text-base font-semibold mb-2">
               If the pilot shows ≥15% readmission reduction, we convert to a paid contract.
             </p>
             <p className="text-[#6B7280] text-sm mb-8">If not, we part as friends.</p>
             <a
               href="#contact"
-              className="bg-[#085041] text-white px-10 py-4 rounded-xl font-semibold text-base hover:bg-[#0D6B56] transition-colors inline-block"
+              className="bg-[#053027] text-white px-10 py-4 rounded-xl font-semibold text-base hover:bg-[#0D6B56] transition-colors inline-block"
             >
               Book your discovery call →
             </a>
@@ -689,7 +693,7 @@ export default function Home() {
       {/* 8 — Founders */}
       <FadeSection id="team" className="bg-white">
         <div className="text-center mb-16">
-          <div className="inline-block bg-[#085041]/10 text-[#085041] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
+          <div className="inline-block bg-[#053027]/10 text-[#053027] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
             The Team
           </div>
           <h2 className="font-serif text-4xl md:text-5xl text-[#1A1A1A]">
@@ -701,7 +705,7 @@ export default function Home() {
           {/* Diksha */}
           <div className="bg-[#FFF8E7] rounded-2xl p-8 border border-gray-100">
             <div className="flex items-start gap-5 mb-6">
-              <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-[#085041]/10">
+              <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-[#053027]/10">
                 <Image src="/diksha.jpg" alt="Diksha Deshmukh" fill className="object-cover object-top" />
               </div>
               <div>
@@ -711,7 +715,7 @@ export default function Home() {
                   href="https://www.linkedin.com/in/dikshadeshmukh16/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 mt-2 text-[#085041] hover:text-[#0D6B56] transition-colors"
+                  className="inline-flex items-center gap-1.5 mt-2 text-[#053027] hover:text-[#0D6B56] transition-colors"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
@@ -728,7 +732,7 @@ export default function Home() {
           {/* Kunwar */}
           <div className="bg-[#FFF8E7] rounded-2xl p-8 border border-gray-100">
             <div className="flex items-start gap-5 mb-6">
-              <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-[#085041]/10">
+              <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-[#053027]/10">
                 <Image src="/kunwar.jpg" alt="Kunwar Uday Singh" fill className="object-cover object-top" />
               </div>
               <div>
@@ -738,7 +742,7 @@ export default function Home() {
                   href="https://www.linkedin.com/in/kunwaruday/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 mt-2 text-[#085041] hover:text-[#0D6B56] transition-colors"
+                  className="inline-flex items-center gap-1.5 mt-2 text-[#053027] hover:text-[#0D6B56] transition-colors"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
@@ -758,7 +762,7 @@ export default function Home() {
       <FadeSection id="contact" className="bg-[#FFF8E7]">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-block bg-[#085041]/10 text-[#085041] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
+            <div className="inline-block bg-[#053027]/10 text-[#053027] text-xs font-semibold px-3 py-1.5 rounded-full mb-4 tracking-wide uppercase">
               Get in Touch
             </div>
             <h2 className="font-serif text-4xl md:text-5xl text-[#1A1A1A] mb-4">
@@ -778,38 +782,38 @@ export default function Home() {
               <div>
                 <label className="block text-xs font-semibold text-[#1A1A1A] mb-2 uppercase tracking-wide">Name</label>
                 <input type="text" name="name" required placeholder="Dr. Jane Smith"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#085041] transition-colors bg-white" />
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#053027] transition-colors bg-white" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-[#1A1A1A] mb-2 uppercase tracking-wide">Hospital Name</label>
                 <input type="text" name="hospital" required placeholder="St. Mary's Medical Center"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#085041] transition-colors bg-white" />
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#053027] transition-colors bg-white" />
               </div>
             </div>
             <div className="grid md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-xs font-semibold text-[#1A1A1A] mb-2 uppercase tracking-wide">Role / Title</label>
                 <input type="text" name="role" required placeholder="VP of Quality"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#085041] transition-colors bg-white" />
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#053027] transition-colors bg-white" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-[#1A1A1A] mb-2 uppercase tracking-wide">Email</label>
                 <input type="email" name="email" required placeholder="jane@hospital.org"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#085041] transition-colors bg-white" />
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#053027] transition-colors bg-white" />
               </div>
             </div>
             <div>
               <label className="block text-xs font-semibold text-[#1A1A1A] mb-2 uppercase tracking-wide">Preferred Time to Talk</label>
               <input type="text" name="preferred_time" placeholder="Weekday mornings, any day this week"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#085041] transition-colors bg-white" />
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:border-[#053027] transition-colors bg-white" />
             </div>
             <button type="submit"
-              className="w-full bg-[#085041] text-white py-4 rounded-xl font-semibold text-base hover:bg-[#0D6B56] transition-colors">
+              className="w-full bg-[#053027] text-white py-4 rounded-xl font-semibold text-base hover:bg-[#0D6B56] transition-colors">
               Book a discovery call →
             </button>
             <p className="text-center text-[#6B7280] text-xs">
               Or email directly:{" "}
-              <a href="mailto:diksha@avyayhealth.com" className="text-[#085041] hover:underline">
+              <a href="mailto:diksha@avyayhealth.com" className="text-[#053027] hover:underline">
                 diksha@avyayhealth.com
               </a>
             </p>
@@ -818,27 +822,27 @@ export default function Home() {
       </FadeSection>
 
       {/* 10 — Footer */}
-      <footer className="bg-[#1A1A1A] text-white px-6 py-14">
+      <footer className="bg-[#053027] text-white px-6 py-14">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start gap-10 mb-10">
             <div>
               <Logo />
-              <p className="text-white/35 text-sm mt-5 max-w-xs leading-relaxed">
+              <p className="text-white/60 text-sm mt-5 max-w-xs leading-relaxed">
                 AI care companion for post-discharge recovery. Reducing readmissions. Protecting patients. Helping hospitals earn.
               </p>
             </div>
             <div className="flex gap-14 text-sm">
               <div>
-                <h4 className="text-white/30 text-xs uppercase tracking-widest mb-4">Product</h4>
-                <ul className="space-y-3 text-white/55">
+                <h4 className="text-white/50 text-xs uppercase tracking-widest mb-4">Product</h4>
+                <ul className="space-y-3 text-white/75">
                   {[["How It Works", "#how-it-works"], ["Dashboard", "#dashboard"], ["Why Avyay", "#why-us"]].map(([label, href]) => (
                     <li key={label}><a href={href} className="hover:text-white transition-colors">{label}</a></li>
                   ))}
                 </ul>
               </div>
               <div>
-                <h4 className="text-white/30 text-xs uppercase tracking-widest mb-4">Company</h4>
-                <ul className="space-y-3 text-white/55">
+                <h4 className="text-white/50 text-xs uppercase tracking-widest mb-4">Company</h4>
+                <ul className="space-y-3 text-white/75">
                   {[["Team", "#team"], ["Free Pilot", "#pilot"], ["Contact", "#contact"]].map(([label, href]) => (
                     <li key={label}><a href={href} className="hover:text-white transition-colors">{label}</a></li>
                   ))}
@@ -846,7 +850,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="border-t border-white/8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-white/25 text-xs">
+          <div className="border-t border-white/15 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-white/50 text-xs">
             <span>Avyay Health, Inc. · Jersey City, NJ · 2026</span>
             <div className="flex gap-6">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>

@@ -2,7 +2,17 @@ import TopBar from '../components/layout/TopBar';
 import { useAuthStore } from '../store/authStore';
 
 export default function Settings() {
-  const coordinator = useAuthStore((s) => s.coordinator);
+  const profile = useAuthStore((s) => s.profile);
+  const email = useAuthStore((s) => s.email);
+
+  const roleLabel =
+    profile?.role === 'care_coordinator'
+      ? 'Care Coordinator'
+      : profile?.role === 'quality_director'
+        ? 'Quality Director'
+        : profile?.role === 'admin'
+          ? 'Admin'
+          : 'Coordinator';
 
   return (
     <div className="flex flex-col h-full">
@@ -15,19 +25,15 @@ export default function Settings() {
             <div className="space-y-3 text-sm font-sans">
               <div className="flex justify-between">
                 <span className="text-slate-500">Name</span>
-                <span className="font-medium text-slate-800">{coordinator?.display_name}</span>
+                <span className="font-medium text-slate-800">{profile?.display_name ?? '—'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Email</span>
-                <span className="font-medium text-slate-800">{coordinator?.email}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Hospital</span>
-                <span className="font-medium text-slate-800">{coordinator?.hospital_name}</span>
+                <span className="font-medium text-slate-800">{email ?? '—'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Role</span>
-                <span className="font-medium text-slate-800 capitalize">{coordinator?.role}</span>
+                <span className="font-medium text-slate-800">{roleLabel}</span>
               </div>
             </div>
           </div>

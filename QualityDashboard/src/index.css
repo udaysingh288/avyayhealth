@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background-color: #f9f7f2;
+  color: #1a2925;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.font-serif {
+  font-family: 'DM Serif Display', Georgia, serif;
+}
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}

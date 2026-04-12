@@ -6,8 +6,11 @@ import Dashboard from './pages/Dashboard';
 import Alerts from './pages/Alerts';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import { useAuthSession } from './hooks/useAuthSession';
 
 export default function App() {
+  useAuthSession();
+
   return (
     <BrowserRouter>
       <Routes>
