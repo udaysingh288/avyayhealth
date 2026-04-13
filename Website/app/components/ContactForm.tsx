@@ -2,6 +2,17 @@
 
 import { useState } from "react";
 
+// Google Form field entry IDs — update these after creating your Google Form
+// To find entry IDs: open the form pre-fill link and look at the URL parameters
+// e.g. entry.123456789=test → the ID is "entry.123456789"
+const GOOGLE_FORM_ACTION =
+  "https://docs.google.com/forms/d/e/1FAIpQLSep4daSSq3fxMqKwUWFFcCUFFFqg-1qlzSSzUXZfDU7PDxKYA/formResponse";
+const FIELD_NAME = "entry.1985712102";
+const FIELD_HOSPITAL = "entry.1286343666";
+const FIELD_ROLE = "entry.454444734";
+const FIELD_EMAIL = "entry.2006775208";
+const FIELD_MESSAGE = "entry.2112037220";
+
 export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -13,41 +24,36 @@ export default function ContactForm() {
     const form = e.currentTarget;
     const data = new FormData(form);
 
-    try {
-      const res = await fetch("https://formspree.io/dikshadeshmukh016@gmail.com", {
-        method: "POST",
-        body: data,
-        headers: { Accept: "application/json" },
-      });
+    const body = new URLSearchParams();
+    body.append(FIELD_NAME, (data.get("name") as string) || "");
+    body.append(FIELD_HOSPITAL, (data.get("hospital") as string) || "");
+    body.append(FIELD_ROLE, (data.get("role") as string) || "");
+    body.append(FIELD_EMAIL, (data.get("email") as string) || "");
+    body.append(FIELD_MESSAGE, (data.get("message") as string) || "");
 
-      if (res.ok) {
-        setSubmitted(true);
-        form.reset();
-      } else {
-        // Fallback: open mailto
-        const name = data.get("name") || "";
-        const hospital = data.get("hospital") || "";
-        const role = data.get("role") || "";
-        const email = data.get("email") || "";
-        const message = data.get("message") || "";
-        const subject = encodeURIComponent(`Discovery Call Request — ${hospital}`);
-        const body = encodeURIComponent(
-          `Name: ${name}\nHospital: ${hospital}\nRole: ${role}\nEmail: ${email}\n\n${message}`
-        );
-        window.location.href = `mailto:dikshadeshmukh016@gmail.com?subject=${subject}&body=${body}`;
-      }
+    try {
+      // Google Forms returns an opaque redirect — use no-cors mode
+      await fetch(GOOGLE_FORM_ACTION, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+      });
+      // no-cors means we can't read the response, but submission works
+      setSubmitted(true);
+      form.reset();
     } catch {
-      // Network error — fallback to mailto
+      // Fallback: open mailto
       const name = data.get("name") || "";
       const hospital = data.get("hospital") || "";
       const role = data.get("role") || "";
       const email = data.get("email") || "";
       const message = data.get("message") || "";
       const subject = encodeURIComponent(`Discovery Call Request — ${hospital}`);
-      const body = encodeURIComponent(
+      const mailBody = encodeURIComponent(
         `Name: ${name}\nHospital: ${hospital}\nRole: ${role}\nEmail: ${email}\n\n${message}`
       );
-      window.location.href = `mailto:dikshadeshmukh016@gmail.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:diksha@avyayhealth.com?subject=${subject}&body=${mailBody}`;
     } finally {
       setLoading(false);
     }

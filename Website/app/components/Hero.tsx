@@ -3,6 +3,11 @@
 import { useState } from "react";
 import SMSMockupAnimated from "./SMSMockupAnimated";
 
+// Same Google Form as ContactForm — only submits email field
+const GOOGLE_FORM_ACTION =
+  "https://docs.google.com/forms/d/e/1FAIpQLSep4daSSq3fxMqKwUWFFcCUFFFqg-1qlzSSzUXZfDU7PDxKYA/formResponse";
+const FIELD_EMAIL = "entry.2006775208";
+
 export default function Hero() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -13,28 +18,24 @@ export default function Hero() {
 
     const form = e.currentTarget;
     const data = new FormData(form);
+    const email = (data.get("email") as string) || "";
+
+    const body = new URLSearchParams();
+    body.append(FIELD_EMAIL, email);
 
     try {
-      const res = await fetch("https://formspree.io/dikshadeshmukh016@gmail.com", {
+      await fetch(GOOGLE_FORM_ACTION, {
         method: "POST",
-        body: data,
-        headers: { Accept: "application/json" },
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
       });
-
-      if (res.ok) {
-        setSubmitted(true);
-        form.reset();
-      } else {
-        const email = data.get("email") || "";
-        const subject = encodeURIComponent("Discovery Call Request — Avyay Health");
-        const body = encodeURIComponent(`Email: ${email}\n\nI'd like to book a discovery call.`);
-        window.location.href = `mailto:dikshadeshmukh016@gmail.com?subject=${subject}&body=${body}`;
-      }
+      setSubmitted(true);
+      form.reset();
     } catch {
-      const email = data.get("email") || "";
       const subject = encodeURIComponent("Discovery Call Request — Avyay Health");
-      const body = encodeURIComponent(`Email: ${email}\n\nI'd like to book a discovery call.`);
-      window.location.href = `mailto:dikshadeshmukh016@gmail.com?subject=${subject}&body=${body}`;
+      const mailBody = encodeURIComponent(`Email: ${email}\n\nI'd like to book a discovery call.`);
+      window.location.href = `mailto:diksha@avyayhealth.com?subject=${subject}&body=${mailBody}`;
     } finally {
       setLoading(false);
     }
