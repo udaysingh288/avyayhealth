@@ -202,6 +202,7 @@ export async function fetchDashboardData(
     const msgs = (ci as any).messages ?? [];
     const patientMsgs = msgs.filter((m: any) => m.role === 'patient');
     const lastPatientMsg = patientMsgs[patientMsgs.length - 1];
+    const imageMsgs = msgs.filter((m: any) => m.message_type === 'image');
 
     const entry: CheckIn = {
       id: ci.id,
@@ -215,6 +216,8 @@ export async function fetchDashboardData(
       escalation_reason: ci.status === 'escalated' ? ci.summary : null,
       sdoh_domain_screened: null,
       sdoh_response: null,
+      image_storage_path: imageMsgs.length > 0 ? imageMsgs[0].image_storage_path : null,
+      image_classification: imageMsgs.length > 0 ? imageMsgs[0].image_classification : null,
     };
 
     if (!checkinsMap[ci.patient_id]) checkinsMap[ci.patient_id] = [];

@@ -5,27 +5,11 @@ export default function Comparison() {
     <FadeSection id="impact" className="bg-white">
       <div className="text-center mb-14">
         <div className="text-[#0D6B56] text-xs font-semibold tracking-[0.2em] uppercase mb-4">
-          Avyay Impact
+          Why We&apos;re Different
         </div>
         <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#1A1A1A] mb-4 text-balance">
-          We don&apos;t cost hospitals money. We make them money.
+          Built for hospitals that can&apos;t afford to wait
         </h2>
-      </div>
-
-      {/* Impact metric cards — Fourier style */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-16">
-        {[
-          { value: "$3,100+", label: "CMS Revenue", desc: "per CHF patient per year in reimbursement" },
-          { value: "5\u20137x", label: "ROI", desc: "return on investment for 100+ patient cohorts" },
-          { value: "<24hr", label: "Go-Live", desc: "enrollment via ADT feed — zero IT integration" },
-          { value: "<2hr", label: "Alert SLA", desc: "coordinator response time on flagged patients" },
-        ].map((m) => (
-          <div key={m.label} className="bg-[#F9F7F2] rounded-2xl p-6 sm:p-8 text-center hover-lift cursor-default">
-            <div className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#053027] mb-1">{m.value}</div>
-            <div className="font-semibold text-sm text-[#1A1A1A] mb-1">{m.label}</div>
-            <div className="text-xs text-[#6B7280] leading-relaxed">{m.desc}</div>
-          </div>
-        ))}
       </div>
 
       {/* Comparison row — minimal */}

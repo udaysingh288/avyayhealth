@@ -11,4 +11,5 @@ export type {
   DashboardMetrics,
   CoordinatorNote,
   DirectMessage,
+  ImageClassification,
 } from '@shared/types/dashboard';

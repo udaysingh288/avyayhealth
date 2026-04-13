@@ -8,7 +8,7 @@ struct CareTeamView: View {
         VStack(spacing: 0) {
             VStack(spacing: 4) {
                 Text("Care Team")
-                    .font(.custom("DMSerifDisplay-Regular", size: 24, relativeTo: .title))
+                    .font(.custom("DMSerifDisplay-Regular", size: 26, relativeTo: .title))
                     .foregroundStyle(.textPrimary)
                     .accessibilityAddTraits(.isHeader)
                 Text(store.session?.hospitalName ?? "Your Hospital")
@@ -25,6 +25,7 @@ struct CareTeamView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal, 20)
             .padding(.bottom, 16)
+            .tint(.forest)
 
             ScrollView {
                 if selectedTab == 0 {
@@ -41,21 +42,21 @@ struct CareTeamView: View {
         VStack(spacing: 12) {
             contactCard(
                 icon: "person.fill",
-                iconColor: .forest,
+                gradient: [.forestGradientStart, .accentTeal],
                 name: store.session?.coordinatorFirstName ?? "Your Coordinator",
                 role: "Care Coordinator, RN",
                 phone: "18005550100"
             )
             contactCard(
                 icon: "cross.case.fill",
-                iconColor: .accentTeal,
+                gradient: [.accentTeal, .accentTeal.opacity(0.7)],
                 name: "Hospital Pharmacy",
                 role: "Medication questions & refills",
                 phone: "18005550101"
             )
             contactCard(
                 icon: "stethoscope",
-                iconColor: .riskRed,
+                gradient: [.riskRed, .riskRed.opacity(0.8)],
                 name: "On-Call Physician",
                 role: "Emergency medical questions",
                 phone: "18005550102",
@@ -71,21 +72,21 @@ struct CareTeamView: View {
         VStack(spacing: 12) {
             contactCard(
                 icon: "building.2.fill",
-                iconColor: .textSecondary,
+                gradient: [.textSecondary, .textSecondary.opacity(0.7)],
                 name: "Main Reception",
                 role: "General inquiries",
                 phone: "18005550100"
             )
             contactCard(
                 icon: "doc.text.fill",
-                iconColor: .textSecondary,
+                gradient: [.textSecondary, .textSecondary.opacity(0.7)],
                 name: "Discharge Planning",
                 role: "Follow-up scheduling",
                 phone: "18005550103"
             )
             contactCard(
                 icon: "person.2.fill",
-                iconColor: .textSecondary,
+                gradient: [.textSecondary, .textSecondary.opacity(0.7)],
                 name: "Patient Services",
                 role: "Billing & support",
                 phone: "18005550104"
@@ -96,17 +97,26 @@ struct CareTeamView: View {
         .padding(.horizontal, 20)
     }
 
-    private func contactCard(icon: String, iconColor: Color, name: String, role: String, phone: String, isUrgent: Bool = false) -> some View {
+    private func contactCard(icon: String, gradient: [Color], name: String, role: String, phone: String, isUrgent: Bool = false) -> some View {
         HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundStyle(iconColor)
-                .frame(width: 48, height: 48)
-                .background(iconColor.opacity(0.1))
-                .clipShape(.rect(cornerRadius: 12))
-                .accessibilityHidden(true)
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: gradient,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 48, height: 48)
 
-            VStack(alignment: .leading, spacing: 2) {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(.white)
+            }
+            .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 3) {
                 Text(name)
                     .font(.custom("DMSans-SemiBold", size: 16, relativeTo: .body))
                     .foregroundStyle(.textPrimary)
@@ -124,21 +134,22 @@ struct CareTeamView: View {
                 }
             } label: {
                 Image(systemName: "phone.fill")
-                    .font(.system(size: 16))
+                    .font(.system(size: 15))
                     .foregroundStyle(isUrgent ? .white : .forest)
                     .frame(width: 44, height: 44)
                     .background(isUrgent ? Color.riskRed : Color.forestPale)
-                    .clipShape(.rect(cornerRadius: 12))
+                    .clipShape(Circle())
+                    .shadow(color: isUrgent ? .riskRed.opacity(0.3) : .clear, radius: 4, y: 2)
             }
             .accessibilityLabel("Call \(name)")
         }
         .padding(16)
         .background(Color.white)
-        .clipShape(.rect(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+        .clipShape(.rect(cornerRadius: 18))
+        .shadow(color: .black.opacity(0.05), radius: 10, y: 3)
         .overlay(
             isUrgent
-                ? RoundedRectangle(cornerRadius: 16).stroke(Color.riskRed.opacity(0.3), lineWidth: 1)
+                ? RoundedRectangle(cornerRadius: 18).stroke(Color.riskRed.opacity(0.2), lineWidth: 1)
                 : nil
         )
         .accessibilityElement(children: .combine)

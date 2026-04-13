@@ -27,6 +27,26 @@ enum MessageRole: String, Codable {
     case ai, patient, coordinator
 }
 
+enum MessageType: String, Codable {
+    case text, image, audio
+}
+
+struct ImageClassification: Codable {
+    let injuryType: String
+    let description: String
+    let riskLevel: RiskLevel
+    let recommendations: String
+    let confidence: String
+
+    enum CodingKeys: String, CodingKey {
+        case injuryType = "injury_type"
+        case description
+        case riskLevel = "risk_level"
+        case recommendations
+        case confidence
+    }
+}
+
 enum SDOHDomain: String, Codable, CaseIterable {
     case food_insecurity
     case housing_instability
@@ -139,19 +159,40 @@ struct Message: Identifiable, Codable {
     let content: String
     let sentAt: String
     let riskLevel: RiskLevel?
+    let messageType: MessageType
+    let imageStoragePath: String?
+    let imageClassification: ImageClassification?
 
     enum CodingKeys: String, CodingKey {
         case id, role, content
         case sentAt = "sent_at"
         case riskLevel = "risk_level"
+        case messageType = "message_type"
+        case imageStoragePath = "image_storage_path"
+        case imageClassification = "image_classification"
     }
 
-    init(id: String = UUID().uuidString, role: MessageRole, content: String, sentAt: String? = nil, riskLevel: RiskLevel? = nil) {
+    init(id: String = UUID().uuidString, role: MessageRole, content: String, sentAt: String? = nil, riskLevel: RiskLevel? = nil, messageType: MessageType = .text, imageStoragePath: String? = nil, imageClassification: ImageClassification? = nil) {
         self.id = id
         self.role = role
         self.content = content
-        self.sentAt = sentAt ?? ISO8601DateFormatter().string(from: Date())
+        self.sentAt = sentAt ?? iso8601Now()
         self.riskLevel = riskLevel
+        self.messageType = messageType
+        self.imageStoragePath = imageStoragePath
+        self.imageClassification = imageClassification
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        role = try c.decode(MessageRole.self, forKey: .role)
+        content = try c.decode(String.self, forKey: .content)
+        sentAt = try c.decodeIfPresent(String.self, forKey: .sentAt) ?? iso8601Now()
+        riskLevel = try c.decodeIfPresent(RiskLevel.self, forKey: .riskLevel)
+        messageType = try c.decodeIfPresent(MessageType.self, forKey: .messageType) ?? .text
+        imageStoragePath = try c.decodeIfPresent(String.self, forKey: .imageStoragePath)
+        imageClassification = try c.decodeIfPresent(ImageClassification.self, forKey: .imageClassification)
     }
 }
 
@@ -207,7 +248,7 @@ struct DirectMessage: Identifiable, Codable {
 
 struct ChatReplyResponse: Codable {
     let reply: String
-    let riskLevel: RiskLevel
+    let riskLevel: RiskLevel?
     let nextPhase: String
     let isComplete: Bool
     let summary: String

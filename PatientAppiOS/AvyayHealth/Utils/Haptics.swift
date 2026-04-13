@@ -4,19 +4,24 @@ enum HapticStyle {
     case light, medium, heavy, success, warning, error
 }
 
+private let lightGenerator = UIImpactFeedbackGenerator(style: .light)
+private let mediumGenerator = UIImpactFeedbackGenerator(style: .medium)
+private let heavyGenerator = UIImpactFeedbackGenerator(style: .heavy)
+private let notificationGenerator = UINotificationFeedbackGenerator()
+
 func haptic(_ style: HapticStyle) {
     switch style {
     case .light:
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        lightGenerator.impactOccurred()
     case .medium:
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        mediumGenerator.impactOccurred()
     case .heavy:
-        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+        heavyGenerator.impactOccurred()
     case .success:
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        notificationGenerator.notificationOccurred(.success)
     case .warning:
-        UINotificationFeedbackGenerator().notificationOccurred(.warning)
+        notificationGenerator.notificationOccurred(.warning)
     case .error:
-        UINotificationFeedbackGenerator().notificationOccurred(.error)
+        notificationGenerator.notificationOccurred(.error)
     }
 }

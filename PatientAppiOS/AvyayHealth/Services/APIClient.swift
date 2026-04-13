@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 /// Central API client for all Supabase edge function calls.
 final class APIClient {
@@ -152,6 +153,95 @@ final class APIClient {
         request.httpBody = try? JSONEncoder().encode(["content": content])
 
         _ = try? await session.data(for: request)
+    }
+
+    // MARK: - Image Upload (HIPAA-Compliant)
+
+    struct ImageUploadResponse: Codable {
+        let messageId: String
+        let classificationSummary: String
+        let riskLevel: RiskLevel?
+        let imageUrl: String?
+        let classification: ImageClassification
+
+        enum CodingKeys: String, CodingKey {
+            case messageId = "message_id"
+            case classificationSummary = "classification_summary"
+            case riskLevel = "risk_level"
+            case imageUrl = "image_url"
+            case classification
+        }
+    }
+
+    /// Upload a patient photo for AI classification.
+    /// Image is compressed, EXIF-stripped, and sent as multipart/form-data.
+    /// Never written to disk — all processing happens in memory.
+    func uploadImage(token: String, image: UIImage) async -> ImageUploadResponse? {
+        guard let url = edgeFunctionURL("upload-image") else { return nil }
+        guard let imageData = compressAndStripExif(image) else { return nil }
+
+        let boundary = UUID().uuidString
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(supabaseAnonKey)", forHTTPHeaderField: "Authorization")
+        request.setValue(supabaseAnonKey, forHTTPHeaderField: "apikey")
+        request.setValue(token, forHTTPHeaderField: "X-Patient-Token")
+
+        // Build multipart body in memory
+        var body = Data()
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"image\"; filename=\"photo.jpg\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        body.append(imageData)
+        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+        request.httpBody = body
+
+        guard let (data, response) = try? await session.data(for: request),
+              let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            return nil
+        }
+        return try? decoder.decode(ImageUploadResponse.self, from: data)
+    }
+
+    /// Get a short-lived signed URL for an image (5-minute expiry).
+    func getImageUrl(token: String, storagePath: String) async -> String? {
+        guard let url = edgeFunctionURL("get-image-url") else { return nil }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        patientHeaders(token).forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
+        request.httpBody = try? JSONEncoder().encode(["storage_path": storagePath])
+
+        guard let (data, response) = try? await session.data(for: request),
+              let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            return nil
+        }
+
+        struct URLResponse: Codable { let url: String }
+        return (try? decoder.decode(URLResponse.self, from: data))?.url
+    }
+
+    /// Compress image and strip EXIF metadata.
+    /// Re-encodes through CGImage to remove GPS, device info, timestamps.
+    /// Resizes to max 2048px on longest side to reduce upload time.
+    private func compressAndStripExif(_ image: UIImage) -> Data? {
+        guard let cgImage = image.cgImage else { return nil }
+        let clean = UIImage(cgImage: cgImage, scale: 1.0, orientation: image.imageOrientation)
+        let resized = resizeIfNeeded(clean, maxDimension: 2048)
+        return resized.jpegData(compressionQuality: 0.8)
+    }
+
+    private func resizeIfNeeded(_ image: UIImage, maxDimension: CGFloat) -> UIImage {
+        let size = image.size
+        let longest = max(size.width, size.height)
+        guard longest > maxDimension else { return image }
+
+        let scale = maxDimension / longest
+        let newSize = CGSize(width: size.width * scale, height: size.height * scale)
+        let renderer = UIGraphicsImageRenderer(size: newSize)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: newSize))
+        }
     }
 }
 

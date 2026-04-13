@@ -46,28 +46,6 @@ export default function ProblemSection() {
         </div>
       </div>
 
-      {/* Financial impact — white section */}
-      <div className="bg-white px-4 sm:px-6 py-16 sm:py-20">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-4">
-            <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#1A1A1A] text-balance">
-              The cost of doing nothing
-            </h3>
-          </div>
-          <div className="grid md:grid-cols-3 gap-5 mt-10">
-            {[
-              { value: "$15K", desc: "average cost per preventable readmission" },
-              { value: "2,400+", desc: "hospitals penalized under HRRP in FY2026" },
-              { value: "$1M+", desc: "annual penalty exposure for a 300-bed hospital" },
-            ].map((item) => (
-              <div key={item.value} className="text-center p-8 rounded-2xl bg-[#F9F7F2] hover-lift cursor-default">
-                <div className="font-serif text-4xl sm:text-5xl text-[#053027] mb-2">{item.value}</div>
-                <p className="text-[#6B7280] text-sm">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   );
 }

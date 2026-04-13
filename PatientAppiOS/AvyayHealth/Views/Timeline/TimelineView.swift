@@ -8,11 +8,11 @@ struct TimelineView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(spacing: 20) {
                 // Header
-                VStack(spacing: 4) {
+                VStack(spacing: 6) {
                     Text("Recovery Timeline")
-                        .font(.custom("DMSerifDisplay-Regular", size: 24, relativeTo: .title))
+                        .font(.custom("DMSerifDisplay-Regular", size: 26, relativeTo: .title))
                         .foregroundStyle(.textPrimary)
                         .accessibilityAddTraits(.isHeader)
                     Text("Day \(currentDay) of \(totalDays)")
@@ -22,21 +22,21 @@ struct TimelineView: View {
                 .padding(.top, 16)
 
                 // Stats
-                HStack(spacing: 12) {
-                    statCard(value: "\(max(currentDay - 1, 0))", label: "Completed", color: .riskGreen)
-                    statCard(value: "1", label: "Today", color: .forest)
-                    statCard(value: "\(totalDays - currentDay)", label: "Remaining", color: .textSecondary)
+                HStack(spacing: 10) {
+                    statCard(value: "\(max(currentDay - 1, 0))", label: "Completed", color: .riskGreen, icon: "checkmark.circle.fill")
+                    statCard(value: "1", label: "Today", color: .forest, icon: "sun.max.fill")
+                    statCard(value: "\(totalDays - currentDay)", label: "Remaining", color: .textSecondary, icon: "clock")
                 }
                 .padding(.horizontal, 20)
 
                 // Calendar grid
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 14) {
                     Text("30-Day Calendar")
-                        .font(.custom("DMSans-SemiBold", size: 16, relativeTo: .headline))
+                        .font(.custom("DMSans-SemiBold", size: 17, relativeTo: .headline))
                         .foregroundStyle(.textPrimary)
                         .accessibilityAddTraits(.isHeader)
 
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 6), spacing: 8) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 6), spacing: 6) {
                         ForEach(1...totalDays, id: \.self) { day in
                             dayCell(day: day)
                         }
@@ -44,11 +44,11 @@ struct TimelineView: View {
                 }
                 .padding(20)
                 .background(Color.white)
-                .clipShape(.rect(cornerRadius: 16))
-                .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
+                .clipShape(.rect(cornerRadius: 20))
+                .shadow(color: .black.opacity(0.05), radius: 10, y: 3)
                 .padding(.horizontal, 20)
 
-                // Legend — uses icons alongside color for accessibility
+                // Legend
                 HStack(spacing: 16) {
                     legendItem(icon: "checkmark.circle.fill", color: .riskGreen, label: "Stable")
                     legendItem(icon: "exclamationmark.circle.fill", color: .riskYellow, label: "Watched")
@@ -63,20 +63,24 @@ struct TimelineView: View {
         .background(Color.warmOatmeal)
     }
 
-    private func statCard(value: String, label: String, color: Color) -> some View {
-        VStack(spacing: 4) {
+    private func statCard(value: String, label: String, color: Color, icon: String) -> some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 16))
+                .foregroundStyle(color)
+                .accessibilityHidden(true)
             Text(value)
-                .font(.custom("DMSans-Bold", size: 24, relativeTo: .title2))
+                .font(.custom("DMSans-Bold", size: 22, relativeTo: .title2))
                 .foregroundStyle(color)
             Text(label)
-                .font(.custom("DMSans-Regular", size: 12, relativeTo: .caption))
+                .font(.custom("DMSans-Regular", size: 11, relativeTo: .caption))
                 .foregroundStyle(.textSecondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
+        .padding(.vertical, 14)
         .background(Color.white)
-        .clipShape(.rect(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.04), radius: 4, y: 1)
+        .clipShape(.rect(cornerRadius: 14))
+        .shadow(color: .black.opacity(0.04), radius: 6, y: 2)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(label): \(value)")
     }
@@ -92,21 +96,25 @@ struct TimelineView: View {
             return "upcoming"
         }()
 
-        return VStack(spacing: 4) {
+        return VStack(spacing: 3) {
             Text("\(day)")
-                .font(.custom("DMSans-SemiBold", size: 14, relativeTo: .subheadline))
-                .foregroundStyle(isToday ? .white : isPast ? .textPrimary : .textSecondary)
+                .font(.custom("DMSans-SemiBold", size: 13, relativeTo: .subheadline))
+                .foregroundStyle(isToday ? .white : isPast ? .textPrimary : .textMuted)
 
             dayDotView(isPast: isPast, isToday: isToday, done: checkinDone)
                 .frame(width: 10, height: 10)
         }
-        .frame(height: 52)
+        .frame(height: 48)
         .frame(maxWidth: .infinity)
-        .background(isToday ? Color.forest : Color.clear)
+        .background(
+            isToday
+                ? AnyShapeStyle(LinearGradient(colors: [.forestGradientStart, .forestGradientEnd], startPoint: .topLeading, endPoint: .bottomTrailing))
+                : AnyShapeStyle(Color.clear)
+        )
         .clipShape(.rect(cornerRadius: 10))
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(isToday ? Color.clear : (day > currentDay ? Color.borderColor : Color.clear), lineWidth: 1)
+                .stroke(isToday ? Color.clear : (day > currentDay ? Color.borderColor.opacity(0.5) : Color.clear), lineWidth: 1)
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Day \(day), \(statusLabel)")
@@ -115,33 +123,29 @@ struct TimelineView: View {
     @ViewBuilder
     private func dayDotView(isPast: Bool, isToday: Bool, done: Bool) -> some View {
         if isToday {
-            // White dot for today
             Circle()
                 .fill(.white.opacity(done ? 1 : 0.5))
         } else if isPast && done {
-            // Green checkmark for completed stable
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 10))
                 .foregroundStyle(.riskGreen)
         } else if isPast && !done {
-            // Yellow warning for watched
             Image(systemName: "exclamationmark.circle.fill")
                 .font(.system(size: 10))
                 .foregroundStyle(.riskYellow)
         } else {
-            // Future: dotted circle
             Circle()
-                .fill(Color.textSecondary.opacity(0.3))
+                .fill(Color.textSecondary.opacity(0.2))
         }
     }
 
     private func legendItem(icon: String, color: Color, label: String) -> some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 5) {
             Image(systemName: icon)
                 .font(.system(size: 10))
                 .foregroundStyle(color)
             Text(label)
-                .font(.custom("DMSans-Regular", size: 12, relativeTo: .caption))
+                .font(.custom("DMSans-Regular", size: 11, relativeTo: .caption))
                 .foregroundStyle(.textSecondary)
         }
     }

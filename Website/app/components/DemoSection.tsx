@@ -1,7 +1,7 @@
 "use client";
 
 import DashboardMockup from "./DashboardMockup";
-import SMSMockup from "./SMSMockup";
+import SMSMockupAnimated from "./SMSMockupAnimated";
 
 export default function DemoSection() {
   return (
@@ -27,7 +27,7 @@ export default function DemoSection() {
         {/* Phone mockup + features side by side */}
         <div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className="flex justify-center">
-            <SMSMockup />
+            <SMSMockupAnimated />
           </div>
           <div>
             <h3 className="font-serif text-2xl sm:text-3xl text-[#1A1A1A] mb-3">
@@ -40,33 +40,26 @@ export default function DemoSection() {
               {[
                 {
                   title: "Red Alerts",
-                  desc: "Instant coordinator notification with full patient context",
                   color: "bg-[#C0392B]/10 text-[#C0392B]",
                 },
                 {
                   title: "AI Risk Scoring",
-                  desc: "Every reply classified as Red, Yellow, or Green daily",
                   color: "bg-[#0D6B56]/10 text-[#0D6B56]",
                 },
                 {
                   title: "SDOH Screening",
-                  desc: "CMS 5-domain framework built into every check-in",
                   color: "bg-[#053027]/10 text-[#053027]",
                 },
                 {
                   title: "SMS + App",
-                  desc: "Meets patients where they are — no download required",
                   color: "bg-[#D97706]/10 text-[#D97706]",
                 },
               ].map((f) => (
-                <div key={f.title} className="flex items-start gap-4 group">
+                <div key={f.title} className="flex items-center gap-4 group">
                   <div className={`${f.color} w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-bold transition-transform group-hover:scale-110`}>
                     {f.title.charAt(0)}
                   </div>
-                  <div>
-                    <div className="font-semibold text-sm text-[#1A1A1A]">{f.title}</div>
-                    <div className="text-xs text-[#6B7280] leading-relaxed mt-0.5">{f.desc}</div>
-                  </div>
+                  <div className="font-semibold text-sm text-[#1A1A1A]">{f.title}</div>
                 </div>
               ))}
             </div>

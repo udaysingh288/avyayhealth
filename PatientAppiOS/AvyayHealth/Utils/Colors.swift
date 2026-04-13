@@ -1,12 +1,14 @@
 import SwiftUI
 
 extension Color {
-    static let forest = Color(red: 0.153, green: 0.314, blue: 0.039)       // #27500A
-    static let forestLight = Color(red: 0.227, green: 0.431, blue: 0.071)  // #3A6E12
-    static let forestPale = Color(red: 0.933, green: 0.957, blue: 0.910)   // #EEF4E8
+    // Brand — primary deep forest #053027
+    static let forest = Color(red: 0.020, green: 0.188, blue: 0.153)       // #053027
+    static let forestLight = Color(red: 0.039, green: 0.259, blue: 0.212)  // #0A4236
+    static let forestPale = Color(red: 0.918, green: 0.953, blue: 0.945)   // #EAF3F1
     static let warmOatmeal = Color(red: 0.976, green: 0.969, blue: 0.949)  // #F9F7F2
     static let accentTeal = Color(red: 0.051, green: 0.420, blue: 0.337)   // #0D6B56
 
+    // Risk
     static let riskRed = Color(red: 0.863, green: 0.149, blue: 0.149)      // #DC2626
     static let riskRedBg = Color(red: 0.996, green: 0.949, blue: 0.949)    // #FEF2F2
     static let riskYellow = Color(red: 0.851, green: 0.467, blue: 0.024)   // #D97706
@@ -14,13 +16,18 @@ extension Color {
     static let riskGreen = Color(red: 0.086, green: 0.639, blue: 0.290)    // #16A34A
     static let riskGreenBg = Color(red: 0.941, green: 0.992, blue: 0.957)  // #F0FDF4
 
-    static let textPrimary = Color(red: 0.118, green: 0.161, blue: 0.231)  // #1E293B
+    // Text
+    static let textPrimary = Color(red: 0.102, green: 0.102, blue: 0.102)  // #1A1A1A
     static let textSecondary = Color(red: 0.392, green: 0.455, blue: 0.545) // #64748B
-    static let textMuted = Color(red: 0.475, green: 0.533, blue: 0.612)    // #798898 — darkened from #94A3B8 for WCAG AA contrast (~4.5:1 on white)
+    static let textMuted = Color(red: 0.475, green: 0.533, blue: 0.612)    // #798898
 
+    // UI
     static let borderColor = Color(red: 0.886, green: 0.910, blue: 0.878)  // #E2E8F0
-
     static let coordinatorBubble = Color(red: 0.902, green: 0.933, blue: 0.925) // #E6EEEC
+
+    // Gradient helpers
+    static let forestGradientStart = Color(red: 0.020, green: 0.188, blue: 0.153)  // #053027
+    static let forestGradientEnd = Color(red: 0.039, green: 0.259, blue: 0.212)    // #0A4236
 }
 
 extension ShapeStyle where Self == Color {

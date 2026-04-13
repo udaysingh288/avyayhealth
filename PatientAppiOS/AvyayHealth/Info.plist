@@ -35,5 +35,13 @@
 	</dict>
 	<key>UILaunchScreen</key>
 	<dict/>
+	<key>NSCameraUsageDescription</key>
+	<string>Take a photo of your injury to share with your care team</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Select a photo of your injury to share with your care team</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Record a voice message to share how you are feeling with your care team</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Convert your voice message to text so your care team can read it</string>
 </dict>
 </plist>

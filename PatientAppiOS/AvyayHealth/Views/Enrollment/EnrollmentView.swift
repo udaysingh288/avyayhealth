@@ -9,12 +9,20 @@ struct EnrollmentView: View {
     @State private var dob = Date()
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var logoScale: CGFloat = 0.8
+    @State private var logoOpacity: Double = 0
 
     enum EnrollStep { case welcome, verify, success }
 
     var body: some View {
         ZStack {
-            Color.warmOatmeal.ignoresSafeArea()
+            // Background gradient
+            LinearGradient(
+                colors: [.warmOatmeal, Color(red: 0.96, green: 0.95, blue: 0.93)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
 
             switch step {
             case .welcome:
@@ -30,34 +38,58 @@ struct EnrollmentView: View {
     // MARK: - Welcome
 
     private var welcomeStep: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: 0) {
             Spacer()
 
-            Image(systemName: "heart.text.clipboard")
-                .font(.system(size: 64))
-                .foregroundStyle(.forest)
+            VStack(spacing: 28) {
+                // Logo
+                ZStack {
+                    Circle()
+                        .fill(Color.forestPale)
+                        .frame(width: 100, height: 100)
+
+                    Image(systemName: "heart.text.clipboard")
+                        .font(.system(size: 44))
+                        .foregroundStyle(.forest)
+                }
+                .scaleEffect(logoScale)
+                .opacity(logoOpacity)
                 .accessibilityHidden(true)
 
-            VStack(spacing: 12) {
-                Text("Welcome to")
-                    .font(.custom("DMSans-Regular", size: 18, relativeTo: .title3))
-                    .foregroundStyle(.textSecondary)
+                VStack(spacing: 10) {
+                    Text("Welcome to")
+                        .font(.custom("DMSans-Regular", size: 17, relativeTo: .title3))
+                        .foregroundStyle(.textSecondary)
 
-                Text("Avyay Health")
-                    .font(.custom("DMSerifDisplay-Regular", size: 36, relativeTo: .largeTitle))
-                    .foregroundStyle(.forest)
-                    .accessibilityAddTraits(.isHeader)
+                    Text("Avyay Health")
+                        .font(.custom("DMSerifDisplay-Regular", size: 38, relativeTo: .largeTitle))
+                        .foregroundStyle(.forest)
+                        .accessibilityAddTraits(.isHeader)
 
-                Text("The care that follows you home")
-                    .font(.custom("DMSans-Regular", size: 16, relativeTo: .body))
-                    .foregroundStyle(.textSecondary)
-                    .italic()
+                    Text("The care that follows you home")
+                        .font(.custom("DMSans-Regular", size: 16, relativeTo: .body))
+                        .foregroundStyle(.textSecondary)
+                        .italic()
+                }
             }
+            .onAppear {
+                if !reduceMotion {
+                    withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.2)) {
+                        logoScale = 1.0
+                        logoOpacity = 1.0
+                    }
+                } else {
+                    logoScale = 1.0
+                    logoOpacity = 1.0
+                }
+            }
+
+            Spacer()
 
             VStack(spacing: 16) {
                 FeatureRow(icon: "bubble.left.and.bubble.right", title: "Daily check-ins", desc: "Quick conversations about how you're feeling")
                 FeatureRow(icon: "person.2", title: "Connected care", desc: "Your care team monitors your progress")
-                FeatureRow(icon: "exclamationmark.triangle", title: "Urgent alerts", desc: "Immediate help when something isn't right")
+                FeatureRow(icon: "bell.badge", title: "Urgent alerts", desc: "Immediate help when something isn't right")
             }
             .padding(.horizontal, 24)
 
@@ -68,17 +100,24 @@ struct EnrollmentView: View {
                 if reduceMotion {
                     step = .verify
                 } else {
-                    withAnimation { step = .verify }
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { step = .verify }
                 }
             } label: {
                 Text("Get started")
                     .font(.custom("DMSans-SemiBold", size: 18, relativeTo: .headline))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, minHeight: 56)
-                    .background(Color.forest)
+                    .background(
+                        LinearGradient(
+                            colors: [.forestGradientStart, .forestGradientEnd],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                     .clipShape(.rect(cornerRadius: 28))
+                    .shadow(color: .forest.opacity(0.3), radius: 10, y: 4)
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
     }
@@ -86,25 +125,27 @@ struct EnrollmentView: View {
     // MARK: - Verify
 
     private var verifyStep: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 20) {
             HStack {
                 Button {
                     haptic(.light)
                     if reduceMotion {
                         step = .welcome
                     } else {
-                        withAnimation { step = .welcome }
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) { step = .welcome }
                     }
                 } label: {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 20, weight: .medium))
+                        .font(.system(size: 18, weight: .medium))
                         .foregroundStyle(.forest)
                         .frame(width: 44, height: 44)
+                        .background(Color.forestPale)
+                        .clipShape(Circle())
                 }
                 .accessibilityLabel("Go back")
                 Spacer()
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 16)
 
             VStack(spacing: 8) {
                 Text("Verify your identity")
@@ -116,6 +157,7 @@ struct EnrollmentView: View {
                     .font(.custom("DMSans-Regular", size: 15, relativeTo: .body))
                     .foregroundStyle(.textSecondary)
                     .multilineTextAlignment(.center)
+                    .lineSpacing(2)
             }
 
             VStack(spacing: 16) {
@@ -126,10 +168,12 @@ struct EnrollmentView: View {
 
                     TextField("Your first name", text: $firstName)
                         .font(.custom("DMSans-Regular", size: 17, relativeTo: .body))
+                        .foregroundColor(.textPrimary)
+                        .accentColor(.forest)
                         .padding(16)
                         .background(Color.white)
-                        .clipShape(.rect(cornerRadius: 12))
-                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.borderColor, lineWidth: 1))
+                        .clipShape(.rect(cornerRadius: 14))
+                        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.borderColor, lineWidth: 1))
                         .textContentType(.givenName)
                         .autocorrectionDisabled()
                         .onChange(of: firstName) { newValue in
@@ -147,20 +191,30 @@ struct EnrollmentView: View {
                     DatePicker("Date of birth", selection: $dob, displayedComponents: .date)
                         .datePickerStyle(.compact)
                         .labelsHidden()
-                        .padding(12)
+                        .tint(.forest)
+                        .padding(14)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color.white)
-                        .clipShape(.rect(cornerRadius: 12))
-                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.borderColor, lineWidth: 1))
+                        .clipShape(.rect(cornerRadius: 14))
+                        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.borderColor, lineWidth: 1))
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 24)
 
             if let error = errorMessage {
-                Text(error)
-                    .font(.custom("DMSans-Medium", size: 14, relativeTo: .subheadline))
-                    .foregroundStyle(.riskRed)
-                    .padding(.horizontal, 20)
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.riskRed)
+                    Text(error)
+                        .font(.custom("DMSans-Medium", size: 14, relativeTo: .subheadline))
+                        .foregroundStyle(.riskRed)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(Color.riskRedBg)
+                .clipShape(.rect(cornerRadius: 12))
+                .padding(.horizontal, 24)
             }
 
             Spacer()
@@ -179,11 +233,16 @@ struct EnrollmentView: View {
                 }
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity, minHeight: 56)
-                .background(firstName.trimmingCharacters(in: .whitespaces).isEmpty ? Color.forest.opacity(0.4) : Color.forest)
+                .background(
+                    firstName.trimmingCharacters(in: .whitespaces).isEmpty
+                        ? AnyShapeStyle(Color.forest.opacity(0.3))
+                        : AnyShapeStyle(LinearGradient(colors: [.forestGradientStart, .forestGradientEnd], startPoint: .leading, endPoint: .trailing))
+                )
                 .clipShape(.rect(cornerRadius: 28))
+                .shadow(color: firstName.trimmingCharacters(in: .whitespaces).isEmpty ? .clear : .forest.opacity(0.3), radius: 10, y: 4)
             }
             .disabled(firstName.trimmingCharacters(in: .whitespaces).isEmpty || isLoading)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
     }
@@ -194,14 +253,20 @@ struct EnrollmentView: View {
         VStack(spacing: 24) {
             Spacer()
 
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 72))
-                .foregroundStyle(.forest)
-                .accessibilityHidden(true)
+            ZStack {
+                Circle()
+                    .fill(Color.riskGreenBg)
+                    .frame(width: 100, height: 100)
 
-            VStack(spacing: 8) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 56))
+                    .foregroundStyle(.riskGreen)
+            }
+            .accessibilityHidden(true)
+
+            VStack(spacing: 10) {
                 Text("Welcome, \(store.session?.firstName ?? firstName)!")
-                    .font(.custom("DMSerifDisplay-Regular", size: 28, relativeTo: .title))
+                    .font(.custom("DMSerifDisplay-Regular", size: 30, relativeTo: .title))
                     .foregroundStyle(.textPrimary)
                     .accessibilityAddTraits(.isHeader)
 
@@ -209,6 +274,7 @@ struct EnrollmentView: View {
                     .font(.custom("DMSans-Regular", size: 16, relativeTo: .body))
                     .foregroundStyle(.textSecondary)
                     .multilineTextAlignment(.center)
+                    .lineSpacing(3)
             }
 
             Spacer()
@@ -217,14 +283,25 @@ struct EnrollmentView: View {
                 haptic(.success)
                 store.checkin = store.buildInitialCheckin()
             } label: {
-                Text("Start my first check-in")
-                    .font(.custom("DMSans-SemiBold", size: 18, relativeTo: .headline))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, minHeight: 56)
-                    .background(Color.forest)
-                    .clipShape(.rect(cornerRadius: 28))
+                HStack(spacing: 8) {
+                    Text("Start my first check-in")
+                        .font(.custom("DMSans-SemiBold", size: 18, relativeTo: .headline))
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, minHeight: 56)
+                .background(
+                    LinearGradient(
+                        colors: [.forestGradientStart, .forestGradientEnd],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .clipShape(.rect(cornerRadius: 28))
+                .shadow(color: .forest.opacity(0.3), radius: 10, y: 4)
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
         .onAppear {
@@ -258,7 +335,7 @@ struct EnrollmentView: View {
                     if reduceMotion {
                         step = .success
                     } else {
-                        withAnimation { step = .success }
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { step = .success }
                     }
                 }
             } catch let apiError as APIError {
@@ -286,20 +363,21 @@ private struct FeatureRow: View {
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.system(size: 22))
+                .font(.system(size: 20))
                 .foregroundStyle(.forest)
-                .frame(width: 44, height: 44)
+                .frame(width: 48, height: 48)
                 .background(Color.forestPale)
-                .clipShape(.rect(cornerRadius: 12))
+                .clipShape(.rect(cornerRadius: 14))
                 .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(title)
                     .font(.custom("DMSans-SemiBold", size: 16, relativeTo: .body))
                     .foregroundStyle(.textPrimary)
                 Text(desc)
                     .font(.custom("DMSans-Regular", size: 14, relativeTo: .subheadline))
                     .foregroundStyle(.textSecondary)
+                    .lineSpacing(1)
             }
             Spacer()
         }

@@ -3,18 +3,35 @@ import SwiftUI
 struct EscalationAlertView: View {
     let hospitalName: String
     let onDismiss: () -> Void
+    @State private var pulseScale: CGFloat = 1.0
 
     var body: some View {
         ZStack {
-            Color.riskRed.opacity(0.08).ignoresSafeArea()
+            Color.riskRedBg.ignoresSafeArea()
 
             VStack(spacing: 24) {
                 Spacer()
 
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 56))
-                    .foregroundStyle(.riskRed)
-                    .accessibilityHidden(true)
+                ZStack {
+                    Circle()
+                        .fill(Color.riskRed.opacity(0.1))
+                        .frame(width: 120, height: 120)
+                        .scaleEffect(pulseScale)
+
+                    Circle()
+                        .fill(Color.riskRed.opacity(0.15))
+                        .frame(width: 90, height: 90)
+
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 44))
+                        .foregroundStyle(.riskRed)
+                }
+                .accessibilityHidden(true)
+                .onAppear {
+                    withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                        pulseScale = 1.15
+                    }
+                }
 
                 VStack(spacing: 12) {
                     Text("This sounds urgent.")
@@ -30,9 +47,9 @@ struct EscalationAlertView: View {
 
                     Text("Your care team at \(hospitalName)\nhas also been notified.")
                         .font(.custom("DMSans-Regular", size: 15, relativeTo: .subheadline))
-                        .foregroundStyle(.textSecondary)
+                        .foregroundStyle(.textMuted)
                         .multilineTextAlignment(.center)
-                        .padding(.top, 8)
+                        .padding(.top, 4)
                 }
 
                 Spacer()
@@ -51,6 +68,7 @@ struct EscalationAlertView: View {
                         .frame(maxWidth: .infinity, minHeight: 56)
                         .background(Color.riskRed)
                         .clipShape(.rect(cornerRadius: 28))
+                        .shadow(color: .riskRed.opacity(0.4), radius: 10, y: 4)
                     }
                     .accessibilityLabel("Call 911 emergency services")
                     .accessibilityHint("Double tap to call emergency services immediately")
@@ -69,7 +87,7 @@ struct EscalationAlertView: View {
                     }
                     .accessibilityLabel("I'm okay, continue check-in")
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 24)
                 .padding(.bottom, 40)
             }
         }

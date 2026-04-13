@@ -14,6 +14,7 @@ export default function Nav() {
   }, []);
 
   const links = [
+    { label: "Features", href: "#benefits" },
     { label: "Platform", href: "#dashboard" },
     { label: "How It Works", href: "#how-it-works" },
     { label: "Impact", href: "#impact" },
@@ -23,12 +24,12 @@ export default function Nav() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
+        scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-[#053027]"
       }`}
     >
-      <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         <Logo scrolled={scrolled} />
-        <div className="hidden md:flex items-center gap-10 text-sm font-medium">
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium">
           {links.map((l) => (
             <a
               key={l.label}
@@ -44,13 +45,13 @@ export default function Nav() {
           ))}
           <a
             href="#contact"
-            className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-all ${
+            className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${
               scrolled
-                ? "bg-[#053027] text-white hover:bg-[#0D6B56]"
-                : "bg-white text-[#053027] hover:bg-[#FFF8E7]"
+                ? "bg-[#053027] text-white hover:bg-[#0D6B56] shadow-sm"
+                : "bg-white text-[#053027] hover:bg-[#F9F7F2]"
             }`}
           >
-            Get In Touch
+            Book a Demo
           </a>
         </div>
         <button
@@ -68,12 +69,12 @@ export default function Nav() {
         </button>
       </div>
       {menuOpen && (
-        <div className="md:hidden bg-white px-6 pb-6 pt-2 flex flex-col gap-4 shadow-lg">
+        <div className="md:hidden bg-white px-6 pb-6 pt-2 flex flex-col gap-4 shadow-lg border-t border-gray-100">
           {links.map((l) => (
             <a
               key={l.label}
               href={l.href}
-              className="text-[#1A1A1A]/70 hover:text-[#053027] text-sm font-medium"
+              className="text-[#1A1A1A]/70 hover:text-[#053027] text-sm font-medium py-1"
               onClick={() => setMenuOpen(false)}
             >
               {l.label}
@@ -81,10 +82,10 @@ export default function Nav() {
           ))}
           <a
             href="#contact"
-            className="bg-[#053027] text-white px-5 py-2.5 rounded-full font-semibold text-sm text-center"
+            className="bg-[#053027] text-white px-5 py-3 rounded-xl font-semibold text-sm text-center"
             onClick={() => setMenuOpen(false)}
           >
-            Get In Touch
+            Book a Demo
           </a>
         </div>
       )}

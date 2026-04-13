@@ -17,16 +17,19 @@
 		63DA20B31DE637BBED5A13AD /* EscalationAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E9CDB4D1533715C580CA35 /* EscalationAlertView.swift */; };
 		70A36568CBC7B7EB085EBF19 /* PhaseHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8BB5061E6BB1E359B350C76 /* PhaseHandlers.swift */; };
 		8C80B5CC9F01E0DBB3F4575F /* AvyayHealthApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58777ECDC3C52696AD68039C /* AvyayHealthApp.swift */; };
+		92522A8D4210C064DD98AB5F /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97FB77DFFFEA29695FB4F94C /* ImagePickerView.swift */; };
 		97CF94554AAF1E1E21ED14B4 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBFF8A15A95E4F90091FBDCA /* Colors.swift */; };
 		B839EA277DDDD153793E4947 /* CheckInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77C1B60D76FFC4F9D3EACBA4 /* CheckInView.swift */; };
+		BCBD376FF15C77B9155BC3CC /* ImageConsentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB8D312EDFB2D84EC98427B /* ImageConsentSheet.swift */; };
 		C45CE2CC1D93A799558EF4AA /* ChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A64D8408F03A8F1746114A1 /* ChatBubble.swift */; };
 		CEA29D116EA54F124D5D106C /* PatientStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1209CC4AA438E00B86B29B1B /* PatientStore.swift */; };
 		CF465C392CAE6A58C41ECA87 /* EnrollmentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B9841A88EB0425B8264BE46 /* EnrollmentView.swift */; };
 		D843EC6BEA263B9EC2D4FE1A /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06B0BA7ABD6E5AD9E503AF1B /* Haptics.swift */; };
 		D878014304FE599463734548 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B194527D4D205F9D4FB452F /* APIClient.swift */; };
 		D96114FDCADF2DAA4188C038 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7069FFE56813EFAA223E0F23 /* Types.swift */; };
-		FEAF220108D6BB386CC6260C /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE99608004129DE8BE43372 /* HomeView.swift */; };
 		E1F2A3B4C5D6E7F809A1B2C3 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* Config.swift */; };
+		FEAF220108D6BB386CC6260C /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE99608004129DE8BE43372 /* HomeView.swift */; };
+		A1B2C3D401000002 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D401000001 /* AudioRecorderManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,19 +41,22 @@
 		3B9841A88EB0425B8264BE46 /* EnrollmentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnrollmentView.swift; sourceTree = "<group>"; };
 		3C91F36DF272662CC3F69A35 /* CareTeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareTeamView.swift; sourceTree = "<group>"; };
 		4A64D8408F03A8F1746114A1 /* ChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubble.swift; sourceTree = "<group>"; };
-		576C159C6ECBE258713B1453 /* AvyayHealth.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AvyayHealth.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		576C159C6ECBE258713B1453 /* AvyayHealth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AvyayHealth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		58777ECDC3C52696AD68039C /* AvyayHealthApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvyayHealthApp.swift; sourceTree = "<group>"; };
 		7069FFE56813EFAA223E0F23 /* Types.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		77C1B60D76FFC4F9D3EACBA4 /* CheckInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInView.swift; sourceTree = "<group>"; };
 		83E9CDB4D1533715C580CA35 /* EscalationAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EscalationAlertView.swift; sourceTree = "<group>"; };
 		8B194527D4D205F9D4FB452F /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		8DB8D312EDFB2D84EC98427B /* ImageConsentSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageConsentSheet.swift; sourceTree = "<group>"; };
+		97FB77DFFFEA29695FB4F94C /* ImagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5C /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		A2335CE2C5C4BCE9B46BA1CC /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		A5CC00CC7DC2CECA70A84740 /* DateUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtils.swift; sourceTree = "<group>"; };
 		A8BB5061E6BB1E359B350C76 /* PhaseHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhaseHandlers.swift; sourceTree = "<group>"; };
 		CBFF8A15A95E4F90091FBDCA /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		D1DFB5268B89EB0426C04F29 /* CarePlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarePlanView.swift; sourceTree = "<group>"; };
 		F9A694CECB5684BD30BF511D /* ClinicalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClinicalConstants.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F60718293A4B5C /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		A1B2C3D401000001 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -90,6 +96,8 @@
 				77C1B60D76FFC4F9D3EACBA4 /* CheckInView.swift */,
 				028EF36A4218FBEDB2CFB527 /* CheckInViewModel.swift */,
 				83E9CDB4D1533715C580CA35 /* EscalationAlertView.swift */,
+				97FB77DFFFEA29695FB4F94C /* ImagePickerView.swift */,
+				8DB8D312EDFB2D84EC98427B /* ImageConsentSheet.swift */,
 			);
 			path = CheckIn;
 			sourceTree = "<group>";
@@ -162,6 +170,7 @@
 			isa = PBXGroup;
 			children = (
 				8B194527D4D205F9D4FB452F /* APIClient.swift */,
+				A1B2C3D401000001 /* AudioRecorderManager.swift */,
 				A1B2C3D4E5F60718293A4B5C /* Config.swift */,
 			);
 			path = Services;
@@ -215,7 +224,6 @@
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					2A04171F85C2B9045F218FB2 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -245,6 +253,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D878014304FE599463734548 /* APIClient.swift in Sources */,
+				A1B2C3D401000002 /* AudioRecorderManager.swift in Sources */,
 				8C80B5CC9F01E0DBB3F4575F /* AvyayHealthApp.swift in Sources */,
 				5B5B1FCF0BE4CD1D5752D1E1 /* CarePlanView.swift in Sources */,
 				262B9471C13622837822B21E /* CareTeamView.swift in Sources */,
@@ -257,6 +266,8 @@
 				1AB0CBF6A9F394A230908AEF /* DateUtils.swift in Sources */,
 				CF465C392CAE6A58C41ECA87 /* EnrollmentView.swift in Sources */,
 				63DA20B31DE637BBED5A13AD /* EscalationAlertView.swift in Sources */,
+				92522A8D4210C064DD98AB5F /* ImagePickerView.swift in Sources */,
+				BCBD376FF15C77B9155BC3CC /* ImageConsentSheet.swift in Sources */,
 				D843EC6BEA263B9EC2D4FE1A /* Haptics.swift in Sources */,
 				FEAF220108D6BB386CC6260C /* HomeView.swift in Sources */,
 				CEA29D116EA54F124D5D106C /* PatientStore.swift in Sources */,
@@ -277,7 +288,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = RCXBB88QQV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AvyayHealth/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -424,7 +435,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = RCXBB88QQV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AvyayHealth/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

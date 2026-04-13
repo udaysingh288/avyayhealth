@@ -1,6 +1,9 @@
 import { MessageSquare, AlertTriangle } from 'lucide-react';
 import type { CheckIn } from '../../../types';
 import { timeStamp, relativeTime } from '../../../utils/dateUtils';
+// Image feature rolled back — kept in code for future use
+// import { Camera } from 'lucide-react';
+// import ImageMessage from './ImageMessage';
 
 export default function ConversationTab({ checkins }: { checkins: CheckIn[] }) {
   if (checkins.length === 0) {
@@ -60,6 +63,8 @@ export default function ConversationTab({ checkins }: { checkins: CheckIn[] }) {
               </div>
             </div>
           )}
+
+          {/* Image feature rolled back — kept in code for future use */}
 
           {/* Escalation */}
           {ci.escalated && (

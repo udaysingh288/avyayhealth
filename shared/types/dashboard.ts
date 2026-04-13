@@ -26,6 +26,14 @@ export interface Patient {
   unread_dm_count: number;
 }
 
+export interface ImageClassification {
+  injury_type: string;
+  description: string;
+  risk_level: RiskLevel;
+  recommendations: string;
+  confidence: string;
+}
+
 export interface CheckIn {
   id: string;
   patient_id: string;
@@ -38,6 +46,8 @@ export interface CheckIn {
   escalation_reason: string | null;
   sdoh_domain_screened: SDOHDomain | null;
   sdoh_response: string | null;
+  image_storage_path?: string | null;
+  image_classification?: ImageClassification | null;
 }
 
 export interface Alert {

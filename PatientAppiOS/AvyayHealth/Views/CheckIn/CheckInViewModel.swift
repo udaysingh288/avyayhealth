@@ -11,6 +11,21 @@ final class CheckInViewModel: ObservableObject {
     @Published var dayNumber = 1
     @Published var quickReplies: [String] = []
 
+    // Image upload state (rolled back — kept for future use)
+    @Published var showImagePicker = false
+    @Published var showImageConsent = false
+    @Published var isUploadingImage = false
+    @Published var imageConsentGiven = false
+    var pendingImage: UIImage?
+    @Published var loadedImages: [String: UIImage] = [:]
+
+    // Audio recording state
+    @Published var isRecording = false
+    @Published var isTranscribing = false
+    @Published var recordingPulse = false
+    @Published var recordingDuration: TimeInterval = 0
+    private let audioManager = AudioRecorderManager()
+
     private var convState = ConversationState()
     private var patientToken = ""
     private var session: PatientSession?
@@ -44,6 +59,7 @@ final class CheckInViewModel: ObservableObject {
             self.conversation = checkin.conversation
             self.isCompleted = checkin.status == .completed
         } else {
+            convState = ConversationState()
             let checkin = store.buildInitialCheckin()
             store.checkin = checkin
             self.conversation = checkin.conversation
@@ -55,7 +71,7 @@ final class CheckInViewModel: ObservableObject {
 
     // MARK: - Send
 
-    func send(text: String? = nil, store: PatientStore) {
+    func send(text: String? = nil, store: PatientStore, messageType: MessageType = .text) {
         let msg = (text ?? replyText).trimmingCharacters(in: .whitespaces)
         guard !msg.isEmpty, session != nil else { return }
 
@@ -67,7 +83,7 @@ final class CheckInViewModel: ObservableObject {
         let isReplyToCoordinator = isCompleted ? hasCoordinatorMsg : lastNonPatient?.role == .coordinator
 
         if isReplyToCoordinator {
-            let patientMsg = Message(role: .patient, content: msg)
+            let patientMsg = Message(role: .patient, content: msg, messageType: messageType)
             replyText = ""
             conversation.append(patientMsg)
             syncCheckin(store: store)
@@ -79,7 +95,7 @@ final class CheckInViewModel: ObservableObject {
         if isCompleted { return }
         if isSending { return }
 
-        let patientMsg = Message(role: .patient, content: msg)
+        let patientMsg = Message(role: .patient, content: msg, messageType: messageType)
         let isRed = containsRedKeyword(msg)
         replyText = ""
         isSending = true
@@ -91,7 +107,15 @@ final class CheckInViewModel: ObservableObject {
             haptic(.warning)
             showEscalation = true
             isSending = false
+            isCompleted = true
             syncCheckin(store: store)
+            Task {
+                await APIClient.shared.completeCheckIn(
+                    token: patientToken,
+                    riskLevel: .red,
+                    summary: "RED ALERT: Patient message contained urgent keywords — \(msg)"
+                )
+            }
             return
         }
 
@@ -123,12 +147,13 @@ final class CheckInViewModel: ObservableObject {
             var responses = [aiReply.reply]
             if let followUp = aiReply.followUp { responses.append(followUp) }
 
+            let risk = aiReply.riskLevel ?? .green
             convState.phase = ConversationPhase(rawValue: aiReply.nextPhase) ?? .complete
-            convState.overallRisk = aiReply.riskLevel
+            convState.overallRisk = risk
             convState.turnCount += 1
             convState.summaryParts.append(aiReply.summary)
 
-            await addAIMessages(responses, riskLevel: aiReply.riskLevel, isComplete: aiReply.isComplete, summary: aiReply.summary, store: store)
+            await addAIMessages(responses, riskLevel: risk, isComplete: aiReply.isComplete, summary: aiReply.summary, store: store)
         } else {
             // Fallback to local engine
             let result = processReply(
@@ -177,6 +202,150 @@ final class CheckInViewModel: ObservableObject {
         syncCheckin(store: store)
     }
 
+    // MARK: - Image Upload
+
+    func sendImage(_ image: UIImage, store: PatientStore) {
+        guard session != nil else { return }
+
+        // Check consent first
+        if !imageConsentGiven {
+            pendingImage = image
+            showImageConsent = true
+            return
+        }
+
+        isUploadingImage = true
+        isSending = true
+
+        // Add placeholder message with local image
+        let placeholderId = UUID().uuidString
+        let placeholder = Message(id: placeholderId, role: .patient, content: "[Photo attached]", messageType: .image)
+        loadedImages[placeholderId] = image
+        conversation.append(placeholder)
+        syncCheckin(store: store)
+
+        Task {
+            let result = await APIClient.shared.uploadImage(token: patientToken, image: image)
+
+            isUploadingImage = false
+            isSending = false
+
+            if let result = result {
+                // Add AI classification response
+                let risk = result.riskLevel ?? .yellow
+                let aiMsg = Message(role: .ai, content: result.classificationSummary, riskLevel: risk)
+                conversation.append(aiMsg)
+                syncCheckin(store: store)
+
+                if risk == .red {
+                    haptic(.warning)
+                    showEscalation = true
+                } else {
+                    haptic(.success)
+                }
+            } else {
+                let errorMsg = Message(role: .ai, content: "I wasn't able to process that photo. Could you describe what you're seeing instead?")
+                conversation.append(errorMsg)
+                syncCheckin(store: store)
+            }
+        }
+    }
+
+    func onImageConsentGiven(store: PatientStore) {
+        imageConsentGiven = true
+        if let image = pendingImage {
+            pendingImage = nil
+            sendImage(image, store: store)
+        }
+    }
+
+    // MARK: - Audio Recording
+
+    func toggleAudioRecording(store: PatientStore) {
+        if isRecording {
+            stopAndTranscribe(store: store)
+        } else {
+            startAudioRecording()
+        }
+    }
+
+    private var durationTimer: Timer?
+
+    private func startAudioRecording() {
+        Task {
+            await audioManager.startRecording()
+            isRecording = audioManager.isRecording
+            if isRecording {
+                recordingPulse = true
+                recordingDuration = 0
+                haptic(.medium)
+                // Poll duration from audio manager
+                durationTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+                    Task { @MainActor [weak self] in
+                        guard let self else { return }
+                        self.recordingDuration = self.audioManager.recordingDuration
+                        if !self.audioManager.isRecording && self.isRecording {
+                            // Auto-stopped at max duration
+                            self.isRecording = false
+                            self.recordingPulse = false
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func stopAndTranscribe(store: PatientStore) {
+        audioManager.stopRecording()
+        isRecording = false
+        recordingPulse = false
+        isTranscribing = true
+        durationTimer?.invalidate()
+        durationTimer = nil
+        haptic(.light)
+
+        Task {
+            let text = await audioManager.transcribe()
+            isTranscribing = false
+
+            if let text, !text.isEmpty {
+                // Send the transcribed text as a voice message
+                send(text: text, store: store, messageType: .audio)
+            } else {
+                // Show error as AI message
+                let errorContent = audioManager.error ?? "Could not understand the audio. Please try again or type your message."
+                let errorMsg = Message(role: .ai, content: errorContent)
+                conversation.append(errorMsg)
+                syncCheckin(store: store)
+            }
+        }
+    }
+
+    func cancelAudioRecording() {
+        audioManager.cancel()
+        isRecording = false
+        isTranscribing = false
+        recordingPulse = false
+        recordingDuration = 0
+        durationTimer?.invalidate()
+        durationTimer = nil
+    }
+
+    /// Load an image from a signed URL into memory (never to disk).
+    func loadImageForMessage(_ message: Message) {
+        guard message.messageType == .image,
+              let path = message.imageStoragePath,
+              loadedImages[message.id] == nil else { return }
+
+        Task {
+            guard let urlString = await APIClient.shared.getImageUrl(token: patientToken, storagePath: path),
+                  let url = URL(string: urlString),
+                  let (data, _) = try? await URLSession.shared.data(from: url),
+                  let image = UIImage(data: data) else { return }
+            loadedImages[message.id] = image
+        }
+    }
+
     private func syncCheckin(store: PatientStore) {
         store.checkin = TodayCheckin(
             checkinId: store.checkin?.checkinId ?? "ci-day\(dayNumber)",
@@ -184,14 +353,19 @@ final class CheckInViewModel: ObservableObject {
             status: isCompleted ? .completed : .pending,
             question: store.checkin?.question ?? "",
             conversation: conversation,
-            completedAt: isCompleted ? ISO8601DateFormatter().string(from: Date()) : nil
+            completedAt: isCompleted ? iso8601Now() : nil
         )
     }
 
     // MARK: - DM Polling
 
-    private func startDMPolling() {
+    func stopDMPolling() {
         dmPollTimer?.invalidate()
+        dmPollTimer = nil
+    }
+
+    private func startDMPolling() {
+        stopDMPolling()
         pollDMs()
         dmPollTimer = Timer.scheduledTimer(withTimeInterval: 8, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in self?.pollDMs() }
@@ -217,5 +391,6 @@ final class CheckInViewModel: ObservableObject {
 
     deinit {
         dmPollTimer?.invalidate()
+        durationTimer?.invalidate()
     }
 }
