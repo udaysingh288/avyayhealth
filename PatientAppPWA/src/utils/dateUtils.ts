@@ -28,7 +28,8 @@ export function fullDate(iso: string): string {
 
 export function daysSinceDischarge(dischargeIso: string): number {
   try {
-    return differenceInDays(startOfDay(new Date()), startOfDay(parseISO(dischargeIso)));
+    const days = differenceInDays(startOfDay(new Date()), startOfDay(parseISO(dischargeIso)));
+    return Number.isNaN(days) ? 0 : Math.max(0, days);
   } catch {
     return 0;
   }

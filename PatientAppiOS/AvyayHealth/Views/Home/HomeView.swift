@@ -78,7 +78,22 @@ struct HomeView: View {
             }
             .padding(.horizontal, 24)
             .padding(.top, 20)
-            .padding(.bottom, 60)
+            .padding(.bottom, 16)
+
+            // Hospital banner
+            HStack(spacing: 6) {
+                Image(systemName: "building.2")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.white.opacity(0.7))
+                Text(store.session?.hospitalName ?? "—")
+                    .font(.custom("DMSans-Medium", size: 15, relativeTo: .subheadline))
+                    .foregroundStyle(.white.opacity(0.85))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 50)
+            .accessibilityLabel("Hospital: \(store.session?.hospitalName ?? "")")
         }
         .background(
             LinearGradient(
@@ -205,12 +220,9 @@ struct HomeView: View {
             }
             .frame(height: 10)
 
-            HStack(spacing: 0) {
-                infoChip(icon: "calendar", label: "Day \(store.session?.daysInProgram ?? 1)/\(store.session?.totalDays ?? 30)")
+            HStack {
+                infoChip(icon: "calendar", label: "Day \(store.session?.daysInProgram ?? 1) of \(store.session?.totalDays ?? 30)")
                 Spacer()
-                infoChip(icon: "heart.text.clipboard", label: store.session?.condition.label ?? "—")
-                Spacer()
-                infoChip(icon: "building.2", label: store.session?.hospitalName ?? "—")
             }
         }
         .padding(20)
@@ -222,15 +234,19 @@ struct HomeView: View {
     }
 
     private func infoChip(icon: String, label: String) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 11))
+                .font(.system(size: 13))
                 .foregroundStyle(.forest)
             Text(label)
-                .font(.custom("DMSans-Medium", size: 12, relativeTo: .caption))
-                .foregroundStyle(.textSecondary)
+                .font(.custom("DMSans-Medium", size: 14, relativeTo: .subheadline))
+                .foregroundStyle(.textPrimary)
                 .lineLimit(1)
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Color.forestPale)
+        .clipShape(.rect(cornerRadius: 8))
     }
 
     // MARK: - Quick Actions
@@ -294,31 +310,65 @@ struct HomeView: View {
     // MARK: - Motivation
 
     private var motivationCard: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             Image(systemName: "sparkles")
-                .font(.system(size: 20))
+                .font(.system(size: 22))
                 .foregroundStyle(.forest)
                 .accessibilityHidden(true)
 
-            Text(motivationalMessage)
-                .font(.custom("DMSans-Regular", size: 15, relativeTo: .body))
-                .foregroundStyle(.textSecondary)
+            Text(dailyQuote)
+                .font(.custom("DMSerifDisplay-Regular", size: 17, relativeTo: .body))
+                .foregroundStyle(.textPrimary)
                 .multilineTextAlignment(.center)
-                .lineSpacing(3)
-                .italic()
+                .lineSpacing(4)
+
+            Text("— Your Avyay Health Team")
+                .font(.custom("DMSans-Regular", size: 12, relativeTo: .caption))
+                .foregroundStyle(.textMuted)
         }
-        .padding(20)
+        .padding(24)
         .frame(maxWidth: .infinity)
         .background(Color.forestPale.opacity(0.5))
         .clipShape(.rect(cornerRadius: 16))
     }
 
-    private var motivationalMessage: String {
-        let day = store.session?.daysInProgram ?? 1
-        if day <= 3 { return "You've taken the first step. Every check-in brings you closer to recovery." }
-        if day <= 7 { return "One week in — you're building a great habit. Keep it going!" }
-        if day <= 14 { return "Two weeks of progress. Your care team is proud of you." }
-        if day <= 21 { return "Three weeks strong. You're doing amazing!" }
-        return "Almost there — the finish line is in sight. You've got this."
+    private var dailyQuote: String {
+        let quotes = [
+            "Every day you check in is a day you choose your health. That takes real strength.",
+            "Healing is not a straight line. Be patient with yourself — you are doing great.",
+            "The strongest people are those who ask for help when they need it.",
+            "Your body is working hard to heal. Give it rest, give it kindness.",
+            "Small steps every day lead to big changes. You are proof of that.",
+            "You are not alone in this. Your care team is right here with you.",
+            "Recovery takes courage, and you have more of it than you know.",
+            "Each morning is a fresh start. Today is full of possibility.",
+            "The fact that you are here, checking in, says everything about your strength.",
+            "Progress is progress, no matter how small. Celebrate every good day.",
+            "You have already survived the hardest part. Now it is time to heal.",
+            "Take it one day at a time. That is all anyone can ask.",
+            "Your health is your greatest treasure. Protect it gently.",
+            "Rest is not giving up. Rest is how your body rebuilds.",
+            "You are stronger than you think, braver than you feel, and never alone.",
+            "Good days will come more often. Trust the process.",
+            "A little progress each day adds up to big results over time.",
+            "You deserve to feel well. Keep going — brighter days are ahead.",
+            "Breathe deeply. You are exactly where you need to be right now.",
+            "Your care team believes in you. We see your effort every single day.",
+            "Healing happens in its own time. Be gentle with yourself today.",
+            "Every check-in is a gift to your future self. Thank you for showing up.",
+            "Even on tough days, you are moving forward. That matters.",
+            "Your family and your care team are cheering you on. Always.",
+            "One step, one breath, one day. You have got this.",
+            "The sun comes out after every storm. Hold on to hope.",
+            "You are writing your recovery story. Make today a good chapter.",
+            "Laughter, rest, and a little fresh air — simple things that heal.",
+            "You have come so far already. Do not forget to look back and be proud.",
+            "Tomorrow will be a little easier because of what you did today.",
+        ]
+
+        // Pick a quote based on the day of the year so it changes daily
+        // but stays the same throughout the day
+        let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
+        return quotes[(dayOfYear - 1) % quotes.count]
     }
 }

@@ -20,6 +20,7 @@ const COND_LABEL: Record<Condition, string> = {
 // ─── Response pool picker ─────────────────────────────────────────
 
 export function pick(pool: string[], state: ConversationState, key: string): string {
+  if (pool.length === 0) return '';
   for (const r of pool) {
     const rKey = `${key}:${pool.indexOf(r)}`;
     if (!state.usedResponseKeys.includes(rKey)) {

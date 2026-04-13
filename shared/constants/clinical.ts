@@ -43,7 +43,7 @@ export const SYMPTOM_RULES: SymptomRule[] = [
   { pattern: /gasping/i, type: 'breathing', severity: 'yellow' },
 
   // Swelling
-  { pattern: /swell(ing|ed|olen)/i, type: 'swelling', severity: 'yellow' },
+  { pattern: /sw(ell(ing|ed)|ollen)/i, type: 'swelling', severity: 'yellow' },
   { pattern: /ankle.*(puff|swell|big)/i, type: 'swelling', severity: 'yellow' },
   { pattern: /feet.*(swell|puff|big)/i, type: 'swelling', severity: 'yellow' },
   { pattern: /legs?.*(swell|puff|big|heavy)/i, type: 'swelling', severity: 'yellow' },

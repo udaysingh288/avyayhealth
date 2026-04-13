@@ -32,3 +32,17 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: true
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_UIStatusBarStyle: ""
+
+  AvyayHealthTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - AvyayHealthTests
+    dependencies:
+      - target: AvyayHealth
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.avyayhealth.patient.tests
+        GENERATE_INFOPLIST_FILE: true
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/AvyayHealth.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AvyayHealth"
+        BUNDLE_LOADER: "$(TEST_HOST)"

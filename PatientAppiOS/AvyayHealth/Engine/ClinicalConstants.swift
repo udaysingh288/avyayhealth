@@ -45,7 +45,7 @@ let SYMPTOM_RULES: [SymptomRule] = {
         ("winded", "breathing", "yellow"),
         ("wheez(ing|e|y)", "breathing", "yellow"),
         ("gasping", "breathing", "yellow"),
-        ("swell(ing|ed|olen)", "swelling", "yellow"),
+        ("sw(ell(ing|ed)|ollen)", "swelling", "yellow"),
         ("ankle.*(puff|swell|big)", "swelling", "yellow"),
         ("feet.*(swell|puff|big)", "swelling", "yellow"),
         ("legs?.*(swell|puff|big|heavy)", "swelling", "yellow"),

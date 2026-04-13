@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Avyay Health — System Architecture</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Avyay Health — System Architecture</h1>
+</header>
+<h1 id="avyay-health-system-architecture">Avyay Health — System
+Architecture</h1>
+<p><strong>Version:</strong> 1.0 | <strong>Date:</strong> April 2026 |
+<strong>Confidential</strong></p>
+<hr />
+<h2 id="platform-overview">1. Platform Overview</h2>
+<p>Avyay Health is a post-discharge AI care platform that contacts every
+discharged patient daily for 30 days — via a Progressive Web App — and
+alerts care coordinators the moment a patient needs help.</p>
+<p>The platform consists of <strong>4 frontend applications</strong>,
+<strong>1 backend (Supabase)</strong>, and <strong>4 Edge
+Functions</strong> that together form a complete post-discharge
+monitoring system.</p>
+<pre><code>+------------------------------------------------------------------+
+|                        AVYAY HEALTH PLATFORM                      |
++------------------------------------------------------------------+
+|                                                                    |
+|   FRONTEND APPS (React/Next.js + Tailwind CSS)                   |
+|   +-----------------+  +-----------------+  +-----------------+   |
+|   | Patient App     |  | Hospital        |  | Quality         |   |
+|   | (PWA)           |  | Dashboard       |  | Dashboard       |   |
+|   | Port: 5173      |  | Port: 3000      |  | Port: 3100      |   |
+|   | For: Patients   |  | For: Care       |  | For: VP of      |   |
+|   |                 |  | Coordinators    |  | Quality         |   |
+|   +-----------------+  +-----------------+  +-----------------+   |
+|                                                                    |
+|   +-----------------+                                             |
+|   | Marketing       |                                             |
+|   | Website         |                                             |
+|   | (Next.js)       |                                             |
+|   | For: Hospital   |                                             |
+|   | buyers          |                                             |
+|   +-----------------+                                             |
+|                                                                    |
++------------------------------------------------------------------+
+            |                    |                   |
+            v                    v                   v
++------------------------------------------------------------------+
+|                     SUPABASE BACKEND                              |
+|  +-------------------+  +----------------------------------+     |
+|  | PostgreSQL DB      |  | Edge Functions (Deno)            |     |
+|  | - hospitals        |  | - enroll-patient                 |     |
+|  | - coordinators     |  | - chat-reply (Claude AI)         |     |
+|  | - patients         |  | - save-checkin-message           |     |
+|  | - check_ins        |  | - complete-checkin               |     |
+|  | - messages         |  +----------------------------------+     |
+|  | - sdoh_flags       |                                           |
+|  | - profiles         |  +----------------------------------+     |
+|  +-------------------+  | Supabase Auth                     |     |
+|                          | - Coordinator/Director login      |     |
+|  +-------------------+  +----------------------------------+     |
+|  | Realtime           |                                           |
+|  | - postgres_changes |  +----------------------------------+     |
+|  | - Auto-refresh     |  | Row Level Security (RLS)         |     |
+|  +-------------------+  | - Hospital-scoped data access     |     |
+|                          +----------------------------------+     |
++------------------------------------------------------------------+
+            |
+            v
++------------------------------------------------------------------+
+|                     ANTHROPIC CLAUDE API                           |
+|  Model: claude-haiku-4-5-20251001                                |
+|  Used by: chat-reply edge function                                |
+|  Purpose: AI-powered patient conversation with clinical context   |
++------------------------------------------------------------------+</code></pre>
+<hr />
+<h2 id="application-details">2. Application Details</h2>
+<h3 id="patient-app-pwa">2.1 Patient App (PWA)</h3>
+<p><strong>Directory:</strong> <code>PatientAppPWA/</code>
+<strong>Tech:</strong> React 18 + TypeScript + Vite + Tailwind CSS +
+Framer Motion <strong>Purpose:</strong> Mobile-first Progressive Web App
+for patients to complete daily AI health check-ins</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Framework</td>
+<td>React 18 + TypeScript</td>
+</tr>
+<tr>
+<td>Build</td>
+<td>Vite</td>
+</tr>
+<tr>
+<td>Styling</td>
+<td>Tailwind CSS</td>
+</tr>
+<tr>
+<td>State</td>
+<td>Zustand (with localStorage persistence)</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td>React Router v6</td>
+</tr>
+<tr>
+<td>Animations</td>
+<td>Framer Motion</td>
+</tr>
+<tr>
+<td>Icons</td>
+<td>Material Symbols (Google Fonts)</td>
+</tr>
+<tr>
+<td>PWA</td>
+<td>vite-plugin-pwa (Workbox)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Files:</strong></p>
+<pre><code>PatientAppPWA/
+  src/
+    pages/
+      Enroll.tsx          # /enroll/:code — patient enrollment
+      Home.tsx            # / — today&#39;s check-in status
+      CheckIn.tsx         # /checkin — AI conversation
+      Timeline.tsx        # /timeline — 30-day history
+      CarePlan.tsx        # /care-plan — medications &amp; habits
+      CareTeam.tsx        # /care-team — coordinator contact
+    api/
+      patients.ts         # Enrollment API
+      checkins.ts         # Check-in messages + AI chat API
+    store/
+      patientStore.ts     # Zustand store with localStorage persistence
+    utils/
+      conversationEngine.ts  # Offline AI fallback engine
+    components/
+      shared/
+        AuthGuard.tsx     # Token-based route protection
+        BottomNav.tsx     # 4-tab navigation</code></pre>
+<p><strong>Auth Flow:</strong></p>
+<pre><code>Nurse gives URL → /enroll/RIVERSIDE
+         ↓
+Patient enters first name + DOB
+         ↓
+enroll-patient edge function verifies against DB
+         ↓
+Returns signed JWT (30-day expiry)
+         ↓
+Token stored in Zustand + localStorage
+         ↓
+Patient accesses protected routes</code></pre>
+<p><strong>Check-in Conversation Flow:</strong></p>
+<pre><code>Patient opens check-in
+         ↓
+AI greeting with condition-specific opening question
+         ↓
+Patient replies (text or quick reply buttons)
+         ↓
+Client sends conversation to chat-reply edge function
+         ↓
+Edge function sends to Claude API with:
+  - Full conversation history
+  - Clinical system prompt (~2K tokens)
+  - Patient context (condition, day number, phase)
+         ↓
+Claude returns structured JSON:
+  { reply, risk_level, next_phase, is_complete, summary, follow_up }
+         ↓
+Client displays AI response + saves messages to DB
+         ↓
+When complete: calls complete-checkin to finalize
+         ↓
+If RED risk: shows escalation alert (call 911)</code></pre>
+<h3 id="hospital-dashboard-care-coordinator-view">2.2 Hospital Dashboard
+(Care Coordinator View)</h3>
+<p><strong>Directory:</strong> <code>HospitalDashboard/</code>
+<strong>Tech:</strong> React 18 + TypeScript + Vite + Tailwind CSS +
+Recharts <strong>Purpose:</strong> Browser-based dashboard for care
+coordinators to monitor their patient population</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Framework</td>
+<td>React 18 + TypeScript</td>
+</tr>
+<tr>
+<td>Build</td>
+<td>Vite</td>
+</tr>
+<tr>
+<td>Styling</td>
+<td>Tailwind CSS</td>
+</tr>
+<tr>
+<td>State</td>
+<td>Zustand</td>
+</tr>
+<tr>
+<td>Charts</td>
+<td>Recharts</td>
+</tr>
+<tr>
+<td>Icons</td>
+<td>Lucide React</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>Supabase Auth (email/password)</td>
+</tr>
+<tr>
+<td>Realtime</td>
+<td>Supabase Realtime (postgres_changes)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Files:</strong></p>
+<pre><code>HospitalDashboard/
+  src/
+    pages/
+      Login.tsx           # Supabase Auth login
+      Dashboard.tsx       # Main view — metrics + patient table
+      Alerts.tsx          # Alert management + acknowledgment
+      Reports.tsx         # Engagement trends
+      Settings.tsx        # User profile
+    hooks/
+      useDashboardData.ts # Central data hook — fetches patients,
+                          # check-ins, alerts, metrics from Supabase
+      useAuthSession.ts   # Supabase Auth session management
+    store/
+      authStore.ts        # Auth state (userId, profile, hospital_id)
+    lib/
+      supabase.ts         # Supabase client initialization</code></pre>
+<p><strong>What coordinators see:</strong> - Patient risk feed (RED →
+YELLOW → GREEN sorted) - Metric cards: Active patients, Red alerts,
+Yellow watch, Green stable - Patient detail panel with conversation
+history - Alert acknowledgment workflow (called / escalated / other) -
+2-minute auto-refresh + Supabase Realtime subscriptions</p>
+<h3 id="quality-dashboard-vp-of-quality-view">2.3 Quality Dashboard (VP
+of Quality View)</h3>
+<p><strong>Directory:</strong> <code>QualityDashboard/</code>
+<strong>Tech:</strong> React 18 + TypeScript + Vite + Tailwind CSS +
+Recharts <strong>Purpose:</strong> Hospital-wide analytics for quality
+directors</p>
+<p><strong>Key Pages:</strong> | Page | Content | |——|———| | Overview |
+Hospital-wide KPIs, HRRP penalty estimates, CMS revenue potential | |
+Coordinators | Per-coordinator performance (completion rate, response
+time, alerts) | | Engagement | 30-day response rate trends, condition
+outcomes, SDOH screening | | Penalties | HRRP penalty calculations,
+readmission rates by condition | | Reimbursement | CMS CPT code revenue
+projections (99453–99496) |</p>
+<p><strong>Data Source:</strong> <code>useHospitalData.ts</code> hook —
+same Supabase queries, but aggregated at the hospital level with
+coordinator-level breakdowns.</p>
+<h3 id="marketing-website">2.4 Marketing Website</h3>
+<p><strong>Directory:</strong> <code>Website/</code>
+<strong>Tech:</strong> Next.js 14 (App Router) + TypeScript + Tailwind
+CSS <strong>Purpose:</strong> B2B sales website targeting hospital VP of
+Quality / Care Transitions Director</p>
+<p><strong>Single conversion goal:</strong> Book a 20-minute discovery
+call <strong>Contact form:</strong> Formspree integration (placeholder
+ID — needs real form ID)</p>
+<hr />
+<h2 id="backend-architecture-supabase">3. Backend Architecture
+(Supabase)</h2>
+<h3 id="database-schema">3.1 Database Schema</h3>
+<pre><code>┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│  hospitals   │     │ coordinators │     │   profiles   │
+│─────────────│     │──────────────│     │─────────────│
+│ id (PK)     │◄────│ hospital_id  │     │ id (FK→auth)│
+│ name        │     │ first_name   │     │ email       │
+│ enroll_code │     │ last_name    │     │ display_name│
+│ city        │     │ email        │     │ role        │
+│ state       │     │ phone        │     │ hospital_id │
+│ created_at  │     │ role         │     │ created_at  │
+└─────────────┘     │ created_at   │     └─────────────┘
+       │            └──────────────┘
+       │
+       ▼
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│  patients   │     │  check_ins   │     │  messages   │
+│─────────────│     │──────────────│     │─────────────│
+│ id (PK)     │◄────│ patient_id   │◄────│ check_in_id │
+│ hospital_id │     │ day_number   │     │ role        │
+│ coordinator │     │ date         │     │ content     │
+│ first_name  │     │ status       │     │ risk_level  │
+│ last_name   │     │ risk_level   │     │ sent_at     │
+│ dob         │     │ summary      │     └─────────────┘
+│ condition   │     │ completed_at │
+│ discharge_dt│     │ created_at   │
+│ days_in_pgm │     │ (unique:     │
+│ total_days  │     │  patient_id  │
+│ phone       │     │  +day_number)│
+│ enroll_token│     └──────────────┘
+│ status      │
+│ created_at  │     ┌──────────────┐
+└─────────────┘     │  sdoh_flags  │
+       │            │──────────────│
+       └────────────│ patient_id   │
+                    │ check_in_id  │
+                    │ domain       │
+                    │ notes        │
+                    │ resolved     │
+                    │ created_at   │
+                    └──────────────┘</code></pre>
+<p><strong>Status enums:</strong> - <code>patients.status</code>:
+<code>active</code> | <code>completed</code> | <code>withdrawn</code> -
+<code>check_ins.status</code>: <code>pending</code> |
+<code>completed</code> | <code>missed</code> | <code>escalated</code> -
+<code>check_ins.risk_level</code>: <code>red</code> |
+<code>yellow</code> | <code>green</code> -
+<code>patients.condition</code>: <code>chf</code> | <code>copd</code> |
+<code>pneumonia</code> | <code>ami</code> -
+<code>sdoh_flags.domain</code>: <code>food_insecurity</code> |
+<code>housing_instability</code> | <code>transportation</code> |
+<code>utility_difficulty</code> | <code>interpersonal_safety</code> -
+<code>coordinators.role</code>: <code>care_coordinator</code> |
+<code>quality_director</code></p>
+<h3 id="row-level-security-rls">3.2 Row Level Security (RLS)</h3>
+<p>All tables have RLS enabled. Policies ensure: - Coordinators only see
+their own hospital’s data - Patients can only access their own records
+(via JWT claims) - Service role key (used by edge functions) bypasses
+RLS</p>
+<h3 id="realtime-subscriptions">3.3 Realtime Subscriptions</h3>
+<p>Both dashboards subscribe to postgres_changes on: -
+<code>patients</code> table — new enrollments, status changes -
+<code>check_ins</code> table — risk level updates, completions -
+<code>messages</code> table — new messages (HospitalDashboard only)</p>
+<p>Auto-refresh interval: 2 minutes (fallback when realtime misses
+events)</p>
+<hr />
+<h2 id="edge-functions-supabase-deno-runtime">4. Edge Functions
+(Supabase Deno Runtime)</h2>
+<h3 id="enroll-patient">4.1 enroll-patient</h3>
+<p><strong>Trigger:</strong> Patient submits name + DOB on enrollment
+page <strong>Flow:</strong> 1. Receives hospital enrollment code +
+patient first name + DOB 2. Looks up hospital by enrollment code 3.
+Finds matching patient record (first_name + dob + hospital_id) 4. If
+found: signs a 30-day patient JWT with
+<code>{ patient_id, hospital_id }</code> 5. Returns JWT + patient
+session data (condition, day number, coordinator name)</p>
+<h3 id="chat-reply-ai-conversation">4.2 chat-reply (AI
+Conversation)</h3>
+<p><strong>Trigger:</strong> Patient sends a message during check-in
+<strong>Flow:</strong> 1. Verifies patient JWT 2. Receives full
+conversation history + patient context 3. Builds system prompt with: -
+Clinical knowledge base (CHF/COPD/Pneumonia/AMI protocols) - SDOH
+screening protocol (CMS 5-domain) - Medication adherence guidance -
+Emergency escalation rules 4. Calls Claude Haiku API
+(<code>claude-haiku-4-5-20251001</code>) 5. Parses structured JSON
+response 6. Returns:
+<code>{ reply, risk_level, next_phase, is_complete, summary, follow_up }</code></p>
+<p><strong>Fallback:</strong> If Anthropic API key is missing or API
+fails, uses built-in rule-based response generator.</p>
+<p><strong>Cost:</strong> ~$0.001 per check-in conversation (Claude
+Haiku pricing)</p>
+<h3 id="save-checkin-message">4.3 save-checkin-message</h3>
+<p><strong>Trigger:</strong> Every message sent (patient or AI)
+<strong>Flow:</strong> 1. Verifies patient JWT 2. Finds or creates
+today’s check-in row (unique per patient + day_number) 3. Inserts
+message into <code>messages</code> table 4. Returns check_in_id +
+message_id</p>
+<h3 id="complete-checkin">4.4 complete-checkin</h3>
+<p><strong>Trigger:</strong> Check-in conversation ends
+<strong>Flow:</strong> 1. Verifies patient JWT 2. Updates check-in
+status to <code>completed</code> or <code>escalated</code> (if RED) 3.
+Saves final risk_level and summary 4. Triggers realtime notification to
+coordinator dashboard</p>
+<hr />
+<h2 id="ai-conversation-architecture">5. AI Conversation
+Architecture</h2>
+<pre><code>┌──────────────────────────────────────────────────────────────┐
+│                    PATIENT APP (Client)                       │
+│                                                              │
+│  ┌────────────────┐    ┌─────────────────────────────────┐  │
+│  │  CheckIn.tsx    │    │  conversationEngine.ts          │  │
+│  │  (UI + flow)    │    │  (offline fallback)             │  │
+│  │                 │    │  - 18 intent types               │  │
+│  │  handleSend()───┼──► │  - 80+ symptom patterns          │  │
+│  │       │         │    │  - Phase-based flow              │  │
+│  │       │ try AI  │    │  - Response pools (no repeats)   │  │
+│  │       ▼         │    └─────────────────────────────────┘  │
+│  │  getChatReply() │              ▲                           │
+│  │       │         │              │ fallback if API fails     │
+│  └───────┼─────────┘              │                           │
+└──────────┼────────────────────────┼───────────────────────────┘
+           │                        │
+           ▼                        │
+┌──────────────────────────────────────────────────────────────┐
+│              SUPABASE EDGE FUNCTION: chat-reply               │
+│                                                              │
+│  1. Verify patient JWT                                       │
+│  2. Build system prompt with:                                │
+│     ┌─────────────────────────────────────────────────────┐  │
+│     │  CLINICAL KNOWLEDGE BASE (RAG-in-prompt ~2K tokens) │  │
+│     │  - CHF red flags + self-care guidance                │  │
+│     │  - COPD red flags + inhaler protocol                 │  │
+│     │  - Pneumonia + AMI recovery warnings                 │  │
+│     │  - SDOH 5-domain screening protocol                  │  │
+│     │  - Medication adherence barriers                     │  │
+│     │  - 911 escalation criteria                           │  │
+│     └─────────────────────────────────────────────────────┘  │
+│  3. Call Claude Haiku API                                    │
+│  4. Parse structured JSON response                           │
+│  5. Return { reply, risk_level, summary, next_phase, ... }   │
+└──────────────────────────────────────────────────────────────┘
+           │
+           ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    ANTHROPIC CLAUDE API                        │
+│  Model: claude-haiku-4-5-20251001                            │
+│  Max tokens: 512                                              │
+│  Input: system prompt + conversation history                  │
+│  Output: structured JSON with risk classification             │
+└──────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="conversation-phases">Conversation Phases</h3>
+<pre><code>Symptom Check → Symptom Follow-up → Medication Check → [SDOH Screen] → Complete
+     │                 │                   │                  │
+     │  &quot;not good&quot;     │  &quot;yes, swelling&quot;  │  &quot;took them&quot;    │  &quot;need a ride&quot;
+     │  → probes       │  → flags team     │  → encourages   │  → flags coordinator
+     │  further        │  → asks about     │  → moves to     │  → completes
+     │                 │  weight gain       │  SDOH/complete  │</code></pre>
+<h3 id="what-the-ai-handles">What the AI handles:</h3>
+<table>
+<colgroup>
+<col style="width: 41%" />
+<col style="width: 58%" />
+</colgroup>
+<thead>
+<tr>
+<th>Input</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“feeling good”</td>
+<td>Warm acknowledgment, condition-specific encouragement</td>
+</tr>
+<tr>
+<td>“not good”</td>
+<td>Empathetic probe — asks for specifics</td>
+</tr>
+<tr>
+<td>“my ankle is swollen”</td>
+<td>Flags for coordinator, asks about weight gain (CHF)</td>
+</tr>
+<tr>
+<td>“asdfghjk” (gibberish)</td>
+<td>Acknowledges warmly, re-asks the health question</td>
+</tr>
+<tr>
+<td>“my daughter visited today”</td>
+<td>Responds to life update, steers to health check</td>
+</tr>
+<tr>
+<td>“I’m scared”</td>
+<td>Validates emotions, flags for coordinator support</td>
+</tr>
+<tr>
+<td>“stop asking me questions”</td>
+<td>Empathetic, explains why check-ins matter</td>
+</tr>
+<tr>
+<td>“can’t breathe”</td>
+<td>EMERGENCY — directs to call 911 immediately</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="authentication-architecture">6. Authentication Architecture</h2>
+<h3 id="patient-auth-patientapppwa">Patient Auth (PatientAppPWA)</h3>
+<pre><code>No username/password — elderly patients can&#39;t remember them
+
+Enrollment link (from nurse) → /enroll/RIVERSIDE
+         ↓
+Enter first name + date of birth
+         ↓
+enroll-patient edge function verifies against patients table
+         ↓
+Signs custom JWT: { patient_id, hospital_id, exp: 30 days }
+         ↓
+Stored in Zustand + localStorage (survives app refresh)
+         ↓
+All API calls include X-Patient-Token header
+         ↓
+30-minute inactivity timer → re-auth required</code></pre>
+<h3 id="coordinator-auth-hospitaldashboard-qualitydashboard">Coordinator
+Auth (HospitalDashboard + QualityDashboard)</h3>
+<pre><code>Supabase Auth (email + password)
+         ↓
+Login → Supabase returns access token
+         ↓
+On auth, looks up `profiles` table for hospital_id + role
+         ↓
+Role determines which dashboard is accessible:
+  - care_coordinator → HospitalDashboard
+  - quality_director → QualityDashboard
+         ↓
+All DB queries scoped by hospital_id
+         ↓
+15-minute inactivity timer → session warning → auto-logout</code></pre>
+<hr />
+<h2 id="data-flow-end-to-end">7. Data Flow: End-to-End</h2>
+<h3 id="patient-check-in-coordinator-alert">Patient Check-in →
+Coordinator Alert</h3>
+<pre><code>1. Patient opens app, starts check-in
+2. AI asks: &quot;How are you feeling today?&quot;
+3. Patient: &quot;My ankle is really swollen and I&#39;m short of breath&quot;
+4. Client → chat-reply edge function → Claude API
+5. Claude classifies as YELLOW (swelling + breathing with CHF)
+6. Claude responds empathetically, asks follow-up
+7. Messages saved to DB via save-checkin-message
+8. Check-in completes → complete-checkin sets risk_level=yellow
+9. Supabase Realtime fires postgres_changes event
+10. Hospital Dashboard receives event → refetches data
+11. Coordinator sees patient flagged YELLOW with summary:
+    &quot;Reports ankle swelling and shortness of breath, Day 5 CHF.
+     Medications taken. No SDOH concerns.&quot;
+12. Coordinator clicks &quot;Follow up today&quot; → calls patient</code></pre>
+<hr />
+<h2 id="environment-deployment">8. Environment &amp; Deployment</h2>
+<h3 id="supabase-project">Supabase Project</h3>
+<ul>
+<li><strong>Project ID:</strong> <code>gehcrdcgxifryfwjhpoz</code></li>
+<li><strong>Region:</strong> (Supabase cloud)</li>
+<li><strong>Database:</strong> PostgreSQL with RLS enabled</li>
+<li><strong>Edge Functions:</strong> 4 deployed (Deno runtime)</li>
+</ul>
+<h3 id="secrets-supabase">Secrets (Supabase)</h3>
+<table>
+<thead>
+<tr>
+<th>Secret</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ANTHROPIC_API_KEY</code></td>
+<td>Claude API for AI chat responses</td>
+</tr>
+<tr>
+<td><code>PATIENT_JWT_SECRET</code></td>
+<td>Signs/verifies patient session tokens</td>
+</tr>
+<tr>
+<td><code>SUPABASE_SERVICE_ROLE_KEY</code></td>
+<td>Edge function DB access (bypasses RLS)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="frontend-env-vars">Frontend Env Vars</h3>
+<table>
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 41%" />
+</colgroup>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>VITE_SUPABASE_URL</code></td>
+<td><code>https://gehcrdcgxifryfwjhpoz.supabase.co</code></td>
+</tr>
+<tr>
+<td><code>VITE_SUPABASE_ANON_KEY</code></td>
+<td>Supabase anon JWT (public, safe to expose)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="development-ports">Development Ports</h3>
+<table>
+<thead>
+<tr>
+<th>App</th>
+<th>Port</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PatientAppPWA</td>
+<td>5173</td>
+<td><code>http://localhost:5173</code></td>
+</tr>
+<tr>
+<td>HospitalDashboard</td>
+<td>3000</td>
+<td><code>http://localhost:3000</code></td>
+</tr>
+<tr>
+<td>QualityDashboard</td>
+<td>3100</td>
+<td><code>http://localhost:3100</code></td>
+</tr>
+<tr>
+<td>Phone testing</td>
+<td>—</td>
+<td><code>http://192.168.1.167:&lt;port&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="demo-credentials">Demo Credentials</h3>
+<table>
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 25%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th>Dashboard</th>
+<th>Email</th>
+<th>Password</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hospital (Coordinator)</td>
+<td><code>sarah.chen@riverside.demo</code></td>
+<td><code>WCLgB$!$ZT@bwdHt3F</code></td>
+</tr>
+<tr>
+<td>Quality (Director)</td>
+<td><code>maya.rodriguez@riverside.demo</code></td>
+<td><code>DHwm6Ciqnn2hzKSwvs</code></td>
+</tr>
+<tr>
+<td>Patient App</td>
+<td>Enroll via <code>/enroll/RIVERSIDE</code></td>
+<td>Any name + DOB</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tech-stack-summary">9. Tech Stack Summary</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 40%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Technology</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frontend framework</td>
+<td>React 18 + TypeScript</td>
+<td>Type safety, ecosystem</td>
+</tr>
+<tr>
+<td>Styling</td>
+<td>Tailwind CSS</td>
+<td>Utility-first, fast iteration</td>
+</tr>
+<tr>
+<td>Build tool</td>
+<td>Vite</td>
+<td>Fast dev server + builds</td>
+</tr>
+<tr>
+<td>State management</td>
+<td>Zustand</td>
+<td>Lightweight, no boilerplate</td>
+</tr>
+<tr>
+<td>Backend / DB</td>
+<td>Supabase (PostgreSQL)</td>
+<td>Auth, realtime, edge functions, RLS</td>
+</tr>
+<tr>
+<td>AI model</td>
+<td>Claude Haiku 4.5</td>
+<td>Fast, cheap, high quality for clinical conversations</td>
+</tr>
+<tr>
+<td>Edge functions</td>
+<td>Deno (Supabase)</td>
+<td>Serverless, TypeScript native</td>
+</tr>
+<tr>
+<td>Patient auth</td>
+<td>Custom JWT</td>
+<td>No password for elderly patients</td>
+</tr>
+<tr>
+<td>Coordinator auth</td>
+<td>Supabase Auth</td>
+<td>Email/password, session management</td>
+</tr>
+<tr>
+<td>Charts</td>
+<td>Recharts</td>
+<td>React-native charting</td>
+</tr>
+<tr>
+<td>Animations</td>
+<td>Framer Motion</td>
+<td>Smooth mobile transitions</td>
+</tr>
+<tr>
+<td>PWA</td>
+<td>vite-plugin-pwa + Workbox</td>
+<td>Offline support, home screen install</td>
+</tr>
+<tr>
+<td>Marketing site</td>
+<td>Next.js 14</td>
+<td>SEO, SSG, fast load</td>
+</tr>
+<tr>
+<td>Fonts</td>
+<td>DM Serif Display + DM Sans</td>
+<td>Warm, trustworthy brand identity</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="security-compliance">10. Security &amp; Compliance</h2>
+<table>
+<colgroup>
+<col style="width: 37%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Implementation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data isolation</td>
+<td>RLS policies scope all queries to hospital_id</td>
+</tr>
+<tr>
+<td>Patient auth</td>
+<td>Custom JWT with HMAC-SHA256, 30-day TTL</td>
+</tr>
+<tr>
+<td>Coordinator auth</td>
+<td>Supabase Auth with session management</td>
+</tr>
+<tr>
+<td>Inactivity timeout</td>
+<td>30 min (patients), 15 min (coordinators)</td>
+</tr>
+<tr>
+<td>PHI protection</td>
+<td>No PHI in URLs, no console logging of patient data</td>
+</tr>
+<tr>
+<td>Cross-tenant</td>
+<td>check_ins and sdoh_flags filtered by hospital patient IDs</td>
+</tr>
+<tr>
+<td>CORS</td>
+<td>Edge functions allow specific headers only</td>
+</tr>
+<tr>
+<td>API keys</td>
+<td>Stored as Supabase secrets, never in client code</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cost-estimates">11. Cost Estimates</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Supabase (free tier)</td>
+<td>$0/month (up to 50K MAU, 500MB DB)</td>
+</tr>
+<tr>
+<td>Claude Haiku API</td>
+<td>~$0.001 per check-in (~$3/month per 100 patients)</td>
+</tr>
+<tr>
+<td>Vercel (website hosting)</td>
+<td>$0/month (free tier)</td>
+</tr>
+<tr>
+<td><strong>Total for 100-patient pilot</strong></td>
+<td><strong>~$3/month</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Avyay Health, Inc. | Jersey City, NJ | Confidential</em></p>
+</body>
+</html>

@@ -191,6 +191,7 @@ func classify(_ text: String) -> ClassificationResult {
 // MARK: - Pick (non-repeating response selector)
 
 func pick(_ pool: [String], _ state: inout ConversationState, _ key: String) -> String {
+    guard !pool.isEmpty else { return "" }
     for (i, r) in pool.enumerated() {
         let rKey = "\(key):\(i)"
         if !state.usedResponseKeys.contains(rKey) {

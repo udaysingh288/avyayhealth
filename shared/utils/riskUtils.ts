@@ -10,7 +10,7 @@ export function riskSortOrder(risk: RiskLevel): number {
     green: 2,
     not_started: 3,
   };
-  return order[risk];
+  return order[risk] ?? 99;
 }
 
 export function conditionLabel(condition: Condition): string {

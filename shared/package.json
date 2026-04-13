@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +17,8 @@
     "date-fns": "^4.1.0",
     "react": "^19.2.5",
     "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.4"
   }
 }

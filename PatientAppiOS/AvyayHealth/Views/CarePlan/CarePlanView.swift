@@ -33,7 +33,7 @@ struct CarePlanView: View {
                     .font(.custom("DMSerifDisplay-Regular", size: 26, relativeTo: .title))
                     .foregroundStyle(.textPrimary)
                     .accessibilityAddTraits(.isHeader)
-                Text(condition.label)
+                Text("Your Recovery Guide")
                     .font(.custom("DMSans-Regular", size: 14, relativeTo: .subheadline))
                     .foregroundStyle(.textSecondary)
             }

@@ -8,3 +8,7 @@ dist/
 .vite/
 .next/
 out/
+.venv/
+xcuserdata/
+*.xcuserdatad/
+~$*
