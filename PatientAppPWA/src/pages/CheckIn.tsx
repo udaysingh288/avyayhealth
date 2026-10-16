@@ -15,6 +15,8 @@ export default function CheckIn() {
     setReply,
     sending,
     showEscalation,
+    escalationStatus,
+    retryEscalation,
     convState,
     conversationEndRef,
     inputRef,
@@ -36,6 +38,8 @@ export default function CheckIn() {
       <EscalationAlert
         hospitalName={session.hospital_name}
         onDismiss={dismissEscalation}
+        status={escalationStatus}
+        onRetry={retryEscalation}
       />
     );
   }
@@ -228,10 +232,9 @@ export default function CheckIn() {
               disabled={!reply.trim() || sending}
               aria-label="Send"
               className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-all tap-scale
-                ${
-                  reply.trim() && !sending
-                    ? 'bg-primary text-white shadow-ios'
-                    : 'bg-primary/15 text-primary/40 cursor-not-allowed'
+                ${reply.trim() && !sending
+                  ? 'bg-primary text-white shadow-ios'
+                  : 'bg-primary/15 text-primary/40 cursor-not-allowed'
                 }`}
             >
               <span

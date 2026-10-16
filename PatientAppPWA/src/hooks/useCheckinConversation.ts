@@ -16,7 +16,8 @@ import {
   getQuickRepliesForPhase,
   type ConversationState,
 } from '../engine';
-import { containsRedKeyword } from '@shared/constants/clinical';
+import { containsRedKeyword, EMERGENCY_PATTERNS } from '@shared/constants/clinical';
+import { riskSortOrder } from '@shared/utils/riskUtils';
 import type { TodayCheckin, Message, RiskLevel } from '../types';
 
 // ─── Initial check-in builder ─────────────────────────────────────
@@ -69,7 +70,21 @@ export function useCheckinConversation() {
   const [reply, setReply] = useState('');
   const [sending, setSending] = useState(false);
   const [showEscalation, setShowEscalation] = useState(false);
-  const [convState, setConvState] = useState<ConversationState>(createInitialState);
+  const [escalationStatus, setEscalationStatus] = useState<'pending' | 'saved' | 'failed'>('pending');
+  const escalationSummaryRef = useRef('');
+  const [convState, setConvState] = useState<ConversationState>(() => {
+    const initial = createInitialState();
+    // Preserve the highest recorded risk when navigating back to this screen.
+    for (const message of checkin.conversation) {
+      if (message.risk_level && riskSortOrder(message.risk_level) < riskSortOrder(initial.overallRisk)) {
+        initial.overallRisk = message.risk_level;
+      }
+      if (message.risk_level === 'red' || message.risk_level === 'yellow') {
+        initial.summaryParts.push(message.content);
+      }
+    }
+    return initial;
+  });
   const conversationEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -157,27 +172,36 @@ export function useCheckinConversation() {
         risk_level: i === 0 ? riskLevel : null,
       };
 
+      // Only report completion after the clinical record is saved successfully.
+      await saveMessage({ patientToken, message: msg });
       if (i === msgs.length - 1 && isComplete) {
+        await completeCheckIn({ patientToken, riskLevel, summary });
         haptic('success');
-        setCheckin((prev) => ({
-          ...prev,
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-          conversation: [...prev.conversation, msg],
-        }));
-        void saveMessage({ patientToken, message: msg });
-        void completeCheckIn({ patientToken, riskLevel, summary });
-      } else {
-        setCheckin((prev) => ({
-          ...prev,
-          conversation: [...prev.conversation, msg],
-        }));
-        void saveMessage({ patientToken, message: msg });
-
-        if (i < msgs.length - 1) {
-          await new Promise((r) => setTimeout(r, 700 + Math.random() * 400));
-        }
       }
+      setCheckin((prev) => ({
+        ...prev,
+        ...(i === msgs.length - 1 && isComplete
+          ? { status: 'completed' as const, completed_at: new Date().toISOString() }
+          : {}),
+        conversation: [...prev.conversation, msg],
+      }));
+      if (i < msgs.length - 1) {
+        await new Promise((r) => setTimeout(r, 700 + Math.random() * 400));
+      }
+    }
+  }
+
+  async function persistEscalation() {
+    setEscalationStatus('pending');
+    try {
+      await completeCheckIn({
+        patientToken,
+        riskLevel: 'red',
+        summary: escalationSummaryRef.current,
+      });
+      setEscalationStatus('saved');
+    } catch {
+      setEscalationStatus('failed');
     }
   }
 
@@ -227,7 +251,8 @@ export function useCheckinConversation() {
       risk_level: null,
     };
 
-    const isRed = containsRedKeyword(text);
+    const isRed = containsRedKeyword(text) || EMERGENCY_PATTERNS.some((pattern) => pattern.test(text));
+    if (isRed) patientMsg.risk_level = 'red';
     setReply('');
     setSending(true);
 
@@ -235,16 +260,24 @@ export function useCheckinConversation() {
       ...prev,
       conversation: [...prev.conversation, patientMsg],
     }));
-    void saveMessage({ patientToken, message: patientMsg });
-
     try {
       if (isRed) {
         haptic('warning');
         setShowEscalation(true);
-        setSending(false);
+        const nextState = {
+          ...convState,
+          overallRisk: 'red' as const,
+          summaryParts: [...convState.summaryParts, `Emergency symptoms reported: ${text}`],
+        };
+        setConvState(nextState);
+        escalationSummaryRef.current = buildSummary(nextState);
+        // Persist the escalation first so a failed message write cannot suppress it.
+        await persistEscalation();
+        await saveMessage({ patientToken, message: patientMsg });
         return;
       }
 
+      await saveMessage({ patientToken, message: patientMsg });
       const conversationForApi = [...checkin.conversation, patientMsg]
         .filter((m) => m.role === 'ai' || m.role === 'patient')
         .map((m) => ({
@@ -266,15 +299,24 @@ export function useCheckinConversation() {
         const responses = [aiReply.reply];
         if (aiReply.follow_up) responses.push(aiReply.follow_up);
 
-        setConvState((prev) => ({
-          ...prev,
+        const overallRisk = riskSortOrder(aiReply.risk_level) < riskSortOrder(convState.overallRisk)
+          ? aiReply.risk_level
+          : convState.overallRisk;
+        const nextState = {
+          ...convState,
           phase: aiReply.next_phase,
-          overallRisk: aiReply.risk_level,
-          turnCount: prev.turnCount + 1,
-          summaryParts: [...prev.summaryParts, aiReply.summary],
-        }));
-
-        await addAiMessages(responses, aiReply.risk_level, aiReply.is_complete, aiReply.summary);
+          overallRisk,
+          turnCount: convState.turnCount + 1,
+          summaryParts: [...convState.summaryParts, aiReply.summary],
+        };
+        setConvState(nextState);
+        const summary = buildSummary(nextState);
+        if (aiReply.risk_level === 'red') {
+          setShowEscalation(true);
+          escalationSummaryRef.current = summary;
+          await persistEscalation();
+        }
+        await addAiMessages(responses, overallRisk, aiReply.is_complete, summary);
       } else {
         const result = processReply({
           patientText: text,
@@ -285,6 +327,11 @@ export function useCheckinConversation() {
         });
 
         setConvState(result.nextState);
+        if (result.riskLevel === 'red') {
+          setShowEscalation(true);
+          escalationSummaryRef.current = buildSummary(result.nextState);
+          await persistEscalation();
+        }
         await addAiMessages(
           result.responses,
           result.riskLevel,
@@ -316,7 +363,9 @@ export function useCheckinConversation() {
       id: crypto.randomUUID(),
       role: 'ai',
       content:
-        "I'm glad you're okay. Your care team has been notified just in case. Let's continue — how is your breathing right now?",
+        escalationStatus === 'saved'
+          ? "Your urgent concern has been saved for your care team. Please call 911 for emergency symptoms. How is your breathing right now?"
+          : "We haven't confirmed that your care team received this concern. Please call 911 for emergency symptoms and contact your care team directly.",
       sent_at: new Date().toISOString(),
       risk_level: null,
     };
@@ -333,6 +382,8 @@ export function useCheckinConversation() {
     setReply,
     sending,
     showEscalation,
+    escalationStatus,
+    retryEscalation: persistEscalation,
     convState,
     conversationEndRef,
     inputRef,

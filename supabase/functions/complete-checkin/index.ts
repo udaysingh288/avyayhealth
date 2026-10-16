@@ -47,7 +47,7 @@ Deno.serve(withPatientAuth<CompleteRequest>(async ({ claims, body }) => {
   }
 
   const dayNumber = patient.days_in_program ?? 1;
-  const finalStatus = risk_level === 'red' ? 'escalated' : 'completed';
+  let finalStatus = risk_level === 'red' ? 'escalated' : 'completed';
 
   // Upsert today's check-in to completed (create it if somehow still missing)
   const { data: existing } = await supabaseAdmin
@@ -78,7 +78,7 @@ Deno.serve(withPatientAuth<CompleteRequest>(async ({ claims, body }) => {
     }
     checkInId = inserted.id;
   } else {
-    const { error: updateErr } = await supabaseAdmin
+    const { data: updated, error: updateErr } = await supabaseAdmin
       .from('check_ins')
       .update({
         status: finalStatus,
@@ -86,11 +86,14 @@ Deno.serve(withPatientAuth<CompleteRequest>(async ({ claims, body }) => {
         summary,
         completed_at: new Date().toISOString(),
       })
-      .eq('id', checkInId);
-    if (updateErr) {
+      .eq('id', checkInId)
+      .select('status')
+      .single();
+    if (updateErr || !updated) {
       console.error('check_in update error', updateErr);
       return jsonResponse({ error: 'checkin_update_failed' }, 500);
     }
+    finalStatus = updated.status;
   }
 
   return jsonResponse({ check_in_id: checkInId, status: finalStatus });

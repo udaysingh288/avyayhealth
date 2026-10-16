@@ -239,6 +239,7 @@ Respond with ONLY a JSON object (no markdown, no code fences):
 ${CLINICAL_KNOWLEDGE}
 
 CRITICAL RULES:
+- Never claim the care team has been notified or contacted. This endpoint only generates a response; it does not deliver notifications.
 - NEVER tell the patient their risk level. They see "Thank you" not "You are classified Yellow."
 - NEVER advise stopping or changing medication.
 - For RED symptoms: first sentence MUST be "Please call 911" or "Please go to the emergency room immediately."
@@ -358,7 +359,7 @@ function fallbackResponse(
   ];
   if (emergencyPatterns.some((p) => p.test(text))) {
     return {
-      reply: `${firstName}, this sounds serious. Please call 911 or go to your nearest emergency room right away. Your care team has been notified.`,
+      reply: `${firstName}, this sounds serious. Please call 911 or go to your nearest emergency room right away. Please contact your care team directly.`,
       risk_level: 'red',
       next_phase: 'complete',
       is_complete: true,

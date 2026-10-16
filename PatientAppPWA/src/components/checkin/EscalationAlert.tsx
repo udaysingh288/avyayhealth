@@ -4,9 +4,11 @@ import { haptic } from '../../utils/haptics';
 interface EscalationAlertProps {
   hospitalName: string;
   onDismiss: () => void;
+  status: 'pending' | 'saved' | 'failed';
+  onRetry: () => void;
 }
 
-export default function EscalationAlert({ hospitalName, onDismiss }: EscalationAlertProps) {
+export default function EscalationAlert({ hospitalName, onDismiss, status, onRetry }: EscalationAlertProps) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -155,8 +157,17 @@ export default function EscalationAlert({ hospitalName, onDismiss }: EscalationA
             >
               notifications_active
             </span>
-            {hospitalName} care team notified
+            {status === 'saved'
+              ? `Urgent concern saved for your ${hospitalName} care team`
+              : status === 'failed'
+                ? 'Unable to save your concern. Call 911 for emergency symptoms and contact your care team directly.'
+                : 'Saving your urgent concern. Call 911 now for emergency symptoms.'}
           </motion.p>
+          {status === 'failed' && (
+            <button type="button" onClick={onRetry} className="mt-3 min-h-[48px] px-6 font-semibold text-primary">
+              Try saving again
+            </button>
+          )}
         </div>
       </div>
     </motion.div>
