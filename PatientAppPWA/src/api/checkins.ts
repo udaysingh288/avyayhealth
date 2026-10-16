@@ -24,8 +24,7 @@ export async function saveMessage(params: {
   });
 
   if (!res.ok) {
-    // eslint-disable-next-line no-console
-    console.warn('[checkins] save message failed', await res.text());
+    throw new Error('Unable to save your message. Please try again.');
   }
 }
 
@@ -34,7 +33,7 @@ export async function completeCheckIn(params: {
   riskLevel: RiskLevel;
   summary: string;
 }): Promise<void> {
-  if (!hasSupabase) return;
+  if (!hasSupabase) throw new Error('Check-in service is unavailable.');
   const { patientToken, riskLevel, summary } = params;
 
   const res = await fetch(edgeFunctionUrl('complete-checkin'), {
@@ -47,8 +46,7 @@ export async function completeCheckIn(params: {
   });
 
   if (!res.ok) {
-    // eslint-disable-next-line no-console
-    console.warn('[checkins] complete check-in failed', await res.text());
+    throw new Error('Unable to save your check-in. Please try again.');
   }
 }
 

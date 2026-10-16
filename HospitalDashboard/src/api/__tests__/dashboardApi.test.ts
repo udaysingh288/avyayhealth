@@ -5,6 +5,20 @@ import { fetchDashboardData, updatePatientRiskOverride } from '../dashboardApi';
 
 interface MockRow { [key: string]: any }
 
+// Apply the selected columns, including nested message fields, like PostgREST.
+// Returning entire fixtures would hide regressions caused by missing projections.
+function projectRow(row: MockRow, columns: string): MockRow {
+  return Object.fromEntries(columns.split(/,(?![^()]*\))/).map((column) => {
+    const nested = column.trim().match(/^(\w+)\s*\((.*)\)$/s);
+    if (nested) {
+      const [, name, fields] = nested;
+      return [name, (row[name] ?? []).map((entry: MockRow) => projectRow(entry, fields))];
+    }
+    const name = column.trim();
+    return [name, row[name]];
+  }));
+}
+
 function createMockSupabase(tables: Record<string, MockRow[]>) {
   // Chainable query builder that filters stored table data
   function makeBuilder(tableName: string) {
@@ -12,10 +26,13 @@ function createMockSupabase(tables: Record<string, MockRow[]>) {
     const filters: Array<(rows: MockRow[]) => MockRow[]> = [];
     let orderCol: string | null = null;
     let orderAsc = true;
-    let updatePayload: MockRow | null = null;
+    let selectedColumns: string | undefined;
 
     const builder: any = {
-      select: (_cols?: string) => builder,
+      select: (columns?: string) => {
+        selectedColumns = columns;
+        return builder;
+      },
       eq: (col: string, val: any) => {
         filters.push(r => r.filter(row => row[col] === val));
         return builder;
@@ -27,10 +44,6 @@ function createMockSupabase(tables: Record<string, MockRow[]>) {
       order: (col: string, opts?: { ascending?: boolean }) => {
         orderCol = col;
         orderAsc = opts?.ascending ?? true;
-        return builder;
-      },
-      update: (payload: MockRow) => {
-        updatePayload = payload;
         return builder;
       },
       then: (resolve: (val: any) => void) => {
@@ -45,16 +58,10 @@ function createMockSupabase(tables: Record<string, MockRow[]>) {
             return 0;
           });
         }
-        if (updatePayload) {
-          // Apply update to matched rows in the source table
-          const toUpdate = result;
-          for (const row of tables[tableName] ?? []) {
-            if (toUpdate.includes(row)) Object.assign(row, updatePayload);
-          }
-          resolve({ data: null, error: null });
-        } else {
-          resolve({ data: result, error: null });
-        }
+        resolve({
+          data: selectedColumns ? result.map(row => projectRow(row, selectedColumns!)) : result,
+          error: null,
+        });
       },
     };
     return builder;
@@ -325,6 +332,38 @@ describe('fetchDashboardData', () => {
     expect(result.patients[0].unread_dm_count).toBe(2);
   });
 
+  it('includes uploaded image details from the selected message fields', async () => {
+    const classification = {
+      risk_level: 'yellow',
+      injury_type: 'wound',
+      description: 'Wound redness requires follow-up',
+      recommendations: 'Review wound photo',
+      confidence: 'high',
+    };
+    const supabase = createMockSupabase({
+      patients: [makePatient()],
+      check_ins: [makeCheckin({
+        messages: [{
+          id: 'image-1',
+          role: 'patient',
+          content: 'Wound photo',
+          sent_at: '2026-03-11T08:05:00Z',
+          message_type: 'image',
+          image_storage_path: 'pat-1/wound.jpg',
+          image_classification: classification,
+        }],
+      })],
+      sdoh_flags: [],
+      direct_messages: [],
+    });
+
+    const result = await fetchDashboardData(supabase, HOSPITAL_ID);
+    expect(result.checkinsMap['pat-1'][0]).toMatchObject({
+      image_storage_path: 'pat-1/wound.jpg',
+      image_classification: classification,
+    });
+  });
+
   it('builds checkinsMap keyed by patient_id', async () => {
     const supabase = createMockSupabase({
       patients: [makePatient()],
@@ -342,27 +381,35 @@ describe('fetchDashboardData', () => {
 });
 
 describe('updatePatientRiskOverride', () => {
-  it('calls supabase update with the risk level', async () => {
-    const tables = { patients: [makePatient()] };
-    const supabase = createMockSupabase(tables);
+  it.each(['red', 'yellow', 'green'] as const)('sets a %s override through the authorized RPC', async (risk) => {
+    const rpc = vi.fn().mockResolvedValue({ data: null, error: null });
+    const supabase = { rpc } as any;
 
-    await updatePatientRiskOverride(supabase, 'pat-1', 'red');
-    expect(tables.patients[0].risk_override).toBe('red');
+    await updatePatientRiskOverride(supabase, 'pat-1', risk);
+    expect(rpc).toHaveBeenCalledWith('set_patient_risk_override', {
+      p_patient_id: 'pat-1',
+      p_risk: risk,
+    });
   });
 
-  it('sets null when risk is not_started', async () => {
-    const tables = { patients: [makePatient({ risk_override: 'red' })] };
-    const supabase = createMockSupabase(tables);
+  it.each(['not_started', null] as const)('clears the override when %s is passed', async (risk) => {
+    const rpc = vi.fn().mockResolvedValue({ data: null, error: null });
+    const supabase = { rpc } as any;
 
-    await updatePatientRiskOverride(supabase, 'pat-1', 'not_started');
-    expect(tables.patients[0].risk_override).toBeNull();
+    await updatePatientRiskOverride(supabase, 'pat-1', risk);
+    expect(rpc).toHaveBeenCalledWith('set_patient_risk_override', {
+      p_patient_id: 'pat-1',
+      p_risk: null,
+    });
   });
 
-  it('clears override when null is passed', async () => {
-    const tables = { patients: [makePatient({ risk_override: 'yellow' })] };
-    const supabase = createMockSupabase(tables);
+  it('propagates denied overrides instead of reporting success', async () => {
+    const error = { code: '42501', message: 'Not authorized to update this patient' };
+    const supabase = {
+      rpc: vi.fn().mockResolvedValue({ data: null, error }),
+    } as any;
 
-    await updatePatientRiskOverride(supabase, 'pat-1', null);
-    expect(tables.patients[0].risk_override).toBeNull();
+    await expect(updatePatientRiskOverride(supabase, 'other-hospital-patient', 'red'))
+      .rejects.toBe(error);
   });
 });

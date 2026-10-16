@@ -17,10 +17,10 @@ export async function updatePatientRiskOverride(
   patientId: string,
   riskLevel: RiskLevel | null,
 ): Promise<void> {
-  const { error } = await supabase
-    .from('patients')
-    .update({ risk_override: riskLevel === 'not_started' ? null : riskLevel })
-    .eq('id', patientId);
+  const { error } = await supabase.rpc('set_patient_risk_override', {
+    p_patient_id: patientId,
+    p_risk: riskLevel === 'not_started' ? null : riskLevel,
+  });
   if (error) throw error;
 }
 
@@ -47,7 +47,7 @@ export async function fetchDashboardData(
       .from('check_ins')
       .select(`
         id, patient_id, day_number, date, status, risk_level, summary, completed_at, created_at,
-        messages ( id, role, content, risk_level, sent_at )
+        messages ( id, role, content, risk_level, sent_at, message_type, image_storage_path, image_classification )
       `)
       .order('day_number', { ascending: false }),
     supabase

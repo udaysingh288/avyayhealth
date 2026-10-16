@@ -11,7 +11,8 @@
 //
 // This script uses the service key (never the publishable key) to:
 //   1. Look up the Riverside hospital row
-//   2. Create the auth.users row with user_metadata = { hospital_id, role, display_name }
+//   2. Create auth.users with trusted app_metadata = { hospital_id, role }
+//      and user_metadata = { display_name }
 //   3. The on_auth_user_created trigger then populates public.profiles
 //
 // If a user already exists, their password is NOT rotated — delete them
@@ -66,11 +67,8 @@ async function createUser({ email, displayName, role, hospitalId }) {
     email,
     password,
     email_confirm: true,
-    user_metadata: {
-      hospital_id: hospitalId,
-      role,
-      display_name: displayName,
-    },
+    app_metadata: { hospital_id: hospitalId, role },
+    user_metadata: { display_name: displayName },
   });
   if (error) throw error;
   console.log(`✓ created ${email} (${role}) id=${data.user.id}`);
